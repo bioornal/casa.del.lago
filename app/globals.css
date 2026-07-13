@@ -2,13 +2,18 @@
 
 @theme {
   /* Paleta cerrada del handoff */
-  --color-terracota: #a04b2a;
+  --color-lago: #155e75;          /* color firma */
+  --color-lago-hover: #0e4a5e;
+  --color-turquesa: #1fa2b8;
+  --color-selva: #2f4a34;
+  --color-terracota: #a24b2a;
   --color-terracota-hover: #85391f;
-  --color-carbon: #1d1d1d;
-  --color-marfil: #f8f5f0;
-  --color-arena: #e8e1d5;        /* arena cálida */
+  --color-atardecer: #e08a2c;
+  --color-brasa: #c4471f;
+  --color-carbon: #1f1d19;
+  --color-marfil: #f5eee1;
+  --color-arena: #eae0ce;
   --color-arena-clara: #f1ece3;
-  --color-selva: #23362b;        /* verde selva */
   --color-bronce: #9a7b4f;
   --color-whatsapp: #2bb673;
   --color-cuerpo: #4a463f;
@@ -25,10 +30,11 @@
   --radius-boton: 2px;
   --radius-input: 4px;
   --radius-card: 8px;
+  --radius-barra: 10px;
 
-  --shadow-booking: 0 40px 80px -50px rgba(29, 29, 29, 0.6);
-  --shadow-card: 0 30px 70px -55px rgba(29, 29, 29, 0.45);
-  --shadow-fab: 0 18px 36px -16px rgba(29, 29, 29, 0.7);
+  --shadow-booking: 0 40px 80px -50px rgba(21, 45, 55, 0.55);
+  --shadow-card: 0 30px 60px -46px rgba(21, 45, 55, 0.5);
+  --shadow-fab: 0 18px 36px -16px rgba(21, 45, 55, 0.55);
 }
 
 * { box-sizing: border-box; }
@@ -38,7 +44,7 @@ body { margin: 0; background: var(--color-marfil); color: var(--color-carbon); f
 ::selection { background: var(--color-terracota); color: var(--color-marfil); }
 
 /* Animaciones (las reactivamos con JS; el contenido es visible sin ellas) */
-@keyframes lago-kb { from { transform: scale(1.12); } to { transform: scale(1.01); } }
+@keyframes lago-kb { from { transform: scale(1.09); } to { transform: scale(1.01); } }
 @keyframes lago-cue { 0%,100% { transform: translateY(0); opacity: .5; } 50% { transform: translateY(7px); opacity: 1; } }
 
 /* Reduced motion: estado final visible, sin animación */
