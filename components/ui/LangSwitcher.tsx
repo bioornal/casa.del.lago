@@ -17,7 +17,11 @@ export function LangSwitcher({ variant = "light" }: { variant?: "light" | "dark"
           <button
             type="button"
             onClick={() => router.replace(pathname, { locale: l })}
-            className={`${text} cursor-pointer uppercase transition-opacity duration-200 ${l === locale ? "opacity-100" : "opacity-45 hover:opacity-100"}`}
+            className={`cursor-pointer uppercase transition-[opacity,color] duration-200 ${
+              l === locale
+                ? "text-lago font-semibold opacity-100"
+                : `${text} opacity-45 hover:opacity-100`
+            }`}
           >
             {l}
           </button>
