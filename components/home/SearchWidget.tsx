@@ -93,12 +93,12 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
     fontSize: 11,
     letterSpacing: ".2em",
     textTransform: "uppercase",
-    color: "#9A7B4F",
+    color: variant === "bar" ? "#155e75" : "rgba(245,238,225,.75)",
   };
   const valueStyle: React.CSSProperties = {
-    fontFamily: "'Cormorant Garamond', serif",
+    fontFamily: "var(--font-display)",
     fontSize: 21,
-    color: "#1D1D1D",
+    color: variant === "bar" ? "#1D1D1D" : "#f5eee1",
     marginTop: 5,
   };
   // Mobile: modal centrado con backdrop (el popover quedaba cortado por la nav fija).
@@ -119,8 +119,20 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
     <Reveal delay={0.05}>
       <div className={wrapperClass} style={wrapperStyle}>
         <div
-          className="flex flex-wrap items-stretch rounded-[4px] border border-[#E7E0D4] bg-marfil"
-          style={{ boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)" }}
+          className={
+            variant === "hero"
+              ? "flex flex-wrap items-stretch rounded-[10px] border backdrop-blur-md"
+              : "flex flex-wrap items-stretch rounded-[4px] border border-[#E7E0D4] bg-marfil"
+          }
+          style={
+            variant === "hero"
+              ? {
+                  boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)",
+                  background: "rgba(16,30,36,.42)",
+                  borderColor: "rgba(245,238,225,.28)",
+                }
+              : { boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)" }
+          }
         >
           {/* Grupo Llegada + Salida — popovers separados que abren hacia arriba */}
           <div className="relative flex flex-1 min-w-[220px]" style={{ flexBasis: "320px" }}>
@@ -188,7 +200,13 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
           >
             <div style={label}>{t("guests")}</div>
             <div className="flex items-center justify-between" style={{ marginTop: 5 }}>
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 21 }}>
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: 21,
+                  color: variant === "bar" ? "#1D1D1D" : "#f5eee1",
+                }}
+              >
                 {guests} {guests === 1 ? t("guest") : t("guestsPlural")}
               </span>
               <span className="flex gap-[10px]">
@@ -203,7 +221,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
                 <button
                   type="button"
                   aria-label="+"
-                  onClick={() => setGuests((g) => Math.min(6, g + 1))}
+                  onClick={() => setGuests((g) => Math.min(8, g + 1))}
                   style={roundBtn}
                 >
                   +
@@ -221,14 +239,14 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
             style={{
               flex: "0 0 auto",
               cursor: valid ? "pointer" : "not-allowed",
-              background: valid ? "#1D1D1D" : "#bdb4a4",
-              color: "#F8F5F0",
+              background: valid ? "#a24b2a" : "#bdb4a4",
+              color: "#f5eee1",
             }}
             onMouseEnter={(e) => {
-              if (valid) e.currentTarget.style.background = "#A04B2A";
+              if (valid) e.currentTarget.style.background = "#85391f";
             }}
             onMouseLeave={(e) => {
-              if (valid) e.currentTarget.style.background = "#1D1D1D";
+              if (valid) e.currentTarget.style.background = "#a24b2a";
             }}
           >
             {t("cta")}
