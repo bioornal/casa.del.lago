@@ -159,15 +159,15 @@ export function UnitDetail({ unit, locale }: { unit: Unit; locale: string }) {
       {/* ===== HEADER ===== */}
       <header className="mx-auto max-w-[1320px] px-5 pt-[120px] md:px-12 md:pt-[138px]">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-[10px] text-[12px] uppercase tracking-[.08em] text-bronce">
+        <div className="flex items-center gap-[10px] text-[12px] uppercase tracking-[.26em] text-turquesa">
           <Link
             href="/#cabanas"
-            className="text-bronce no-underline transition-colors duration-[250ms] hover:text-terracota"
+            className="text-turquesa no-underline transition-colors duration-[250ms] hover:text-atardecer"
           >
             {t("breadcrumb")}
           </Link>
-          <span className="opacity-50">/</span>
-          <span className="text-[#6b665d]">{unit.name}</span>
+          <span className="text-muted">/</span>
+          <span className="text-muted">{unit.name}</span>
         </div>
 
         {/* H1 + subtitle + specs row */}
@@ -175,7 +175,7 @@ export function UnitDetail({ unit, locale }: { unit: Unit; locale: string }) {
           <div>
             <h1
               className="font-display m-0 font-normal leading-[1.0] tracking-[-0.015em] text-carbon"
-              style={{ fontSize: "clamp(40px,6vw,76px)" }}
+              style={{ fontSize: "clamp(42px,6vw,76px)" }}
             >
               {unit.name}
             </h1>

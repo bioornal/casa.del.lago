@@ -9,7 +9,7 @@ export function StickyBookingCard({ unit }: { unit: Unit }) {
   const tb = useTranslations("bookingBar");
   const whatsappMode = isWhatsAppBookingMode();
   const ctaClass =
-    "mt-[18px] block text-center bg-terracota text-marfil text-[12.5px] uppercase tracking-[.1em] px-4 py-4 rounded-[3px] no-underline transition-[background,transform] duration-300 hover:bg-terracota-hover hover:-translate-y-0.5";
+    "mt-[18px] block text-center bg-terracota text-marfil text-[12.5px] uppercase tracking-[.1em] px-4 py-4 rounded-[6px] no-underline transition-[background,transform] duration-300 hover:bg-terracota-hover hover:-translate-y-0.5";
 
   return (
     <div className="lg:sticky lg:top-[108px]">
@@ -19,7 +19,7 @@ export function StickyBookingCard({ unit }: { unit: Unit }) {
       >
         {/* Price */}
         <div className="flex items-baseline gap-2">
-          <span className="font-display text-[36px] text-carbon">
+          <span className="font-display text-[30px] text-carbon">
             ${new Intl.NumberFormat("es-AR").format(unit.price)}
           </span>
           <span className="text-[13px] text-muted">{t("perNight")}</span>
@@ -31,25 +31,25 @@ export function StickyBookingCard({ unit }: { unit: Unit }) {
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: "#E2DACE" }}
         >
           {/* Llegada */}
-          <div className="bg-white px-[15px] py-[13px]">
-            <div className="text-[10px] uppercase tracking-[.16em] text-bronce">
+          <div className="bg-marfil px-[15px] py-[13px]">
+            <div className="text-[10px] uppercase tracking-[.18em] text-lago">
               {tb("arrival")}
             </div>
-            <div className="mt-1 text-[15px] text-carbon">— / — / —</div>
+            <div className="font-display mt-1 text-[15px] text-carbon">— / — / —</div>
           </div>
           {/* Salida */}
-          <div className="bg-white px-[15px] py-[13px]">
-            <div className="text-[10px] uppercase tracking-[.16em] text-bronce">
+          <div className="bg-marfil px-[15px] py-[13px]">
+            <div className="text-[10px] uppercase tracking-[.18em] text-lago">
               {tb("departure")}
             </div>
-            <div className="mt-1 text-[15px] text-carbon">— / — / —</div>
+            <div className="font-display mt-1 text-[15px] text-carbon">— / — / —</div>
           </div>
           {/* Huéspedes — full width */}
-          <div className="bg-white px-[15px] py-[13px] border-t border-borde-claro" style={{ gridColumn: "span 2" }}>
-            <div className="text-[10px] uppercase tracking-[.16em] text-bronce">
+          <div className="bg-marfil px-[15px] py-[13px] border-t border-borde-claro" style={{ gridColumn: "span 2" }}>
+            <div className="text-[10px] uppercase tracking-[.18em] text-lago">
               {tb("guests")}
             </div>
-            <div className="mt-1 text-[15px] text-carbon">{unit.specs.guests} —</div>
+            <div className="font-display mt-1 text-[15px] text-carbon">{unit.specs.guests} —</div>
           </div>
         </div>
 
