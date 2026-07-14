@@ -4,39 +4,52 @@ import { SERVICES, DISTANCES, CHECK_IN, CHECK_OUT, PETS_ALLOWED } from "@/lib/si
 export function InfoSections() {
   const t = useTranslations("tarifas");
 
-  const box: React.CSSProperties = { border: "1px solid #E7E0D4", borderRadius: 8, background: "#fff", padding: "24px 26px" };
-  const heading: React.CSSProperties = { fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontSize: 22, margin: "0 0 14px", color: "#1D1D1D" };
-  const row: React.CSSProperties = { display: "flex", justifyContent: "space-between", fontSize: 14, padding: "7px 0", color: "#3a352c", borderTop: "1px solid #efe9dd" };
+  const kickerClass = "mb-[14px] text-[11px] uppercase tracking-[.22em] text-lago";
+  const rowClass = "flex justify-between border-t border-black/10 py-[7px] text-[14px] text-cuerpo";
 
   return (
-    <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
-      <div style={box}>
-        <h3 style={heading}>{t("services.title")}</h3>
-        <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-          {SERVICES.map((k) => (
-            <li key={k} style={{ fontSize: 14, padding: "7px 0", color: "#3a352c", borderTop: "1px solid #efe9dd" }}>
-              {t(`services.${k}`)}
-            </li>
+    <div className="mt-10 rounded-[8px] border border-borde-medio bg-arena px-6 py-8 md:px-10 md:py-10">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10">
+        <div>
+          <div className={kickerClass}>{t("services.title")}</div>
+          <ul className="m-0 list-none p-0">
+            {SERVICES.map((k) => (
+              <li key={k} className={rowClass}>
+                {t(`services.${k}`)}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <div className={kickerClass}>{t("distances.title")}</div>
+          {DISTANCES.map((d) => (
+            <div key={d.key} className={rowClass}>
+              <span>{t(`distances.${d.key}`)}</span>
+              <span className="text-bronce">{t("distances.km", { km: d.km })}</span>
+            </div>
           ))}
-        </ul>
-      </div>
+        </div>
 
-      <div style={box}>
-        <h3 style={heading}>{t("distances.title")}</h3>
-        {DISTANCES.map((d) => (
-          <div key={d.key} style={row}>
-            <span>{t(`distances.${d.key}`)}</span>
-            <span style={{ color: "#9A7B4F" }}>{t("distances.km", { km: d.km })}</span>
+        <div>
+          <div className={kickerClass}>{t("conditions.title")}</div>
+          <div className={rowClass}>
+            <span>{t("conditions.checkIn")}</span>
+            <span>{CHECK_IN}</span>
           </div>
-        ))}
-      </div>
-
-      <div style={box}>
-        <h3 style={heading}>{t("conditions.title")}</h3>
-        <div style={row}><span>{t("conditions.checkIn")}</span><span>{CHECK_IN}</span></div>
-        <div style={row}><span>{t("conditions.checkOut")}</span><span>{CHECK_OUT}</span></div>
-        <div style={row}><span>{t("conditions.pets")}</span><span>{PETS_ALLOWED ? t("conditions.petsYes") : t("conditions.petsNo")}</span></div>
-        <div style={row}><span>{t("conditions.payment")}</span><span>{t("conditions.paymentCard")}</span></div>
+          <div className={rowClass}>
+            <span>{t("conditions.checkOut")}</span>
+            <span>{CHECK_OUT}</span>
+          </div>
+          <div className={rowClass}>
+            <span>{t("conditions.pets")}</span>
+            <span>{PETS_ALLOWED ? t("conditions.petsYes") : t("conditions.petsNo")}</span>
+          </div>
+          <div className={rowClass}>
+            <span>{t("conditions.payment")}</span>
+            <span>{t("conditions.paymentCard")}</span>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -14,6 +14,15 @@ function fmtDay(iso: string, locale: string): string {
 
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
 
+const ctaActiveClass =
+  "inline-flex items-center justify-center whitespace-nowrap rounded-[3px] bg-terracota px-[26px] py-[13px] text-[12.5px] uppercase tracking-[.1em] text-marfil no-underline transition-[background,transform] duration-300 hover:bg-terracota-hover hover:-translate-y-px";
+
+const ctaDisabledClass =
+  "inline-flex items-center justify-center whitespace-nowrap rounded-[3px] border border-borde-medio px-[26px] py-[13px] text-[12.5px] uppercase tracking-[.1em] text-muted";
+
+const chipClass =
+  "inline-flex items-center rounded-full border border-[#CFE2E7] bg-[#EAF2F4] px-3 py-[5px] text-[11px] uppercase tracking-[.08em] text-lago";
+
 interface UnitRateCardProps {
   unit: Unit;
   rate: UnitRate | null; // null = sin fechas elegidas (modo "desde")
@@ -27,35 +36,44 @@ export function UnitRateCard({ unit, rate, query }: UnitRateCardProps) {
   const overCapacity = !!query && query.guests > unit.specs.guests;
   const bookable = !!rate && rate.available && !overCapacity;
   const nightly = query ? pricePerNight(unit.slug, query.guests) : unit.price;
+  const chips = t("specs", {
+    guests: unit.specs.guests,
+    bedrooms: unit.specs.bedrooms,
+    baths: unit.specs.baths,
+    area: unit.specs.area,
+  }).split(" · ");
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] md:gap-6 overflow-hidden rounded-lg border border-[#E7E0D4] bg-white">
+    <div className="group grid grid-cols-1 overflow-hidden rounded-[6px] border border-borde-medio bg-white transition-[transform,box-shadow] duration-400 ease-[cubic-bezier(.16,.84,.44,1)] hover:-translate-y-1 hover:shadow-card md:grid-cols-[300px_1fr]">
       <div className="h-[210px] md:h-auto md:min-h-[220px]">
         <ImageSlot label={unit.name} className="h-full w-full" />
       </div>
 
       <div className="flex flex-col p-5 md:py-6 md:pl-0 md:pr-7">
-        <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontSize: 27, margin: 0, color: "#1D1D1D" }}>
+        <h3 className="font-display m-0 font-medium text-[27px] text-carbon transition-colors duration-300 group-hover:text-lago">
           {unit.name}
         </h3>
-        <p style={{ fontSize: 13, color: "#6b665d", margin: "8px 0 0" }}>
-          {t("specs", { guests: unit.specs.guests, bedrooms: unit.specs.bedrooms, baths: unit.specs.baths, area: unit.specs.area })}
-        </p>
 
-        <div style={{ marginTop: "auto", paddingTop: 18, display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+        <div className="mt-[10px] flex flex-wrap gap-2">
+          {chips.map((chip) => (
+            <span key={chip} className={chipClass}>
+              {chip}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-4 pt-[18px]">
           <div>
             {rate && rate.available && rate.nights > 0 ? (
               <>
-                <div style={{ fontSize: 13, color: "#6b665d" }}>
-                  {money(nightly)} × {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} + {t("cleaning")}
-                </div>
-                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, color: "#1D1D1D", marginTop: 2 }}>
-                  {money(rate.total)} <span style={{ fontSize: 14, color: "#6b665d" }}>{t("total")}</span>
+                <div className="font-display text-[30px] text-carbon">{money(rate.total)}</div>
+                <div className="mt-[2px] text-[12px] text-muted">
+                  {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} · {money(nightly)} {t("perNight")}
                 </div>
               </>
             ) : (
-              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, color: "#1D1D1D" }}>
-                {t("from")} {money(unit.price)} <span style={{ fontSize: 14, color: "#6b665d" }}>{t("perNight")}</span>
+              <div className="font-display text-[24px] text-muted">
+                {t("from")} {money(unit.price)} <span className="text-[14px]">{t("perNight")}</span>
               </div>
             )}
           </div>
@@ -73,40 +91,26 @@ export function UnitRateCard({ unit, rate, query }: UnitRateCardProps) {
                 )}
                 target="_blank"
                 rel="noopener"
-                style={ctaStyle(true)}
+                className={ctaActiveClass}
               >
                 {t("reserveWhatsApp")}
               </a>
             ) : (
-              <Link href={buildCheckoutUrl({ unitId: unit.slug, ...query })} style={ctaStyle(true)}>
+              <Link href={buildCheckoutUrl({ unitId: unit.slug, ...query })} className={ctaActiveClass}>
                 {t("reserve")}
               </Link>
             )
           ) : (
-            <span style={ctaStyle(false)}>
+            <span className={ctaDisabledClass}>
               {!query ? t("pickDatesCta") : overCapacity ? t("capacity", { n: unit.specs.guests }) : t("unavailable")}
             </span>
           )}
         </div>
 
         {whatsappMode && bookable && (
-          <p style={{ margin: "10px 0 0", fontSize: 12.5, color: "#6b665d", textAlign: "right" }}>
-            {t("waNote")}
-          </p>
+          <p className="m-0 mt-[10px] text-right text-[12.5px] text-muted">{t("waNote")}</p>
         )}
       </div>
     </div>
   );
-}
-
-function ctaStyle(active: boolean): React.CSSProperties {
-  return {
-    display: "inline-flex", alignItems: "center", justifyContent: "center",
-    padding: "13px 26px", borderRadius: 3, textDecoration: "none",
-    fontSize: 12.5, letterSpacing: ".1em", textTransform: "uppercase",
-    background: active ? "#A04B2A" : "#ece5d9",
-    color: active ? "#F8F5F0" : "#8a8170",
-    cursor: active ? "pointer" : "default",
-    whiteSpace: "nowrap",
-  };
 }

@@ -43,12 +43,12 @@ export default async function TarifasPage({
   return (
     <>
       <SiteNav />
-      <main style={{ background: "#F4EFE7", minHeight: "100vh", paddingBottom: 110 }}>
-        <div style={{ height: 96 }} />
+      <main style={{ background: "#f5eee1", minHeight: "100vh", paddingBottom: 110 }}>
+        <div style={{ height: 170 }} />
         <SearchWidget variant="bar" initial={query ?? undefined} />
 
         <div style={{ maxWidth: 1020, margin: "0 auto", padding: "44px 24px 0" }}>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 400, fontSize: "clamp(30px,4vw,46px)", margin: 0, color: "#1D1D1D" }}>
+          <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "clamp(30px,4vw,46px)", margin: 0, color: "#1f1d19" }}>
             {query ? t("title") : t("pickDatesTitle")}
           </h1>
           <p style={{ fontSize: 14, color: "#6b665d", margin: "8px 0 0" }}>
