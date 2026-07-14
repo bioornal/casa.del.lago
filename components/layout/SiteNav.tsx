@@ -203,7 +203,9 @@ function linkClass(section: string, active: string, dark: boolean) {
   return [
     "text-[15px] md:text-[13px] tracking-[.04em] no-underline transition-colors duration-[250ms] py-3 md:py-0 md:whitespace-nowrap",
     isActive
-      ? "text-terracota opacity-100 md:font-medium"
+      ? dark
+        ? "text-marfil opacity-100 md:font-medium"
+        : "text-lago opacity-100 md:font-medium"
       : dark
         ? "text-marfil/90 opacity-100 hover:text-atardecer"
         : "text-carbon opacity-[.82] hover:text-atardecer",
