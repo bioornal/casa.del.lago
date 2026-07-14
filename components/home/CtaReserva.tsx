@@ -60,6 +60,13 @@ export function CtaReserva() {
               {t("whatsapp")}
             </a>
           </div>
+
+          <p
+            className="font-accent text-atardecer text-[27px] mt-8 inline-block"
+            style={{ transform: "rotate(-2deg)" }}
+          >
+            {t("handwritten")}
+          </p>
         </Reveal>
       </div>
     </section>

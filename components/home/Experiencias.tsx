@@ -24,7 +24,7 @@ export function Experiencias() {
         <div className="grid grid-cols-1 md:grid-cols-[1.15fr_1fr] gap-10 md:gap-[72px] items-center">
           {/* Left: feature image with parallax — vista aérea de las Cataratas */}
           <Reveal className="order-1">
-            <div className="overflow-hidden rounded-[3px] h-[400px] md:h-[560px]" style={{ background: "#2c4034" }}>
+            <div className="overflow-hidden rounded-[3px] h-[400px] md:h-[560px]" style={{ background: "#2A4230" }}>
               <Parallax speed={-40}>
                 <ImageSlot
                   label="Cataratas del Iguazú desde el aire"
@@ -73,13 +73,13 @@ export function Experiencias() {
                 {items.map(({ key, num }, idx) => (
                   <div
                     key={key}
-                    className="group flex justify-between items-start gap-4 transition-colors duration-300 hover:bg-[#2c4034]"
+                    className="group flex justify-between items-start gap-4 transition-colors duration-300 hover:bg-[#2A4230]"
                     style={{
                       padding: "18px 18px",
                       margin: "0 -18px",
-                      borderTop: "1px solid #3a4d40",
+                      borderTop: "1px solid #3E5A44",
                       ...(idx === items.length - 1
-                        ? { borderBottom: "1px solid #3a4d40" }
+                        ? { borderBottom: "1px solid #3E5A44" }
                         : {}),
                     }}
                   >
@@ -97,7 +97,7 @@ export function Experiencias() {
                         {t(`items.${key}.desc`)}
                       </span>
                     </div>
-                    <span className="text-[13px] text-[#8fa091] transition-colors duration-300 group-hover:text-terracota shrink-0">
+                    <span className="text-[13px] text-[#8FA391] transition-colors duration-300 group-hover:text-terracota shrink-0">
                       {num}
                     </span>
                   </div>

@@ -29,7 +29,7 @@ export function Manifiesto() {
             </p>
             <a
               href="#casa"
-              className="mt-[28px] inline-flex items-center gap-[9px] border-b border-[#d8b9a8] pb-[5px] text-[13px] uppercase tracking-[.08em] text-terracota no-underline transition-[gap,border-color] duration-300 hover:gap-[16px] hover:border-terracota"
+              className="mt-[28px] inline-flex items-center gap-[9px] border-b border-[#b8d2da] pb-[5px] text-[13px] uppercase tracking-[.08em] text-lago no-underline transition-[gap,border-color] duration-300 hover:gap-[16px] hover:border-lago"
             >
               {t("link")}
             </a>

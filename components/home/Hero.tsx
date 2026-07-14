@@ -46,7 +46,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 hidden md:block"
         style={{
           background:
-            "radial-gradient(120% 80% at 78% 8%,rgba(160,75,42,.34) 0%,rgba(160,75,42,0) 46%)",
+            "radial-gradient(120% 80% at 76% 10%,rgba(224,138,44,.30) 0%,rgba(224,138,44,0) 48%)",
         }}
       />
 
@@ -55,7 +55,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg,rgba(20,20,20,.5) 0%,rgba(20,20,20,.05) 32%,rgba(20,20,20,.18) 60%,rgba(20,20,20,.72) 100%)",
+            "linear-gradient(180deg,rgba(13,26,31,.49) 0%,rgba(13,26,31,.05) 34%,rgba(13,26,31,.18) 60%,rgba(13,26,31,.65) 100%)",
         }}
       />
 
@@ -68,7 +68,7 @@ export function Hero() {
           {/* Hero kicker — arena color, wider tracking (not the bronce <Kicker>) */}
           <div
             className="font-sans text-[11px] md:text-[13px] uppercase"
-            style={{ letterSpacing: "0.42em", color: "#E8E1D5" }}
+            style={{ letterSpacing: "0.42em", color: "#eae0ce" }}
           >
             {t("kicker")}
           </div>
@@ -90,7 +90,7 @@ export function Hero() {
             className="font-display italic font-light"
             style={{
               fontSize: "clamp(16px,2.1vw,24px)",
-              color: "#E8E1D5",
+              color: "#eae0ce",
               margin: "22px 0 0",
             }}
           >
