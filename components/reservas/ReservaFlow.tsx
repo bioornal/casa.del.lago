@@ -72,7 +72,7 @@ export function ReservaFlow() {
             style={{
               color: "#1D1D1D",
               textDecoration: "none",
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "var(--font-display)",
               fontWeight: 600,
               fontSize: 23,
               letterSpacing: ".34em",
@@ -111,7 +111,7 @@ export function ReservaFlow() {
       <div className="mx-auto max-w-[1280px] px-5 pb-20 pt-8 md:px-12 md:pb-[110px] md:pt-12">
         {state.step < 3 ? (
           <div className="mt-[18px] grid grid-cols-1 items-start gap-8 lg:grid-cols-[1.6fr_1fr] lg:gap-12">
-            <div className="rounded-lg border border-[#E7E0D4] bg-white p-6 md:min-h-[440px] md:p-[38px]" style={{ boxShadow: "0 30px 70px -55px rgba(29,29,29,.45)" }}>
+            <div className="rounded-lg border border-borde-claro bg-white p-6 md:min-h-[440px] md:p-[38px]" style={{ boxShadow: "var(--shadow-card)" }}>
               {state.step === 1 && <StepDatos state={state} dispatch={dispatch} />}
               {state.step === 2 && (
                 <StepPago
@@ -122,26 +122,39 @@ export function ReservaFlow() {
               )}
 
               {/* Nav buttons */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 36, paddingTop: 26, borderTop: "1px solid #E7E0D4" }}>
+              <div style={{ marginTop: 36, paddingTop: 26, borderTop: "1px solid var(--color-borde-claro)" }}>
                 {state.step === 1 ? (
-                  <Link href={buildTarifasUrl(query)} style={{ background: "transparent", border: "none", fontFamily: "'Manrope', sans-serif", fontSize: 13, color: "#6b665d", letterSpacing: ".04em", textDecoration: "none" }}>
-                    {t("backBtn")}
-                  </Link>
+                  <div className="flex flex-col gap-4">
+                    <button
+                      type="button"
+                      onClick={() => { if (canGoNext) { dispatch({ type: "NEXT" }); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
+                      disabled={!canGoNext}
+                      className="flex w-full items-center justify-center rounded-[6px] font-sans text-[13px] font-semibold uppercase tracking-[0.12em] transition-[background,transform] duration-300"
+                      style={{
+                        background: canGoNext ? "var(--color-terracota)" : "var(--color-borde-medio)",
+                        color: "#F8F5F0",
+                        border: "none",
+                        cursor: canGoNext ? "pointer" : "not-allowed",
+                        padding: "18px 26px",
+                      }}
+                    >
+                      {nextLabels["1"]}
+                    </button>
+                    <Link
+                      href={buildTarifasUrl(query)}
+                      className="text-center"
+                      style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "#6b665d", letterSpacing: ".04em", textDecoration: "none" }}
+                    >
+                      {t("backBtn")}
+                    </Link>
+                  </div>
                 ) : (
-                  <button type="button" onClick={() => { dispatch({ type: "BACK" }); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Manrope', sans-serif", fontSize: 13, color: "#6b665d", letterSpacing: ".04em" }}>
-                    {t("backBtn")}
-                  </button>
-                )}
-
-                {state.step === 1 ? (
-                  <button type="button" onClick={() => { if (canGoNext) { dispatch({ type: "NEXT" }); window.scrollTo({ top: 0, behavior: "smooth" }); } }}
-                    disabled={!canGoNext}
-                    style={{ background: canGoNext ? "#A04B2A" : "#d8cdbd", color: "#F8F5F0", border: "none", cursor: canGoNext ? "pointer" : "not-allowed", fontFamily: "'Manrope', sans-serif", fontSize: 12.5, letterSpacing: ".1em", textTransform: "uppercase", padding: "15px 30px", borderRadius: 3, transition: "background .35s" }}>
-                    {nextLabels["1"]}
-                  </button>
-                ) : (
-                  <span />
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <button type="button" onClick={() => { dispatch({ type: "BACK" }); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-sans)", fontSize: 13, color: "#6b665d", letterSpacing: ".04em" }}>
+                      {t("backBtn")}
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

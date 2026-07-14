@@ -53,7 +53,7 @@ export function StepTransferencia({ state, onPending }: Props) {
 
   return (
     <div>
-      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontSize: 26, margin: "0 0 6px" }}>
+      <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 26, margin: "0 0 6px" }}>
         {t("transferTitle")}
       </h3>
       <p style={{ fontSize: 13, color: "#6b665d", margin: "0 0 22px", lineHeight: 1.6 }}>

@@ -164,7 +164,7 @@ function MethodTabs({ method, setMethod, t }: {
 function Header({ t, total }: { t: ReturnType<typeof useTranslations>; total: number }) {
   return (
     <>
-      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontSize: 26, margin: "0 0 6px" }}>
+      <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 26, margin: "0 0 6px" }}>
         {t("payTitle")}
       </h3>
       <p style={{ fontSize: 13, color: "#6b665d", margin: "0 0 22px" }}>

@@ -2,17 +2,13 @@ import { useTranslations } from "next-intl";
 import type { Dispatch } from "react";
 import type { State, Action, GuestField } from "@/lib/reservation/reducer";
 
+const inputCls =
+  "block w-full rounded-[4px] border border-borde-medio bg-white font-sans text-[15px] text-carbon outline-none transition-colors duration-200 focus:border-lago";
 const inputStyle: React.CSSProperties = {
-  background: "#FBF9F5",
-  border: "1px solid #d3c9b8",
-  borderRadius: 4,
-  padding: "14px 16px",
-  fontFamily: "'Manrope', sans-serif",
-  fontSize: 14,
-  color: "#1D1D1D",
-  outline: "none",
-  width: "100%",
+  padding: "13px 16px",
 };
+const labelCls =
+  "mb-[7px] block text-[11px] uppercase tracking-[0.16em] text-muted";
 
 interface StepDatosProps {
   state: State;
@@ -41,8 +37,8 @@ export function StepDatos({ state, dispatch }: StepDatosProps) {
   return (
     <div>
       <h3
+        className="font-display"
         style={{
-          fontFamily: "'Cormorant Garamond', serif",
           fontWeight: 500,
           fontSize: 26,
           margin: "0 0 24px",
@@ -52,10 +48,22 @@ export function StepDatos({ state, dispatch }: StepDatosProps) {
       </h3>
 
       <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-        <input type="text" placeholder={ph.nombre} style={inputStyle} {...field("firstName", ph.nombre)} />
-        <input type="text" placeholder={ph.apellido} style={inputStyle} {...field("lastName", ph.apellido)} />
-        <input type="email" placeholder={ph.email} style={inputStyle} {...field("email", ph.email)} />
-        <input type="tel" placeholder={ph.phone} style={inputStyle} {...field("phone", ph.phone)} />
+        <label className="block">
+          <span className={labelCls}>{ph.nombre}</span>
+          <input type="text" placeholder={ph.nombre} className={inputCls} style={inputStyle} {...field("firstName", ph.nombre)} />
+        </label>
+        <label className="block">
+          <span className={labelCls}>{ph.apellido}</span>
+          <input type="text" placeholder={ph.apellido} className={inputCls} style={inputStyle} {...field("lastName", ph.apellido)} />
+        </label>
+        <label className="block">
+          <span className={labelCls}>{ph.email}</span>
+          <input type="email" placeholder={ph.email} className={inputCls} style={inputStyle} {...field("email", ph.email)} />
+        </label>
+        <label className="block">
+          <span className={labelCls}>{ph.phone}</span>
+          <input type="tel" placeholder={ph.phone} className={inputCls} style={inputStyle} {...field("phone", ph.phone)} />
+        </label>
       </div>
 
       <div

@@ -15,6 +15,7 @@ interface ConfirmacionProps {
 
 export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
   const t = useTranslations("reservas");
+  const tCta = useTranslations("cta");
   const unit = getUnit(state.unitId)!;
   const nights = computeNights(state.checkIn, state.checkOut);
   const total = computeTotal(pricePerNight(state.unitId, state.guests), nights, CLEANING_FEE);
@@ -32,15 +33,15 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
 
   return (
     <div
+      className="border border-borde-claro bg-white"
       style={{
         maxWidth: 620,
         margin: "24px auto 0",
-        background: "#23362B",
-        borderRadius: 8,
+        borderRadius: "var(--radius-card)",
         padding: "56px 48px",
         textAlign: "center",
-        color: "#E8E1D5",
-        boxShadow: "0 50px 90px -55px rgba(29,29,29,.6)",
+        color: "var(--color-carbon)",
+        boxShadow: "var(--shadow-card)",
       }}
     >
       {/* Check circle */}
@@ -48,12 +49,12 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
         style={{
           width: 70,
           height: 70,
-          border: "2px solid #9DBF9E",
+          border: "2px solid var(--color-selva)",
           borderRadius: "50%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "#9DBF9E",
+          color: "var(--color-selva)",
           fontSize: 32,
           margin: "0 auto",
         }}
@@ -61,14 +62,30 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
         ✓
       </div>
 
+      {/* Handwritten, éxito solamente */}
+      {!pending && (
+        <div
+          className="font-accent"
+          style={{
+            fontWeight: 500,
+            fontSize: 34,
+            color: "var(--color-atardecer)",
+            transform: "rotate(-2deg)",
+            marginTop: 22,
+          }}
+        >
+          {tCta("handwritten")}
+        </div>
+      )}
+
       {/* Title */}
       <h2
+        className="font-display"
         style={{
-          fontFamily: "'Cormorant Garamond', serif",
           fontWeight: 400,
-          fontSize: 40,
-          margin: "26px 0 0",
-          color: "#F8F5F0",
+          fontSize: 30,
+          margin: pending ? "26px 0 0" : "12px 0 0",
+          color: "var(--color-carbon)",
         }}
       >
         {title}
@@ -76,11 +93,11 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
 
       {/* Subtitle */}
       <p
+        className="text-cuerpo"
         style={{
           fontSize: 15,
           lineHeight: 1.7,
           fontWeight: 300,
-          color: "#bcd0bd",
           margin: "14px auto 0",
           maxWidth: "42ch",
         }}
@@ -90,9 +107,8 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
 
       {/* Summary card */}
       <div
+        className="bg-arena-clara border border-borde-claro"
         style={{
-          background: "rgba(255,255,255,.05)",
-          border: "1px solid #3a4d40",
           borderRadius: 6,
           padding: 24,
           margin: "34px 0 0",
@@ -108,8 +124,8 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
             fontSize: 14,
           }}
         >
-          <span style={{ color: "#9fb0a3" }}>{t("code")}</span>
-          <span style={{ color: "#F8F5F0", letterSpacing: ".08em" }}>{code}</span>
+          <span className="text-muted">{t("code")}</span>
+          <span style={{ color: "var(--color-carbon)", letterSpacing: ".08em" }}>{code}</span>
         </div>
 
         {/* Accommodation */}
@@ -119,11 +135,11 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
             justifyContent: "space-between",
             padding: "9px 0",
             fontSize: 14,
-            borderTop: pending ? undefined : "1px solid #34433a",
+            borderTop: pending ? undefined : "1px solid var(--color-borde-claro)",
           }}
         >
-          <span style={{ color: "#9fb0a3" }}>{t("accommodation")}</span>
-          <span style={{ color: "#F8F5F0" }}>{unit.name}</span>
+          <span className="text-muted">{t("accommodation")}</span>
+          <span style={{ color: "var(--color-carbon)" }}>{unit.name}</span>
         </div>
 
         {/* Dates */}
@@ -133,11 +149,11 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
             justifyContent: "space-between",
             padding: "9px 0",
             fontSize: 14,
-            borderTop: "1px solid #34433a",
+            borderTop: "1px solid var(--color-borde-claro)",
           }}
         >
-          <span style={{ color: "#9fb0a3" }}>{t("dates")}</span>
-          <span style={{ color: "#F8F5F0" }}>{rangeLabel}</span>
+          <span className="text-muted">{t("dates")}</span>
+          <span style={{ color: "var(--color-carbon)" }}>{rangeLabel}</span>
         </div>
 
         {/* Guests */}
@@ -147,11 +163,11 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
             justifyContent: "space-between",
             padding: "9px 0",
             fontSize: 14,
-            borderTop: "1px solid #34433a",
+            borderTop: "1px solid var(--color-borde-claro)",
           }}
         >
-          <span style={{ color: "#9fb0a3" }}>{t("guests")}</span>
-          <span style={{ color: "#F8F5F0" }}>{guestsLabel}</span>
+          <span className="text-muted">{t("guests")}</span>
+          <span style={{ color: "var(--color-carbon)" }}>{guestsLabel}</span>
         </div>
 
         {/* Total */}
@@ -161,23 +177,23 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
             justifyContent: "space-between",
             padding: "13px 0 4px",
             fontSize: 16,
-            borderTop: "1px solid #34433a",
+            borderTop: "1px solid var(--color-borde-claro)",
             marginTop: 6,
           }}
         >
           <span
+            className="font-display"
             style={{
-              color: "#F8F5F0",
-              fontFamily: "'Cormorant Garamond', serif",
+              color: "var(--color-carbon)",
               fontSize: 22,
             }}
           >
             Total
           </span>
           <span
+            className="font-display"
             style={{
-              color: "#F8F5F0",
-              fontFamily: "'Cormorant Garamond', serif",
+              color: "var(--color-carbon)",
               fontSize: 22,
             }}
           >
@@ -198,16 +214,15 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
       >
         <Link
           href="/"
+          className="border border-carbon font-sans transition-[background,color] duration-300 hover:bg-carbon hover:text-arena"
           style={{
-            background: "#A04B2A",
-            color: "#F8F5F0",
+            color: "var(--color-carbon)",
             textDecoration: "none",
             fontSize: 12.5,
             letterSpacing: ".1em",
             textTransform: "uppercase",
             padding: "14px 30px",
             borderRadius: 3,
-            transition: "background .35s",
           }}
         >
           {t("backHome")}
@@ -215,17 +230,17 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
         <Link
           href="/tarifas"
           style={{
-            background: "transparent",
-            color: "#cdd8cf",
-            border: "1px solid #3f5346",
+            background: "var(--color-terracota)",
+            color: "#F8F5F0",
+            border: "none",
             textDecoration: "none",
-            fontFamily: "'Manrope', sans-serif",
+            fontFamily: "var(--font-sans)",
             fontSize: 12.5,
             letterSpacing: ".1em",
             textTransform: "uppercase",
             padding: "14px 28px",
             borderRadius: 3,
-            transition: "border-color .3s",
+            transition: "background .3s",
           }}
         >
           {t("newRes")}
@@ -234,7 +249,7 @@ export function Confirmacion({ state, code, pending }: ConfirmacionProps) {
 
       {/* Link a la consulta de estado */}
       <p style={{ marginTop: 22, fontSize: 13 }}>
-        <Link href="/mi-reserva" style={{ color: "#9DBF9E", textDecoration: "underline" }}>
+        <Link href="/mi-reserva" style={{ color: "var(--color-lago)", textDecoration: "underline" }}>
           {t("checkStatus")}
         </Link>
       </p>

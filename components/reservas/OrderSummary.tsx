@@ -31,21 +31,21 @@ export function OrderSummary({ state }: OrderSummaryProps) {
 
   return (
     <div
+      className="border border-borde-claro bg-white"
       style={{
-        background: "#23362B",
-        color: "#E8E1D5",
-        borderRadius: 8,
+        color: "var(--color-carbon)",
+        borderRadius: "var(--radius-card)",
         padding: 30,
-        boxShadow: "0 40px 80px -55px rgba(29,29,29,.5)",
+        boxShadow: "var(--shadow-card)",
       }}
     >
       {/* Kicker */}
       <div
+        className="text-bronce"
         style={{
           fontSize: 11,
           letterSpacing: ".22em",
           textTransform: "uppercase",
-          color: "#9A7B4F",
         }}
       >
         {t("yourReservation")}
@@ -53,10 +53,10 @@ export function OrderSummary({ state }: OrderSummaryProps) {
 
       {/* Unit name */}
       <div
+        className="font-display"
         style={{
-          fontFamily: "'Cormorant Garamond', serif",
           fontSize: 28,
-          color: "#F8F5F0",
+          color: "var(--color-carbon)",
           marginTop: 10,
         }}
       >
@@ -66,16 +66,16 @@ export function OrderSummary({ state }: OrderSummaryProps) {
       {/* Info rows */}
       <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
-          <span style={{ color: "#9fb0a3" }}>{t("dates")}</span>
-          <span style={{ color: "#F8F5F0", textAlign: "right" }}>{rangeLabel}</span>
+          <span className="text-muted">{t("dates")}</span>
+          <span style={{ color: "var(--color-carbon)", textAlign: "right" }}>{rangeLabel}</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
-          <span style={{ color: "#9fb0a3" }}>{t("nights")}</span>
-          <span style={{ color: "#F8F5F0" }}>{nights > 0 ? String(nights) : "—"}</span>
+          <span className="text-muted">{t("nights")}</span>
+          <span style={{ color: "var(--color-carbon)" }}>{nights > 0 ? String(nights) : "—"}</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
-          <span style={{ color: "#9fb0a3" }}>{t("guests")}</span>
-          <span style={{ color: "#F8F5F0" }}>
+          <span className="text-muted">{t("guests")}</span>
+          <span style={{ color: "var(--color-carbon)" }}>
             {state.guests}{" "}
             {state.guests === 1 ? t("adult") : t("adults")}
           </span>
@@ -83,28 +83,28 @@ export function OrderSummary({ state }: OrderSummaryProps) {
       </div>
 
       {/* Divider */}
-      <div style={{ borderTop: "1px solid #34433a", margin: "24px 0" }} />
+      <div style={{ borderTop: "1px solid var(--color-borde-claro)", margin: "24px 0" }} />
 
       {/* Price breakdown */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
-          <span style={{ color: "#9fb0a3" }}>
+          <span className="text-muted">
             {money(nightly)} × {nights || 0}
           </span>
-          <span style={{ color: "#F8F5F0" }}>
+          <span style={{ color: "var(--color-carbon)" }}>
             {nights > 0 ? money(subtotal) : "—"}
           </span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
-          <span style={{ color: "#9fb0a3" }}>{t("cleaning")}</span>
-          <span style={{ color: "#F8F5F0" }}>
+          <span className="text-muted">{t("cleaning")}</span>
+          <span style={{ color: "var(--color-carbon)" }}>
             {nights > 0 ? money(CLEANING_FEE) : "—"}
           </span>
         </div>
       </div>
 
       {/* Total */}
-      <div style={{ borderTop: "1px solid #34433a", margin: "24px 0 0" }} />
+      <div style={{ borderTop: "1px solid var(--color-borde-claro)", margin: "24px 0 0" }} />
       <div
         style={{
           display: "flex",
@@ -113,16 +113,16 @@ export function OrderSummary({ state }: OrderSummaryProps) {
           marginTop: 20,
         }}
       >
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, color: "#F8F5F0" }}>
+        <span className="font-display" style={{ fontSize: 24, color: "var(--color-carbon)" }}>
           Total
         </span>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, color: "#F8F5F0" }}>
+        <span className="font-display" style={{ fontSize: 30, color: "var(--color-carbon)" }}>
           {nights > 0 ? money(total) : "—"}
         </span>
       </div>
 
       {/* No fees note */}
-      <div style={{ fontSize: 12, color: "#7e9184", marginTop: 10, lineHeight: 1.5 }}>
+      <div className="text-muted" style={{ fontSize: 12, marginTop: 10, lineHeight: 1.5 }}>
         {t("noFees")}
       </div>
     </div>
