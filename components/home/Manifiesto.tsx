@@ -28,7 +28,7 @@ export function Manifiesto() {
               {t("body")}
             </p>
             <a
-              href="#casa"
+              href="#lugar"
               className="mt-[28px] inline-flex items-center gap-[9px] border-b border-[#b8d2da] pb-[5px] text-[13px] uppercase tracking-[.08em] text-lago no-underline transition-[gap,border-color] duration-300 hover:gap-[16px] hover:border-lago"
             >
               {t("link")}

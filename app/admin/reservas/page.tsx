@@ -28,7 +28,7 @@ export default async function AdminReservasPage({
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px 80px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500, fontSize: 30, margin: 0 }}>
+        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 30, margin: 0 }}>
           Reservas
         </h1>
         <form action={signOut}>

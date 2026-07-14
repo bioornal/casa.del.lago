@@ -41,7 +41,7 @@ describe("useSectionSpy", () => {
     );
   });
 
-  it("marca activa la sección visible con mayor ratio", () => {
+  it("casa activa la sección visible con mayor ratio", () => {
     const { result } = renderHook(() => useSectionSpy());
     const io = MockIntersectionObserver.instances[0];
     const galeria = document.getElementById("galeria")!;

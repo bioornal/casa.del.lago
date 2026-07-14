@@ -30,7 +30,7 @@ export default async function MiReservaPage({
     <main style={{ maxWidth: 720, margin: "0 auto", padding: "96px 20px 120px" }}>
       <h1
         style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "var(--font-display)",
           fontWeight: 400,
           fontSize: 40,
           textAlign: "center",
