@@ -4,8 +4,10 @@ import { HeroReveal } from "@/components/motion/HeroReveal";
 import { HeroScrollFade } from "@/components/motion/HeroScrollFade";
 import { ScrollCue } from "@/components/home/ScrollCue";
 
+// Placeholder temático (lago a la hora dorada) hasta tener la foto propia del lago.
+// TODO(adaptación): reemplazar por fotografía real (Cloudinary o bucket propio).
 const HERO_IMAGE =
-  "https://res.cloudinary.com/djtvjkcu6/image/upload/f_auto,q_auto,w_1920/v1781879164/ArumaLodge/Hero_bgsjtf.png";
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80";
 
 export function Hero() {
   const t = useTranslations("hero");

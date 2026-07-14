@@ -3,66 +3,63 @@ import { useTranslations } from "next-intl";
 import { LangSwitcher } from "@/components/ui/LangSwitcher";
 import { Link as IntlLink } from "@/lib/i18n/navigation";
 
-// Logo oficial (Cloudinary). En el footer va monocromo en tono marfil
-// cálido (brightness-0 + invert + sepia) porque el original es verde oscuro
-// sobre transparente y no se leería en el fondo carbón.
-const LOGO_URL =
-  "https://res.cloudinary.com/djtvjkcu6/image/upload/f_auto,q_auto,w_320/v1783166702/ArumaLodge/ALARGADA_vs5bwo.png";
-const LOGO_LIGHT_FILTER =
-  "brightness(0) invert(1) sepia(0.22) saturate(0.55)";
-
 export function SiteFooter() {
   const tf = useTranslations("footer");
   const tn = useTranslations("nav");
   const tc = useTranslations("contacto");
 
   return (
-    <footer className="bg-carbon text-arena pt-16 md:pt-[90px] pb-9">
+    <footer className="bg-lago-hover text-arena pt-16 md:pt-[90px] pb-9">
       <div className="max-w-[1320px] mx-auto px-5 md:px-12">
         {/* Top grid — responsive */}
         <div
-          className="grid gap-10 md:gap-12 pb-12 md:pb-16 border-b border-[#34302b] grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]"
+          className="grid gap-10 md:gap-12 pb-12 md:pb-16 border-b border-white/10 grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]"
         >
-          {/* 1. Brand — full width on mobile */}
+          {/* 1. Brand — wordmark tipográfico (logo oficial pendiente) */}
           <div className="col-span-2 lg:col-span-1">
-            <img
-              src={LOGO_URL}
-              alt="La Casa del Lago Urugua-í"
-              className="h-24 md:h-28 w-auto"
-              style={{ filter: LOGO_LIGHT_FILTER }}
-            />
-            <p className="text-[14px] leading-[1.7] font-light text-[#a39d92] mt-[22px] max-w-[34ch]">
+            <div className="flex flex-col leading-none">
+              <span className="font-display font-medium text-[24px] md:text-[27px] tracking-[0.01em] text-marfil">
+                La Casa del Lago
+              </span>
+              <span
+                className="text-[10px] uppercase mt-2 text-[#7FC9D6]"
+                style={{ letterSpacing: "0.38em" }}
+              >
+                Urugua-í
+              </span>
+            </div>
+            <p className="text-[14px] leading-[1.7] font-light text-[#A9CBD5] mt-[22px] max-w-[34ch]">
               {tf("tagline")}
             </p>
           </div>
 
           {/* 2. Explorar */}
           <div>
-            <div className="text-[11px] uppercase tracking-[.22em] text-bronce mb-5">
+            <div className="text-[11px] uppercase tracking-[.22em] text-[#7FC9D6] mb-5">
               {tf("exploreTitle")}
             </div>
             <div className="flex flex-col gap-[13px] text-[14px]">
               <a
                 href="#cabanas"
-                className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("brand")}
               </a>
               <a
                 href="#cabanas"
-                className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("apartments")}
               </a>
               <a
                 href="#lugar"
-                className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("experiences")}
               </a>
               <a
                 href="#galeria"
-                className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("gallery")}
               </a>
@@ -71,31 +68,31 @@ export function SiteFooter() {
 
           {/* 3. Contacto */}
           <div>
-            <div className="text-[11px] uppercase tracking-[.22em] text-bronce mb-5">
+            <div className="text-[11px] uppercase tracking-[.22em] text-[#7FC9D6] mb-5">
               {tf("contactTitle")}
             </div>
             <div className="flex flex-col gap-[13px] text-[14px]">
               <IntlLink
                 href="/mi-reserva"
-                className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tf("myReservation")}
               </IntlLink>
               <a
                 href="#contacto"
-                className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 WhatsApp
               </a>
               <a
                 href="mailto:info@lacasadellago.com.ar"
-                className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 info@lacasadellago.com.ar
               </a>
               <a
                 href="#contacto"
-                className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tc("address")}
               </a>
@@ -104,7 +101,7 @@ export function SiteFooter() {
 
           {/* 4. Idioma */}
           <div>
-            <div className="text-[11px] uppercase tracking-[.22em] text-bronce mb-5">
+            <div className="text-[11px] uppercase tracking-[.22em] text-[#7FC9D6] mb-5">
               {tf("langTitle")}
             </div>
             <LangSwitcher variant="dark" />
@@ -112,12 +109,12 @@ export function SiteFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex justify-between items-center flex-wrap gap-[14px] pt-7 text-[12px] text-[#7d776d] tracking-[.04em]">
+        <div className="flex justify-between items-center flex-wrap gap-[14px] pt-7 text-[12px] text-[#7fa9b5] tracking-[.04em]">
           <span>
             <Link
               href="/admin/login"
               aria-label="Acceso administración"
-              className="text-[#7d776d] no-underline cursor-pointer"
+              className="text-[#7fa9b5] no-underline cursor-pointer"
             >
               {tf("copyright")}
             </Link>
@@ -126,7 +123,7 @@ export function SiteFooter() {
             href="https://selva-digital.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#7d776d] no-underline hover:text-marfil transition-colors duration-[250ms]"
+            className="text-[#7fa9b5] no-underline hover:text-marfil transition-colors duration-[250ms]"
           >
             {tf("credit")}
           </a>

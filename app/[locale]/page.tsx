@@ -91,8 +91,14 @@ export default async function HomePage({
       />
       <SiteNav />
       <main className="relative">
-        <Hero />
-        <SearchWidget variant="hero" />
+        {/* El buscador se dockea al borde inferior del hero en desktop;
+            en mobile queda en flujo, solapado apenas como barra flotante. */}
+        <div className="relative">
+          <Hero />
+          <div className="md:absolute md:inset-x-0 md:bottom-0 md:z-20">
+            <SearchWidget variant="hero" />
+          </div>
+        </div>
         <Manifiesto />
         <UnitsGrid />
         <Experiencias />

@@ -79,15 +79,15 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
     );
   }
 
+  // Hero: barra dockeada al borde inferior del hero, ancho completo (estilo
+  // buscador de hotel). En mobile vuelve a ser una barra flotante compacta.
   const wrapperClass =
     variant === "hero"
-      ? "relative z-20 max-w-[1020px] mx-auto px-5 md:px-12"
+      ? "relative z-20 w-full max-w-[1020px] md:max-w-none mx-auto px-5 md:px-0 -mt-[52px] md:mt-0"
       : "relative z-20 max-w-[1020px] mx-auto px-5 md:px-6";
 
-  const wrapperStyle: React.CSSProperties =
-    variant === "hero"
-      ? { marginTop: "-52px" }
-      : { marginTop: 0 };
+  // Separadores verticales entre campos, según fondo (glass oscuro vs claro)
+  const sep = variant === "hero" ? "rgba(245,238,225,.22)" : "#E7E0D4";
 
   const label: React.CSSProperties = {
     fontSize: 11,
@@ -117,18 +117,18 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
 
   return (
     <Reveal delay={0.05}>
-      <div className={wrapperClass} style={wrapperStyle}>
+      <div className={wrapperClass}>
         <div
           className={
             variant === "hero"
-              ? "flex flex-wrap items-stretch rounded-[10px] border backdrop-blur-md"
+              ? "flex flex-wrap items-stretch rounded-[10px] md:rounded-none border md:border-x-0 md:border-b-0 backdrop-blur-md"
               : "flex flex-wrap items-stretch rounded-[4px] border border-[#E7E0D4] bg-marfil"
           }
           style={
             variant === "hero"
               ? {
                   boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)",
-                  background: "rgba(16,30,36,.42)",
+                  background: "rgba(16,30,36,.55)",
                   borderColor: "rgba(245,238,225,.28)",
                 }
               : { boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)" }
@@ -140,7 +140,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
               type="button"
               onClick={clickArrival}
               className="flex-1 text-left bg-transparent border-none cursor-pointer"
-              style={{ padding: "18px 24px", borderRight: "1px solid #E7E0D4" }}
+              style={{ padding: "18px 24px", borderRight: `1px solid ${sep}` }}
             >
               <div style={label}>{t("arrival")}</div>
               <div style={valueStyle}>{fmtDate(checkIn)}</div>
@@ -191,7 +191,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
           </div>
 
           {/* Separador vertical para guests */}
-          <div className="hidden sm:block w-px self-stretch bg-[#E7E0D4]" />
+          <div className="hidden sm:block w-px self-stretch" style={{ background: sep }} />
 
           {/* Huéspedes */}
           <div
@@ -235,7 +235,10 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
             type="button"
             onClick={submit}
             disabled={!valid}
-            className="group/btn flex items-center justify-center gap-[10px] w-full sm:w-auto border-none px-9 py-4 text-[12.5px] uppercase tracking-[.16em] transition-[background] duration-300"
+            className={
+              "group/btn flex items-center justify-center gap-[10px] w-full sm:w-auto border-none py-4 text-[12.5px] uppercase tracking-[.16em] transition-[background] duration-300 " +
+              (variant === "hero" ? "px-9 md:px-16" : "px-9")
+            }
             style={{
               flex: "0 0 auto",
               cursor: valid ? "pointer" : "not-allowed",

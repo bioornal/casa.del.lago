@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { ImageSlot, bucketSrc } from "@/components/ui/ImageSlot";
+import { ImageSlot, slotSrc } from "@/components/ui/ImageSlot";
 
 export type GalleryItem = { label: string; photo?: string };
 
@@ -63,7 +63,7 @@ export function GalleryLightbox({
       <div className="relative z-[1] flex items-center justify-center max-w-[92vw] max-h-[86vh]">
         {item.photo ? (
           <img
-            src={bucketSrc(item.photo)}
+            src={slotSrc(item.label, item.photo)}
             alt={item.label}
             className="max-h-[86vh] max-w-[92vw] w-auto h-auto object-contain rounded-[3px]"
             decoding="async"

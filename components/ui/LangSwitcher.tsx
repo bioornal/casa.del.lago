@@ -8,8 +8,13 @@ export function LangSwitcher({ variant = "light" }: { variant?: "light" | "dark"
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const sep = variant === "dark" ? "text-[#34302b]" : "text-bronce";
+  const sep = variant === "dark" ? "text-white/30" : "text-bronce";
   const text = variant === "dark" ? "text-marfil" : "text-carbon";
+  // Sobre fondo oscuro (footer lago) el activo va en marfil; sobre claro, en lago.
+  const active =
+    variant === "dark"
+      ? "text-marfil font-semibold opacity-100"
+      : "text-lago font-semibold opacity-100";
   return (
     <div className="flex items-center gap-[9px] text-[12px] tracking-[0.06em]">
       {LOCALES.map((l, i) => (
@@ -18,9 +23,7 @@ export function LangSwitcher({ variant = "light" }: { variant?: "light" | "dark"
             type="button"
             onClick={() => router.replace(pathname, { locale: l })}
             className={`cursor-pointer uppercase transition-[opacity,color] duration-200 ${
-              l === locale
-                ? "text-lago font-semibold opacity-100"
-                : `${text} opacity-45 hover:opacity-100`
+              l === locale ? active : `${text} opacity-45 hover:opacity-100`
             }`}
           >
             {l}
