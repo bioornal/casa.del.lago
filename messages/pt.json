@@ -1,16 +1,16 @@
 {
   "nav": {
-    "brand": "A Marca",
+    "brand": "A casa",
     "apartments": "Cabanas",
-    "experiences": "Experiências",
+    "experiences": "O lugar",
     "gallery": "Galeria",
     "contact": "Contato",
     "book": "Reservar"
   },
   "hero": {
-    "kicker": "Lago Urugua-í · Misiones",
-    "title": "Um refúgio à beira do lago",
-    "subtitle": "Cabanas pensadas em cada detalhe, entre a selva e o lago Urugua-í."
+    "kicker": "Puerto Libertad · Misiones",
+    "title": "Às margens do lago Urugua-í",
+    "subtitle": "Cabanas de madeira e tijolo, piscina de frente para o lago e fogo para o churrasco."
   },
   "bookingBar": {
     "arrival": "Chegada",
@@ -32,8 +32,8 @@
   "tarifas": {
     "title": "Tarifas disponíveis",
     "subtitle": "Escolha sua acomodação para as datas selecionadas",
-    "pickDatesTitle": "Escolha suas datas",
-    "pickDatesHint": "Selecione datas para ver disponibilidade e preços",
+    "pickDatesTitle": "Escolha suas datas, olhe o lago.",
+    "pickDatesHint": "Preços por noite, por cabana. Selecione chegada e saída para ver disponibilidade e o total da sua estadia.",
     "from": "a partir de",
     "perNight": "por noite",
     "nights": "noites",
@@ -76,57 +76,57 @@
     }
   },
   "manifiesto": {
-    "kicker": "A marca",
-    "title": "A selva se visita. Aqui se descansa.",
-    "body": "A Casa del Lago Urugua-í são cabanas de autor, pensadas em cada detalhe como se pensa uma casa. Depois de um dia de selva e água, você volta para a calma do lago: conforto, natureza e design às margens do Urugua-í, entre Iguazú e Libertad.",
-    "link": "Conhecer a filosofia →"
+    "kicker": "A casa",
+    "title": "O dia termina olhando o pôr do sol sobre a água.",
+    "body": "A Casa del Lago são cabanas de madeira e tijolo junto ao espelho de água do Urugua-í. Dias de píer, caiaque e piscina; noites de fogo, churrasco e céu aberto. Nós cuidamos da calma.",
+    "link": "Conheça o lugar →"
   },
   "units": {
-    "sectionKicker": "Acomodações",
-    "sectionTitle": "Cada unidade, outro jeito de voltar da selva.",
-    "viewAll": "Ver todos →",
+    "sectionKicker": "Cabanas",
+    "sectionTitle": "Cada cabana, um jeito de olhar o lago.",
+    "viewAll": "Ver tarifas →",
     "fromPrice": "A partir de $—",
     "perNight": "/ noite",
     "timbo": {
       "name": "Cabaña Timbó",
-      "sub": "até 6 hóspedes · 2 quartos · 1 banheiro · 65 m² · piscina com jacuzzi · wifi"
+      "sub": "até 6 hóspedes · 2 quartos · varanda com churrasqueira · vista para o lago · wifi"
     },
     "lapacho": {
       "name": "Cabaña Lapacho",
-      "sub": "até 4 hóspedes · 1 quarto · 1 banheiro · 45 m² · cozinha equipada · wifi"
+      "sub": "até 4 hóspedes · 1 quarto · lareira a lenha · deck sobre a água · wifi"
     },
     "guatambu": {
       "name": "Cabaña Guatambú",
-      "sub": "até 5 hóspedes · 2 quartos · 1 banheiro · 55 m² · cozinha completa · wifi · DirectTV"
+      "sub": "até 5 hóspedes · 2 quartos · cozinha completa · acesso à piscina · wifi"
     }
   },
   "experiencias": {
-    "kicker": "Experiências",
-    "title": "As Cataratas, sem pressa.",
-    "body": "A gente te dá muito mais do que um lugar para dormir. Montamos um guia sob medida com o que realmente vale a pena em Iguaçu e te conectamos com gente de confiança para reservar cada passeio.",
+    "kicker": "O lugar",
+    "title": "O lago, sem pressa.",
+    "body": "Píer próprio, caiaques e pores do sol refletidos na água. E quando o sol se põe, fogo: lareira a lenha por dentro, churrasco por fora.",
     "items": {
       "nature": {
-        "title": "Natureza",
-        "desc": "Cataratas, Parque Nacional e Selva Paranaense, a minutos do lodge."
+        "title": "A água",
+        "desc": "Píer, caiaque, pesca e piscina turquesa de frente para o lago."
       },
       "gastronomy": {
-        "title": "Gastronomia",
-        "desc": "As mesas e sabores que você não pode perder na Tríplice Fronteira."
+        "title": "Pores do sol",
+        "desc": "O céu dourado sobre o espelho de água, todos os dias."
       },
       "frontier": {
-        "title": "Tríplice Fronteira",
-        "desc": "Cruze para o Brasil e o Paraguai no mesmo dia, sem complicação."
+        "title": "Fogo e churrasco",
+        "desc": "Churrasqueira, fogueira e lareira a lenha: o calor de dentro."
       },
       "activities": {
-        "title": "Atividades",
-        "desc": "Rafting, cavalgadas, observação de aves e outras aventuras."
+        "title": "Selva de Misiones",
+        "desc": "Palmeiras, trilhas e tapetes de folhas de outono."
       }
     }
   },
   "galeria": {
     "kicker": "Galeria",
-    "title": "Um relato em imagens.",
-    "viewFull": "Ver galeria completa",
+    "title": "Postais do lago.",
+    "viewFull": "Ver completa",
     "relato": {
       "intro": "Um passeio em fotos pela Casa del Lago: do primeiro reflexo na água ao último canto pensado para você ficar.",
       "frames": {
@@ -174,23 +174,24 @@
     }
   },
   "cta": {
-    "kicker": "Reservas",
-    "title": "Prontos para chegar a Iguaçu?",
-    "body": "Você reserva direto com a gente: confirmação na hora e atendimento de verdade, sem intermediários.",
+    "kicker": "Reservar",
+    "title": "Seu lugar à beira da água está te esperando.",
+    "body": "Escreva para a gente e combinamos sua estadia. Anfitriões presentes, resposta direta e sem complicação.",
     "bookNow": "Reservar agora",
-    "whatsapp": "Fale conosco no WhatsApp"
+    "whatsapp": "WhatsApp",
+    "handwritten": "Esperamos por você!"
   },
   "contacto": {
     "kicker": "Contato",
-    "title": "Estamos a uma mensagem de distância.",
-    "whatsappTitle": "Quem responde somos nós, normalmente em menos de 24 h.",
-    "whatsappSub": "Fale conosco no WhatsApp",
+    "title": "Escreva para a gente, é direto.",
+    "whatsappTitle": "Reserve pelo WhatsApp",
+    "whatsappSub": "Respondemos no mesmo dia",
     "whereTitle": "Onde estamos",
-    "address": "Margem do lago Urugua-í — entre Puerto Iguazú e Puerto Libertad, Misiones, Argentina",
-    "addressNote": "Às margens do lago Urugua-í, entre Iguazú e Libertad, cercado pela selva.",
+    "address": "Puerto Libertad, Misiones",
+    "addressNote": "Às margens do lago Urugua-í, na rota 12 entre Iguazú e Eldorado.",
     "directTitle": "Direto",
     "checkInOut": "Check-in 15h · Check-out 11h",
-    "mapCta": "Como chegar →",
+    "mapCta": "Como chegar",
     "form": {
       "name": "Nome",
       "email": "E-mail",
@@ -203,30 +204,30 @@
     }
   },
   "footer": {
-    "tagline": "Cabanas às margens do lago Urugua-í, entre Iguazú e Libertad, Misiones, Argentina.",
+    "tagline": "Cabanas às margens do lago Urugua-í. Desconexão, pores do sol e fogo em Puerto Libertad, Misiones.",
     "exploreTitle": "Explorar",
     "contactTitle": "Contato",
     "langTitle": "Idioma",
-    "copyright": "© 2026 La Casa del Lago Urugua-í. Todos os direitos reservados.",
+    "copyright": "© 2026 La Casa del Lago Urugua-í",
     "myReservation": "Minha reserva",
-    "credit": "Site criado por Selva Digital"
+    "credit": "Feito à beira da água"
   },
   "departamento": {
-    "breadcrumb": "Apartamentos",
+    "breadcrumb": "Cabanas",
     "specGuests": "Hóspedes",
     "specBedroom": "Quarto",
     "specArea": "Área",
-    "subtitle": "Design, conforto e equipamento de primeira, no pleno centro de Iguaçu.",
+    "subtitle": "Design, conforto e equipamento de primeira, às margens do lago Urugua-í.",
     "spaceTitle": "O espaço",
     "spaceBody": {
-      "timbo": "Uma cabana pensada para grupos e famílias: 2 quartos, banheiro completo, cozinha equipada e sala de jantar, para até 6 hóspedes. Com acesso à piscina com jacuzzi hidromassagem, às margens do lago Urugua-í, entre Iguazú e Libertad.",
+      "timbo": "Madeira e tijolo de frente para o lago: dois quartos, varanda com churrasqueira e um deck onde o dia termina olhando o pôr do sol sobre a água. A Timbó é a cabana mais ampla da casa, com cozinha completa, lareira a lenha para as noites frescas e acesso direto ao píer e à piscina — ideal para famílias ou dois casais que querem desconectar sem abrir mão do conforto.",
       "lapacho": "Um apartamento luminoso: 1 quarto, banheiro completo, cozinha equipada, sala de estar e jantar. Com acesso à piscina, às margens do lago Urugua-í, entre Iguazú e Libertad.",
-      "guatambu": "Uma cabana com tudo o que você precisa: dois quartos, banheiro completo, cozinha totalmente equipada e lavanderia com máquina de lavar. Com acesso à piscina, às margens do lago Urugua-í, entre Iguazú e Libertad."
+      "guatambu": "Uma cabana com tudo o que você precisa: 2 quartos, banheiro completo, cozinha totalmente equipada e lavanderia com máquina de lavar. Com acesso à piscina, às margens do lago Urugua-í, entre Iguazú e Libertad."
     },
     "featuresTitle": "Características",
     "featCapacity": "Capacidade",
-    "featBedroom": "Quarto",
-    "featBath": "Banheiro",
+    "featBedroom": "Quartos",
+    "featBath": "Banheiros",
     "featView": "Vista",
     "featArea": "Área",
     "featExterior": "Exterior",
@@ -247,7 +248,7 @@
     "waBookNote": "Confirmamos sua reserva na hora pelo WhatsApp",
     "waBookMessage": "Olá! Quero reservar {unit}. Tem disponibilidade?",
     "whatsappLink": "Fale conosco no WhatsApp",
-    "otherTitle": "Outras acomodações"
+    "otherTitle": "Outros jeitos de olhar o lago."
   },
   "meta": {
     "title": "La Casa del Lago Urugua-í — Cabanas à beira do lago",
@@ -255,10 +256,10 @@
   },
   "reservas": {
     "backToSite": "← Voltar ao site",
-    "directKicker": "Reserva direta",
+    "directKicker": "Reservar",
     "titles": [
       " ",
-      "Seus dados",
+      "Falta pouco para o lago.",
       "Pague sua reserva",
       "Reserva confirmada"
     ],
@@ -298,7 +299,7 @@
     "cleaning": "Limpeza",
     "noFees": "Sem taxas de reserva. Cancelamento flexível até 7 dias antes.",
     "confirmedTitle": "Reserva confirmada",
-    "confirmedSub": "Sua reserva está confirmada e o pagamento foi recebido. Guarde seu código e confira seu email. Esperamos você em Iguaçu!",
+    "confirmedSub": "Sua reserva está confirmada e o pagamento foi recebido. Guarde seu código e confira seu email. Esperamos você no lago Urugua-í!",
     "code": "Código",
     "accommodation": "Acomodação",
     "backHome": "Voltar ao início",

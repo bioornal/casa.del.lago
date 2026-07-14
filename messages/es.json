@@ -1,16 +1,16 @@
 {
   "nav": {
-    "brand": "La Marca",
+    "brand": "La casa",
     "apartments": "Cabañas",
-    "experiences": "Experiencias",
+    "experiences": "El lugar",
     "gallery": "Galería",
     "contact": "Contacto",
     "book": "Reservar"
   },
   "hero": {
-    "kicker": "Lago Urugua-í · Misiones",
-    "title": "Un refugio a orillas del lago",
-    "subtitle": "Cabañas pensadas al detalle, entre la selva y el lago Urugua-í."
+    "kicker": "Puerto Libertad · Misiones",
+    "title": "A orillas del lago Urugua-í",
+    "subtitle": "Cabañas de madera y ladrillo, pileta frente al lago y fuego para el asado."
   },
   "bookingBar": {
     "arrival": "Llegada",
@@ -32,8 +32,8 @@
   "tarifas": {
     "title": "Tarifas disponibles",
     "subtitle": "Elegí tu alojamiento para las fechas seleccionadas",
-    "pickDatesTitle": "Elegí tus fechas",
-    "pickDatesHint": "Seleccioná fechas para ver disponibilidad y precios",
+    "pickDatesTitle": "Elegí tus fechas, mirá el lago.",
+    "pickDatesHint": "Precios por noche, por cabaña. Seleccioná llegada y salida para ver disponibilidad y el total de tu estadía.",
     "from": "desde",
     "perNight": "por noche",
     "nights": "noches",
@@ -76,57 +76,57 @@
     }
   },
   "manifiesto": {
-    "kicker": "La marca",
-    "title": "La selva se visita. Acá se descansa.",
-    "body": "La Casa del Lago Urugua-í son cabañas de autor, pensadas al detalle como se piensa una casa. Después de un día de selva y agua, volvés a la calma del lago: confort, naturaleza y diseño a orillas del Urugua-í, entre Iguazú y Libertad.",
-    "link": "Conocer la filosofía →"
+    "kicker": "La casa",
+    "title": "El día termina mirando el atardecer sobre el agua.",
+    "body": "La Casa del Lago son cabañas de madera y ladrillo junto al espejo de agua del Urugua-í. Días de muelle, kayak y pileta; noches de fuego, asado y cielo abierto. Nosotros ponemos la calma.",
+    "link": "Conocé el lugar →"
   },
   "units": {
-    "sectionKicker": "Alojamientos",
-    "sectionTitle": "Cada unidad, otra forma de volver de la selva.",
-    "viewAll": "Ver todos →",
+    "sectionKicker": "Cabañas",
+    "sectionTitle": "Cada cabaña, una forma de mirar el lago.",
+    "viewAll": "Ver tarifas →",
     "fromPrice": "Desde $—",
     "perNight": "/ noche",
     "timbo": {
       "name": "Cabaña Timbó",
-      "sub": "hasta 6 huéspedes · 2 dormitorios · 1 baño · 65 m² · piscina con jacuzzi · wifi"
+      "sub": "hasta 6 huéspedes · 2 dormitorios · galería con parrilla · vista al lago · wifi"
     },
     "lapacho": {
       "name": "Cabaña Lapacho",
-      "sub": "hasta 4 huéspedes · 1 dormitorio · 1 baño · 45 m² · cocina equipada · wifi"
+      "sub": "hasta 4 huéspedes · 1 dormitorio · salamandra · deck al agua · wifi"
     },
     "guatambu": {
       "name": "Cabaña Guatambú",
-      "sub": "hasta 5 huéspedes · 2 habitaciones · 1 baño · 55 m² · cocina completa · wifi · DirectTV"
+      "sub": "hasta 5 huéspedes · 2 dormitorios · cocina completa · acceso a pileta · wifi"
     }
   },
   "experiencias": {
-    "kicker": "Experiencias",
-    "title": "Las Cataratas, sin apuro.",
-    "body": "Te damos mucho más que un lugar donde dormir. Te armamos una guía a medida con lo que de verdad vale la pena en Iguazú y te ponemos en contacto con gente de confianza para reservar cada excursión.",
+    "kicker": "El lugar",
+    "title": "El lago, sin apuro.",
+    "body": "Muelle propio, kayaks y atardeceres que se reflejan en el agua. Y cuando baja el sol, fuego: salamandra adentro, asado afuera.",
     "items": {
       "nature": {
-        "title": "Naturaleza",
-        "desc": "Cataratas, Parque Nacional y Selva Paranaense, a minutos del lodge."
+        "title": "El agua",
+        "desc": "Muelle, kayak, pesca y pileta turquesa frente al lago."
       },
       "gastronomy": {
-        "title": "Gastronomía",
-        "desc": "Las mesas y sabores que no te podés perder en la Triple Frontera."
+        "title": "Atardeceres",
+        "desc": "El cielo dorado sobre el espejo de agua, todos los días."
       },
       "frontier": {
-        "title": "Triple Frontera",
-        "desc": "Cruce a Brasil y Paraguay en el mismo día, sin vueltas."
+        "title": "Fuego y asado",
+        "desc": "Parrilla, fogón y salamandra: el calor del interior."
       },
       "activities": {
-        "title": "Actividades",
-        "desc": "Rafting, cabalgatas, avistaje de aves y otras aventuras."
+        "title": "Selva misionera",
+        "desc": "Palmeras, senderos y alfombras de hojas de otoño."
       }
     }
   },
   "galeria": {
     "kicker": "Galería",
-    "title": "Un relato en imágenes.",
-    "viewFull": "Ver galería completa",
+    "title": "Postales del lago.",
+    "viewFull": "Ver completa",
     "relato": {
       "intro": "Un recorrido en fotos por La Casa del Lago: del primer reflejo del agua al último rincón pensado para que te quedes.",
       "frames": {
@@ -174,23 +174,24 @@
     }
   },
   "cta": {
-    "kicker": "Reservas",
-    "title": "¿Listos para llegar al lago Urugua-í?",
-    "body": "Reservás directo con nosotros: confirmación al instante y atención de verdad, sin intermediarios.",
+    "kicker": "Reservá",
+    "title": "Tu lugar junto al agua te espera.",
+    "body": "Escribinos y coordinamos tu estadía. Anfitriones presentes, respuesta directa y sin vueltas.",
     "bookNow": "Reservar ahora",
-    "whatsapp": "Escribinos por WhatsApp"
+    "whatsapp": "WhatsApp",
+    "handwritten": "¡Te esperamos!"
   },
   "contacto": {
     "kicker": "Contacto",
-    "title": "Estamos a un mensaje de distancia.",
-    "whatsappTitle": "Te respondemos nosotros, normalmente en menos de 24 h.",
-    "whatsappSub": "Escribinos por WhatsApp",
+    "title": "Escribinos, es directo.",
+    "whatsappTitle": "Reservá por WhatsApp",
+    "whatsappSub": "Respondemos en el día",
     "whereTitle": "Dónde estamos",
-    "address": "Costa del lago Urugua-í — entre Puerto Iguazú y Puerto Libertad, Misiones, Argentina",
-    "addressNote": "A orillas del lago Urugua-í, entre Iguazú y Libertad, rodeado de selva.",
+    "address": "Puerto Libertad, Misiones",
+    "addressNote": "A orillas del lago Urugua-í, sobre la ruta 12 entre Iguazú y Eldorado.",
     "directTitle": "Directo",
     "checkInOut": "Check-in 15 h · Check-out 11 h",
-    "mapCta": "Cómo llegar →",
+    "mapCta": "Cómo llegar",
     "form": {
       "name": "Nombre",
       "email": "Email",
@@ -203,30 +204,30 @@
     }
   },
   "footer": {
-    "tagline": "Cabañas a orillas del lago Urugua-í, entre Iguazú y Libertad, Misiones, Argentina.",
+    "tagline": "Cabañas a orillas del lago Urugua-í. Desconexión, atardeceres y fuego en Puerto Libertad, Misiones.",
     "exploreTitle": "Explorar",
     "contactTitle": "Contacto",
     "langTitle": "Idioma",
-    "copyright": "© 2026 La Casa del Lago Urugua-í. Todos los derechos reservados.",
+    "copyright": "© 2026 La Casa del Lago Urugua-í",
     "myReservation": "Mi reserva",
-    "credit": "Sitio creado por Selva Digital"
+    "credit": "Hecho junto al agua"
   },
   "departamento": {
-    "breadcrumb": "Departamentos",
+    "breadcrumb": "Cabañas",
     "specGuests": "Huéspedes",
     "specBedroom": "Dormitorio",
     "specArea": "Superficie",
     "subtitle": "Diseño, confort y equipamiento de primera, a orillas del lago Urugua-í.",
     "spaceTitle": "El espacio",
     "spaceBody": {
-      "timbo": "Una cabaña pensada para grupos y familias: 2 dormitorios, baño completo, cocina equipada y sala comedor, hasta 6 huéspedes. Con acceso a la piscina con jacuzzi hidromasaje, a orillas del lago Urugua-í, entre Iguazú y Libertad.",
+      "timbo": "Madera y ladrillo frente al lago: dos dormitorios, galería con parrilla y un deck donde el día termina mirando el atardecer sobre el agua. La Timbó es la cabaña más amplia de la casa, con cocina completa, salamandra para las noches frescas y acceso directo al muelle y la pileta — ideal para familias o dos parejas que quieren desconectar sin resignar comodidad.",
       "lapacho": "Una cabaña luminosa: 1 dormitorio, baño completo, cocina equipada, living y comedor. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad.",
-      "guatambu": "Una cabaña con todo lo necesario: dos habitaciones, baño completo, cocina equipada completa y lavadero con lavarropas. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad."
+      "guatambu": "Una cabaña con todo lo necesario: 2 dormitorios, baño completo, cocina equipada completa y lavadero con lavarropas. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad."
     },
     "featuresTitle": "Características",
     "featCapacity": "Capacidad",
-    "featBedroom": "Dormitorio",
-    "featBath": "Baño",
+    "featBedroom": "Dormitorios",
+    "featBath": "Baños",
     "featView": "Vista",
     "featArea": "Superficie",
     "featExterior": "Exterior",
@@ -247,7 +248,7 @@
     "waBookNote": "Confirmamos tu reserva al instante por WhatsApp",
     "waBookMessage": "Hola! Quiero reservar {unit}. ¿Tienen disponibilidad?",
     "whatsappLink": "Escribinos por WhatsApp",
-    "otherTitle": "Otros alojamientos"
+    "otherTitle": "Otras formas de mirar el lago."
   },
   "meta": {
     "title": "La Casa del Lago Urugua-í — Cabañas a orillas del lago",
@@ -255,10 +256,10 @@
   },
   "reservas": {
     "backToSite": "← Volver al sitio",
-    "directKicker": "Reserva directa",
+    "directKicker": "Reservá",
     "titles": [
       " ",
-      "Tus datos",
+      "Falta poco para el lago.",
       "Pagá tu reserva",
       "Reserva confirmada"
     ],
@@ -283,7 +284,7 @@
     "units": {
       "timbo": "hasta 6 huéspedes · 2 dormitorios · 1 baño · cocina equipada · wifi",
       "lapacho": "hasta 4 huéspedes · 1 dormitorio · 1 baño · cocina equipada · wifi",
-      "guatambu": "hasta 5 huéspedes · 2 habitaciones · 1 baño · cocina completa · lavarropas · wifi · DirectTV"
+      "guatambu": "hasta 5 huéspedes · 2 dormitorios · 1 baño · cocina completa · lavarropas · wifi · DirectTV"
     },
     "chooseStay": "Elegí tu alojamiento",
     "perNight": "por noche",

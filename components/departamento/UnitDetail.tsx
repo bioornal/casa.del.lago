@@ -13,13 +13,13 @@ const UNIT_FEAT: Record<
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
   timbo: {
-    bedroom: "3 habitaciones: 2 camas matrimoniales + 3 individuales",
-    bath: "3 completos",
-    view: "Jardín y piscina",
-    exterior: "Piscina con jacuzzi hidromasaje",
+    bedroom: "2 (matrimonial + twin)",
+    bath: "1 completo",
+    view: "Al lago",
+    exterior: "Galería con parrilla + deck",
   },
   lapacho: {
-    bedroom: "2 dormitorios",
+    bedroom: "1 dormitorio",
     bath: "1 completo",
     view: "Jardín y pileta",
     exterior: "Balcón con vista a la pileta",
@@ -37,8 +37,8 @@ const UNIT_FEAT_EN: Record<
   UnitSlug,
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
-  timbo: { bedroom: "3 bedrooms: 2 double beds + 3 single beds", bath: "3 full", view: "Garden & pool", exterior: "Pool with hydromassage jacuzzi" },
-  lapacho: { bedroom: "2 bedrooms", bath: "1 full", view: "Garden & pool", exterior: "Balcony overlooking the pool" },
+  timbo: { bedroom: "2 (double + twin)", bath: "1 full", view: "Lake view", exterior: "Covered deck with grill" },
+  lapacho: { bedroom: "1 bedroom", bath: "1 full", view: "Garden & pool", exterior: "Balcony overlooking the pool" },
   guatambu: { bedroom: "1 double + 3 single beds", bath: "1 full", view: "Garden & pool", exterior: "Pool access" },
 };
 
@@ -46,8 +46,8 @@ const UNIT_FEAT_PT: Record<
   UnitSlug,
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
-  timbo: { bedroom: "3 quartos: 2 camas de casal + 3 camas de solteiro", bath: "3 completos", view: "Jardim e piscina", exterior: "Piscina com jacuzzi hidromassagem" },
-  lapacho: { bedroom: "2 quartos", bath: "1 completo", view: "Jardim e piscina", exterior: "Sacada com vista para a piscina" },
+  timbo: { bedroom: "2 (casal + solteiro)", bath: "1 completo", view: "Vista para o lago", exterior: "Varanda com churrasqueira" },
+  lapacho: { bedroom: "1 quarto", bath: "1 completo", view: "Jardim e piscina", exterior: "Sacada com vista para a piscina" },
   guatambu: { bedroom: "1 casal + 3 individuais", bath: "1 completo", view: "Jardim e piscina", exterior: "Acesso à piscina" },
 };
 

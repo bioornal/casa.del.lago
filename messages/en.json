@@ -1,16 +1,16 @@
 {
   "nav": {
-    "brand": "The Brand",
+    "brand": "The house",
     "apartments": "Cabins",
-    "experiences": "Experiences",
+    "experiences": "The place",
     "gallery": "Gallery",
     "contact": "Contact",
     "book": "Book"
   },
   "hero": {
-    "kicker": "Lake Urugua-í · Misiones",
-    "title": "A retreat on the lakeshore",
-    "subtitle": "Cabins designed down to the detail, between the jungle and Lake Urugua-í."
+    "kicker": "Puerto Libertad · Misiones",
+    "title": "On the shores of Lake Urugua-í",
+    "subtitle": "Wood and brick cabins, a pool facing the lake and fire for the asado."
   },
   "bookingBar": {
     "arrival": "Check-in",
@@ -32,8 +32,8 @@
   "tarifas": {
     "title": "Available rates",
     "subtitle": "Choose your accommodation for the selected dates",
-    "pickDatesTitle": "Choose your dates",
-    "pickDatesHint": "Pick dates to see availability and prices",
+    "pickDatesTitle": "Pick your dates, look at the lake.",
+    "pickDatesHint": "Prices per night, per cabin. Select check-in and check-out to see availability and the total for your stay.",
     "from": "from",
     "perNight": "per night",
     "nights": "nights",
@@ -76,57 +76,57 @@
     }
   },
   "manifiesto": {
-    "kicker": "The brand",
-    "title": "The jungle to explore. Here to rest.",
-    "body": "La Casa del Lago Urugua-í is a set of designer cabins, considered down to the last detail — the way you'd think through a home. After a day of jungle and water, you come back to the calm of the lake: comfort, nature and design on the shores of the Urugua-í, between Iguazú and Libertad.",
-    "link": "Discover the philosophy →"
+    "kicker": "The house",
+    "title": "The day ends watching the sunset over the water.",
+    "body": "La Casa del Lago is wood and brick cabins by the still water of the Urugua-í. Days of the dock, kayaking and the pool; nights of fire, asado and open sky. We bring the calm.",
+    "link": "Discover the place →"
   },
   "units": {
-    "sectionKicker": "Stays",
-    "sectionTitle": "Each unit, another way to come back from the jungle.",
-    "viewAll": "View all →",
+    "sectionKicker": "Cabins",
+    "sectionTitle": "Each cabin, another way to look at the lake.",
+    "viewAll": "View rates →",
     "fromPrice": "From $—",
     "perNight": "/ night",
     "timbo": {
       "name": "Cabaña Timbó",
-      "sub": "up to 6 guests · 2 bedrooms · 1 bathroom · 65 m² · pool with jacuzzi · wifi"
+      "sub": "up to 6 guests · 2 bedrooms · covered deck with grill · lake view · wifi"
     },
     "lapacho": {
       "name": "Cabaña Lapacho",
-      "sub": "up to 4 guests · 1 bedroom · 1 bathroom · 45 m² · equipped kitchen · wifi"
+      "sub": "up to 4 guests · 1 bedroom · wood stove · deck on the water · wifi"
     },
     "guatambu": {
       "name": "Cabaña Guatambú",
-      "sub": "up to 5 guests · 2 bedrooms · 1 bathroom · 55 m² · full kitchen · wifi · DirectTV"
+      "sub": "up to 5 guests · 2 bedrooms · full kitchen · pool access · wifi"
     }
   },
   "experiencias": {
-    "kicker": "Experiences",
-    "title": "The Falls, unhurried.",
-    "body": "We give you much more than a place to sleep. We put together a tailor-made guide to what's really worth doing in Iguazú and connect you with trusted locals to book every excursion.",
+    "kicker": "The place",
+    "title": "The lake, unhurried.",
+    "body": "A private dock, kayaks and sunsets reflected on the water. And once the sun goes down, fire: a wood stove inside, an asado outside.",
     "items": {
       "nature": {
-        "title": "Nature",
-        "desc": "The Falls, the National Park and the Paraná rainforest, minutes away."
+        "title": "The water",
+        "desc": "Dock, kayak, fishing and a turquoise pool facing the lake."
       },
       "gastronomy": {
-        "title": "Gastronomy",
-        "desc": "The tables and flavors you shouldn't miss in the Triple Frontier."
+        "title": "Sunsets",
+        "desc": "The golden sky over the still water, every single day."
       },
       "frontier": {
-        "title": "Triple Frontier",
-        "desc": "Cross into Brazil and Paraguay in the same day, hassle-free."
+        "title": "Fire and asado",
+        "desc": "Grill, bonfire and wood stove: the warmth of the inside."
       },
       "activities": {
-        "title": "Activities",
-        "desc": "Rafting, horseback riding, bird watching and more adventures."
+        "title": "Misiones jungle",
+        "desc": "Palm trees, trails and carpets of autumn leaves."
       }
     }
   },
   "galeria": {
     "kicker": "Gallery",
-    "title": "A story in images.",
-    "viewFull": "View full gallery",
+    "title": "Postcards from the lake.",
+    "viewFull": "View full",
     "relato": {
       "intro": "A walk through La Casa del Lago in photos: from the first reflection on the water to the last thoughtfully chosen corner.",
       "frames": {
@@ -174,23 +174,24 @@
     }
   },
   "cta": {
-    "kicker": "Booking",
-    "title": "Ready to reach Lake Urugua-í?",
-    "body": "Book directly with us: instant confirmation and real, human attention — no middlemen.",
+    "kicker": "Book",
+    "title": "Your place by the water is waiting.",
+    "body": "Write to us and we'll set up your stay. Hosts who are actually there, direct answers, no runaround.",
     "bookNow": "Book now",
-    "whatsapp": "Message us on WhatsApp"
+    "whatsapp": "WhatsApp",
+    "handwritten": "See you soon!"
   },
   "contacto": {
     "kicker": "Contact",
-    "title": "We're one message away.",
-    "whatsappTitle": "You'll hear back from us directly, usually within 24 h.",
-    "whatsappSub": "Message us on WhatsApp",
+    "title": "Write to us, it's direct.",
+    "whatsappTitle": "Book via WhatsApp",
+    "whatsappSub": "We reply the same day",
     "whereTitle": "Where we are",
-    "address": "Lake Urugua-í shore — between Puerto Iguazú and Puerto Libertad, Misiones, Argentina",
-    "addressNote": "On the shores of Lake Urugua-í, between Iguazú and Libertad, surrounded by jungle.",
+    "address": "Puerto Libertad, Misiones",
+    "addressNote": "On the shores of Lake Urugua-í, on route 12 between Iguazú and Eldorado.",
     "directTitle": "Direct",
     "checkInOut": "Check-in 3 pm · Check-out 11 am",
-    "mapCta": "Get directions →",
+    "mapCta": "Get directions",
     "form": {
       "name": "Name",
       "email": "Email",
@@ -203,30 +204,30 @@
     }
   },
   "footer": {
-    "tagline": "Cabins on the shores of Lake Urugua-í, between Iguazú and Libertad, Misiones, Argentina.",
+    "tagline": "Cabins on the shores of Lake Urugua-í. Disconnection, sunsets and fire in Puerto Libertad, Misiones.",
     "exploreTitle": "Explore",
     "contactTitle": "Contact",
     "langTitle": "Language",
-    "copyright": "© 2026 La Casa del Lago Urugua-í. All rights reserved.",
+    "copyright": "© 2026 La Casa del Lago Urugua-í",
     "myReservation": "My reservation",
-    "credit": "Site created by Selva Digital"
+    "credit": "Made by the water"
   },
   "departamento": {
-    "breadcrumb": "Apartments",
+    "breadcrumb": "Cabins",
     "specGuests": "Guests",
     "specBedroom": "Bedroom",
     "specArea": "Area",
     "subtitle": "Design, comfort and first-class amenities, on the shores of Lake Urugua-í.",
     "spaceTitle": "The space",
     "spaceBody": {
-      "timbo": "A cabin designed for groups and families: 2 bedrooms, a full bathroom, an equipped kitchen and dining room, for up to 6 guests. With access to the pool with hydromassage jacuzzi, on the shores of Lake Urugua-í, between Iguazú and Libertad.",
+      "timbo": "Wood and brick facing the lake: two bedrooms, a covered deck with a grill and a deck where the day ends watching the sunset over the water. The Timbó is the roomiest cabin in the house, with a full kitchen, a wood stove for cool nights and direct access to the dock and the pool — perfect for families or two couples who want to disconnect without giving up comfort.",
       "lapacho": "A bright cabin: 1 bedroom, a full bathroom, an equipped kitchen, living and dining rooms. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad.",
-      "guatambu": "A cabin with everything you need: two bedrooms, a full bathroom, a fully equipped kitchen and a laundry room with washer. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad."
+      "guatambu": "A cabin with everything you need: 2 bedrooms, a full bathroom, a fully equipped kitchen and a laundry room with washer. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad."
     },
     "featuresTitle": "Features",
     "featCapacity": "Capacity",
-    "featBedroom": "Bedroom",
-    "featBath": "Bathroom",
+    "featBedroom": "Bedrooms",
+    "featBath": "Bathrooms",
     "featView": "View",
     "featArea": "Area",
     "featExterior": "Outdoor",
@@ -247,7 +248,7 @@
     "waBookNote": "We confirm your booking instantly via WhatsApp",
     "waBookMessage": "Hi! I would like to book {unit}. Is it available?",
     "whatsappLink": "Message us on WhatsApp",
-    "otherTitle": "Other stays"
+    "otherTitle": "Other ways to look at the lake."
   },
   "meta": {
     "title": "La Casa del Lago Urugua-í — Cabins on the lakeshore",
@@ -255,10 +256,10 @@
   },
   "reservas": {
     "backToSite": "← Back to site",
-    "directKicker": "Direct booking",
+    "directKicker": "Book",
     "titles": [
       " ",
-      "Your details",
+      "Almost at the lake.",
       "Pay your booking",
       "Booking confirmed"
     ],
