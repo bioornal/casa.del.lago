@@ -42,7 +42,7 @@ function form(fields: Record<string, string>, file?: File) {
 }
 
 const VALID = {
-  unitId: "tatu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4",
+  unitId: "guatambu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4",
   firstName: "Juan", lastName: "Pérez", email: "juan@test.com", phone: "+54",
   locale: "pt",
 };
@@ -51,7 +51,7 @@ const goodFile = () => new File([new Uint8Array([1, 2, 3])], "c.jpg", { type: "i
 beforeEach(() => {
   vi.clearAllMocks();
   isRangeAvailable.mockResolvedValue(true);
-  uploadComprobante.mockResolvedValue("tatu-path/x.jpg");
+  uploadComprobante.mockResolvedValue("guatambu-path/x.jpg");
   createPendingEvent.mockResolvedValue({ eventId: "evt-1" });
   insertReservation.mockResolvedValue(undefined);
 });
@@ -116,8 +116,8 @@ describe("POST /api/reservations/transfer", () => {
     insertReservation.mockRejectedValue(new Error("db down"));
     const res = await POST(form(VALID, goodFile()));
     expect(res.status).toBe(502);
-    expect(deleteEvent).toHaveBeenCalledWith("tatu", "evt-1");
-    expect(removeComprobante).toHaveBeenCalledWith("tatu-path/x.jpg");
+    expect(deleteEvent).toHaveBeenCalledWith("guatambu", "evt-1");
+    expect(removeComprobante).toHaveBeenCalledWith("guatambu-path/x.jpg");
   });
 
   it("propaga locale al insert (default es si falta o es inválido)", async () => {

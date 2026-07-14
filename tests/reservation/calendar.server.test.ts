@@ -14,12 +14,12 @@ const FAKE_SA = JSON.stringify({
 
 beforeEach(() => {
   process.env.GOOGLE_SERVICE_ACCOUNT_JSON = FAKE_SA;
-  process.env.CDL_CAL_YVYRA = "yvyra@group.calendar.google.com";
+  process.env.CDL_CAL_TIMBO = "timbo@group.calendar.google.com";
 });
 afterEach(() => {
   vi.unstubAllGlobals();
   delete process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-  delete process.env.CDL_CAL_YVYRA;
+  delete process.env.CDL_CAL_TIMBO;
 });
 
 function stubFetch(handlers: {
@@ -39,7 +39,7 @@ function stubFetch(handlers: {
 describe("isRangeAvailable", () => {
   it("true cuando no hay eventos que solapen las noches", async () => {
     stubFetch({ events: () => new Response(JSON.stringify({ items: [] }), { status: 200 }) });
-    const ok = await isRangeAvailable("yvyra", { from: "2026-07-02", to: "2026-07-05" });
+    const ok = await isRangeAvailable("timbo", { from: "2026-07-02", to: "2026-07-05" });
     expect(ok).toBe(true);
   });
 
@@ -51,7 +51,7 @@ describe("isRangeAvailable", () => {
           { status: 200 },
         ),
     });
-    const ok = await isRangeAvailable("yvyra", { from: "2026-07-02", to: "2026-07-05" });
+    const ok = await isRangeAvailable("timbo", { from: "2026-07-02", to: "2026-07-05" });
     expect(ok).toBe(false);
   });
 
@@ -63,7 +63,7 @@ describe("isRangeAvailable", () => {
           { status: 200 },
         ),
     });
-    const ok = await isRangeAvailable("yvyra", { from: "2026-07-02", to: "2026-07-05" });
+    const ok = await isRangeAvailable("timbo", { from: "2026-07-02", to: "2026-07-05" });
     expect(ok).toBe(true);
   });
 
@@ -75,7 +75,7 @@ describe("isRangeAvailable", () => {
           { status: 200 },
         ),
     });
-    const ok = await isRangeAvailable("yvyra", { from: "2026-07-02", to: "2026-07-05" });
+    const ok = await isRangeAvailable("timbo", { from: "2026-07-02", to: "2026-07-05" });
     expect(ok).toBe(false);
   });
 
@@ -87,7 +87,7 @@ describe("isRangeAvailable", () => {
         return new Response(JSON.stringify({ items: [] }), { status: 200 });
       },
     });
-    await isRangeAvailable("yvyra", { from: "2026-07-02", to: "2026-07-05" });
+    await isRangeAvailable("timbo", { from: "2026-07-02", to: "2026-07-05" });
     expect(calledUrl).toContain("singleEvents=true");
     // timeMin = from-1 = 2026-07-01, timeMax = to+1 = 2026-07-06 (URL-encoded)
     expect(decodeURIComponent(calledUrl)).toContain("timeMin=2026-07-01T00:00:00Z");
@@ -100,19 +100,19 @@ describe("isRangeAvailable", () => {
       end: { date: "2030-01-02" },
     }));
     stubFetch({ events: () => new Response(JSON.stringify({ items: full }), { status: 200 }) });
-    const ok = await isRangeAvailable("yvyra", { from: "2026-07-02", to: "2026-07-05" });
+    const ok = await isRangeAvailable("timbo", { from: "2026-07-02", to: "2026-07-05" });
     expect(ok).toBe(false); // ninguno solapa, pero la página llena → NO disponible
   });
 
   it("lanza si falta GOOGLE_SERVICE_ACCOUNT_JSON", async () => {
     delete process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
     stubFetch({ events: () => new Response(JSON.stringify({ items: [] }), { status: 200 }) });
-    await expect(isRangeAvailable("yvyra", { from: "2026-07-02", to: "2026-07-05" })).rejects.toThrow();
+    await expect(isRangeAvailable("timbo", { from: "2026-07-02", to: "2026-07-05" })).rejects.toThrow();
   });
 
   it("lanza si la API responde con error", async () => {
     stubFetch({ events: () => new Response("nope", { status: 500 }) });
-    await expect(isRangeAvailable("yvyra", { from: "2026-07-02", to: "2026-07-05" })).rejects.toThrow();
+    await expect(isRangeAvailable("timbo", { from: "2026-07-02", to: "2026-07-05" })).rejects.toThrow();
   });
 });
 
@@ -132,8 +132,8 @@ describe("createBookingEvent", () => {
         return new Response(JSON.stringify({ id: "evt-123" }), { status: 200 });
       },
     });
-    const res = await createBookingEvent("yvyra", {
-      unitName: "Suite Yvyrá",
+    const res = await createBookingEvent("timbo", {
+      unitName: "Cabaña Timbó",
       firstName: "Juan",
       lastName: "Pérez",
       email: "juan@test.com",
@@ -147,7 +147,7 @@ describe("createBookingEvent", () => {
       paymentId: "pay-999",
     });
     expect(res.eventId).toBe("evt-123");
-    expect(captured!.summary).toBe("[CONFIRMADA] Suite Yvyrá — Juan Pérez");
+    expect(captured!.summary).toBe("[CONFIRMADA] Cabaña Timbó — Juan Pérez");
     expect(captured!.start.date).toBe("2026-07-02");
     expect(captured!.end.date).toBe("2026-07-05");
     expect(captured!.description).toContain("$395");
@@ -160,8 +160,8 @@ describe("createBookingEvent", () => {
   it("lanza si el insert falla", async () => {
     stubFetch({ events: () => new Response("err", { status: 403 }) });
     await expect(
-      createBookingEvent("yvyra", {
-        unitName: "Suite Yvyrá", firstName: "J", lastName: "P", email: "j@t.com",
+      createBookingEvent("timbo", {
+        unitName: "Cabaña Timbó", firstName: "J", lastName: "P", email: "j@t.com",
         phone: "", guests: 1, checkIn: "2026-07-02", checkOut: "2026-07-05",
         nights: 3, total: 395, code: "CDL-2026-AB12", paymentId: "x",
       }),
@@ -178,14 +178,14 @@ describe("findBookingEventByCode", () => {
         return new Response(JSON.stringify({ items: [{ id: "evt-existing" }] }), { status: 200 });
       },
     });
-    const found = await findBookingEventByCode("yvyra", "CDL-2026-AB12");
+    const found = await findBookingEventByCode("timbo", "CDL-2026-AB12");
     expect(found).toEqual({ eventId: "evt-existing" });
     expect(decodeURIComponent(calledUrl)).toContain("privateExtendedProperty=code=CDL-2026-AB12");
   });
 
   it("devuelve null cuando no hay evento con ese código", async () => {
     stubFetch({ events: () => new Response(JSON.stringify({ items: [] }), { status: 200 }) });
-    const found = await findBookingEventByCode("yvyra", "CDL-2026-ZZ99");
+    const found = await findBookingEventByCode("timbo", "CDL-2026-ZZ99");
     expect(found).toBeNull();
   });
 });

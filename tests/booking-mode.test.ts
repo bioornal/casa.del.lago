@@ -29,9 +29,9 @@ describe("waLink", () => {
   });
 
   it("con mensaje lo urlencodea en ?text=", () => {
-    const url = waLink("Hola! Quiero reservar Suite Yvyrá del 15 jul al 18 jul");
+    const url = waLink("Hola! Quiero reservar Cabaña Timbó del 15 jul al 18 jul");
     expect(url).toBe(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola! Quiero reservar Suite Yvyrá del 15 jul al 18 jul")}`,
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola! Quiero reservar Cabaña Timbó del 15 jul al 18 jul")}`,
     );
     expect(url).not.toContain(" ");
   });

@@ -6,9 +6,9 @@ import type { UnitId } from "./reducer";
 // "server-only" para mantener el módulo testeable en Vitest.
 
 const ENV_BY_UNIT: Record<UnitId, string> = {
-  yvyra: "CDL_ICS_YVYRA",
-  mberu: "CDL_ICS_MBERU",
-  tatu: "CDL_ICS_TATU",
+  timbo: "CDL_ICS_TIMBO",
+  lapacho: "CDL_ICS_LAPACHO",
+  guatambu: "CDL_ICS_GUATAMBU",
 };
 
 export function resolveIcsUrl(unitId: UnitId): string | undefined {

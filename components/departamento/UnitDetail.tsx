@@ -12,19 +12,19 @@ const UNIT_FEAT: Record<
   UnitSlug,
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
-  yvyra: {
+  timbo: {
     bedroom: "3 habitaciones: 2 camas matrimoniales + 3 individuales",
     bath: "3 completos",
     view: "Jardín y piscina",
     exterior: "Piscina con jacuzzi hidromasaje",
   },
-  mberu: {
+  lapacho: {
     bedroom: "2 dormitorios",
     bath: "1 completo",
     view: "Jardín y pileta",
     exterior: "Balcón con vista a la pileta",
   },
-  tatu: {
+  guatambu: {
     bedroom: "1 matrimonial + 3 individuales",
     bath: "1 completo",
     view: "Jardín y pileta",
@@ -37,36 +37,36 @@ const UNIT_FEAT_EN: Record<
   UnitSlug,
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
-  yvyra: { bedroom: "3 bedrooms: 2 double beds + 3 single beds", bath: "3 full", view: "Garden & pool", exterior: "Pool with hydromassage jacuzzi" },
-  mberu: { bedroom: "2 bedrooms", bath: "1 full", view: "Garden & pool", exterior: "Balcony overlooking the pool" },
-  tatu: { bedroom: "1 double + 3 single beds", bath: "1 full", view: "Garden & pool", exterior: "Pool access" },
+  timbo: { bedroom: "3 bedrooms: 2 double beds + 3 single beds", bath: "3 full", view: "Garden & pool", exterior: "Pool with hydromassage jacuzzi" },
+  lapacho: { bedroom: "2 bedrooms", bath: "1 full", view: "Garden & pool", exterior: "Balcony overlooking the pool" },
+  guatambu: { bedroom: "1 double + 3 single beds", bath: "1 full", view: "Garden & pool", exterior: "Pool access" },
 };
 
 const UNIT_FEAT_PT: Record<
   UnitSlug,
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
-  yvyra: { bedroom: "3 quartos: 2 camas de casal + 3 camas de solteiro", bath: "3 completos", view: "Jardim e piscina", exterior: "Piscina com jacuzzi hidromassagem" },
-  mberu: { bedroom: "2 quartos", bath: "1 completo", view: "Jardim e piscina", exterior: "Sacada com vista para a piscina" },
-  tatu: { bedroom: "1 casal + 3 individuais", bath: "1 completo", view: "Jardim e piscina", exterior: "Acesso à piscina" },
+  timbo: { bedroom: "3 quartos: 2 camas de casal + 3 camas de solteiro", bath: "3 completos", view: "Jardim e piscina", exterior: "Piscina com jacuzzi hidromassagem" },
+  lapacho: { bedroom: "2 quartos", bath: "1 completo", view: "Jardim e piscina", exterior: "Sacada com vista para a piscina" },
+  guatambu: { bedroom: "1 casal + 3 individuais", bath: "1 completo", view: "Jardim e piscina", exterior: "Acesso à piscina" },
 };
 
 // Per-unit extra services appended to the shared services list, per locale.
 const UNIT_EXTRAS: Record<string, Record<UnitSlug, string[]>> = {
   es: {
-    yvyra: ["Dúplex con dormitorios en planta alta", "Sala de estar con sofá", "Sala comedor", "Balcón con vista a la calle", "Estacionamiento gratuito en el predio"],
-    mberu: [],
-    tatu: ["DirectTV", "Lavadero con lavarropas", "Acceso a la piscina", "Estacionamiento gratuito en el mismo predio"],
+    timbo: ["Dúplex con dormitorios en planta alta", "Sala de estar con sofá", "Sala comedor", "Balcón con vista a la calle", "Estacionamiento gratuito en el predio"],
+    lapacho: [],
+    guatambu: ["DirectTV", "Lavadero con lavarropas", "Acceso a la piscina", "Estacionamiento gratuito en el mismo predio"],
   },
   en: {
-    yvyra: ["Duplex with upstairs bedrooms", "Living room with sofa", "Dining room", "Balcony with street view", "Free on-site parking"],
-    mberu: [],
-    tatu: ["DirectTV", "Laundry with washer", "Pool access", "Free on-site parking"],
+    timbo: ["Duplex with upstairs bedrooms", "Living room with sofa", "Dining room", "Balcony with street view", "Free on-site parking"],
+    lapacho: [],
+    guatambu: ["DirectTV", "Laundry with washer", "Pool access", "Free on-site parking"],
   },
   pt: {
-    yvyra: ["Duplex com quartos no andar superior", "Sala de estar com sofá", "Sala de jantar", "Sacada com vista para a rua", "Estacionamento gratuito no local"],
-    mberu: [],
-    tatu: ["DirectTV", "Lavanderia com máquina de lavar", "Acesso à piscina", "Estacionamento gratuito no mesmo local"],
+    timbo: ["Duplex com quartos no andar superior", "Sala de estar com sofá", "Sala de jantar", "Sacada com vista para a rua", "Estacionamento gratuito no local"],
+    lapacho: [],
+    guatambu: ["DirectTV", "Lavanderia com máquina de lavar", "Acesso à piscina", "Estacionamento gratuito no mesmo local"],
   },
 };
 
@@ -74,8 +74,8 @@ const UNIT_EXTRAS: Record<string, Record<UnitSlug, string[]>> = {
 // cuadrícula asimétrica. `span` marca el tamaño: hero 2x2, wide 2x1, tall 1x2.
 type GalleryPhoto = { photo: string; alt: string; span?: "hero" | "wide" | "tall" };
 
-// Suite Yvyrá — carpeta Dpto2 del bucket.
-const YVYRA_PHOTOS: GalleryPhoto[] = [
+// Cabaña Timbó — carpeta Dpto2 del bucket.
+const TIMBO_PHOTOS: GalleryPhoto[] = [
   { photo: "Dpto2/4.jpg", alt: "Living con sofá esquinero y rack de TV", span: "hero" },
   { photo: "Dpto2/11.jpg", alt: "Dormitorio principal con cama king" },
   { photo: "Dpto2/3.jpg", alt: "Escalera de doble altura", span: "tall" },
@@ -99,8 +99,8 @@ const YVYRA_PHOTOS: GalleryPhoto[] = [
   { photo: "Dpto2/19 (1).jpg", alt: "Escalera desde la planta alta" },
 ];
 
-// Departamento Mberú — carpeta Dpto1 del bucket (21 fotos: 1-9, 11-22).
-const MBERU_PHOTOS: GalleryPhoto[] = [
+// Cabaña Lapacho — carpeta Dpto1 del bucket (21 fotos: 1-9, 11-22).
+const LAPACHO_PHOTOS: GalleryPhoto[] = [
   { photo: "Dpto1/20.jpg", alt: "Living con sofá y Smart TV", span: "hero" },
   { photo: "Dpto1/9.jpg", alt: "Dormitorio principal con cama matrimonial", span: "wide" },
   { photo: "Dpto1/1.jpg", alt: "Escalera de acceso a la planta alta", span: "tall" },
@@ -125,8 +125,8 @@ const MBERU_PHOTOS: GalleryPhoto[] = [
 ];
 
 const UNIT_GALLERY: Partial<Record<UnitSlug, GalleryPhoto[]>> = {
-  yvyra: YVYRA_PHOTOS,
-  mberu: MBERU_PHOTOS,
+  timbo: TIMBO_PHOTOS,
+  lapacho: LAPACHO_PHOTOS,
 };
 
 const SPAN_CLS: Record<NonNullable<GalleryPhoto["span"]>, string> = {

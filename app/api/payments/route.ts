@@ -15,7 +15,7 @@ import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
 import type { UnitId } from "@/lib/reservation/reducer";
 
-const VALID_UNITS: UnitId[] = ["yvyra", "mberu", "tatu"];
+const VALID_UNITS: UnitId[] = ["timbo", "lapacho", "guatambu"];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function isUnitId(v: unknown): v is UnitId {

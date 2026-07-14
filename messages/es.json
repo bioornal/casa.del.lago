@@ -87,17 +87,17 @@
     "viewAll": "Ver todos →",
     "fromPrice": "Desde $—",
     "perNight": "/ noche",
-    "yvyra": {
-      "name": "Suite Yvyrá",
-      "sub": "hasta 8 huéspedes · dúplex de 3 habitaciones · 3 baños · piscina con jacuzzi · wifi"
+    "timbo": {
+      "name": "Cabaña Timbó",
+      "sub": "hasta 6 huéspedes · 2 dormitorios · 1 baño · 65 m² · piscina con jacuzzi · wifi"
     },
-    "mberu": {
-      "name": "Departamento Mberú",
-      "sub": "hasta 6 huéspedes · 2 dormitorios · 2 baños (uno en suite) · en planta alta · balcón con vista a la pileta · cocina equipada · wifi"
+    "lapacho": {
+      "name": "Cabaña Lapacho",
+      "sub": "hasta 4 huéspedes · 1 dormitorio · 1 baño · 45 m² · cocina equipada · wifi"
     },
-    "tatu": {
-      "name": "Cabaña Tatú",
-      "sub": "hasta 5 plazas · 2 habitaciones · cocina completa · lavarropas · acceso a piscina · wifi · DirectTV"
+    "guatambu": {
+      "name": "Cabaña Guatambú",
+      "sub": "hasta 5 huéspedes · 2 habitaciones · 1 baño · 55 m² · cocina completa · wifi · DirectTV"
     }
   },
   "experiencias": {
@@ -219,9 +219,9 @@
     "subtitle": "Diseño, confort y equipamiento de primera, a orillas del lago Urugua-í.",
     "spaceTitle": "El espacio",
     "spaceBody": {
-      "yvyra": "Un dúplex pensado para grupos y familias: 3 habitaciones (2 con cama matrimonial y una con 3 camas individuales) y un sofá en la sala de estar, hasta 8 huéspedes. 3 baños, cocina equipada, sala comedor y dormitorios en planta alta. Con estacionamiento gratuito en el predio y acceso a la piscina con jacuzzi hidromasaje, a orillas del lago Urugua-í, entre Iguazú y Libertad.",
-      "mberu": "Un departamento luminoso en planta alta: 2 dormitorios, 2 baños (uno en suite), cocina equipada, living y comedor, y un balcón con vista a la pileta. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad.",
-      "tatu": "Una cabaña con todo lo necesario: dos habitaciones, baño completo, cocina equipada completa y lavadero con lavarropas. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad."
+      "timbo": "Una cabaña pensada para grupos y familias: 2 dormitorios, baño completo, cocina equipada y sala comedor, hasta 6 huéspedes. Con acceso a la piscina con jacuzzi hidromasaje, a orillas del lago Urugua-í, entre Iguazú y Libertad.",
+      "lapacho": "Una cabaña luminosa: 1 dormitorio, baño completo, cocina equipada, living y comedor. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad.",
+      "guatambu": "Una cabaña con todo lo necesario: dos habitaciones, baño completo, cocina equipada completa y lavadero con lavarropas. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad."
     },
     "featuresTitle": "Características",
     "featCapacity": "Capacidad",
@@ -281,9 +281,9 @@
       "1": "Continuar al pago →"
     },
     "units": {
-      "yvyra": "hasta 8 huéspedes · dúplex 3 habitaciones · 3 baños · cocina equipada · wifi",
-      "mberu": "hasta 6 huéspedes · 2 dormitorios · 2 baños (uno en suite) · en planta alta · cocina equipada · wifi",
-      "tatu": "hasta 5 plazas · 2 habitaciones · 1 baño · cocina completa · lavarropas · wifi · DirectTV"
+      "timbo": "hasta 6 huéspedes · 2 dormitorios · 1 baño · cocina equipada · wifi",
+      "lapacho": "hasta 4 huéspedes · 1 dormitorio · 1 baño · cocina equipada · wifi",
+      "guatambu": "hasta 5 huéspedes · 2 habitaciones · 1 baño · cocina completa · lavarropas · wifi · DirectTV"
     },
     "chooseStay": "Elegí tu alojamiento",
     "perNight": "por noche",

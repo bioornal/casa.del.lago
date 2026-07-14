@@ -9,25 +9,25 @@ export function bucketSrc(path: string) {
   return `${SUPABASE_FOTOS}/${encodeURI(path)}`;
 }
 const REAL_PHOTOS: Record<string, string> = {
-  // Suite Yvyrá — la galería del detalle usa la prop `photo` (ver UnitDetail);
+  // Cabaña Timbó — la galería del detalle usa la prop `photo` (ver UnitDetail);
   // este seed solo cubre las cards (home, tarifas, otros alojamientos).
-  "suite-yvyra": "Dpto2/4.jpg", // living con sofá esquinero
-  // Departamento Mberú — la galería del detalle usa la prop `photo` (ver UnitDetail);
+  "cabana-timbo": "Dpto2/4.jpg", // living con sofá esquinero
+  // Cabaña Lapacho — la galería del detalle usa la prop `photo` (ver UnitDetail);
   // este seed solo cubre las cards (home, tarifas, otros alojamientos).
-  "departamento-mberu": "Dpto1/20.jpg", // living con sofá y Smart TV (portada)
-  // Cabaña Tatú
-  "cabana-tatu": "Casa/18.jpg", // lateral con jardín
-  "cabana-tatu-interior": "Casa/1.jpg", // comedor
-  "cabana-tatu-dormitorio": "Casa/5.jpg", // dormitorio principal
-  "cabana-tatu-bano": "Casa/13.jpg", // baño
-  "cabana-tatu-terraza": "Casa/18.jpg", // lateral con jardín
-  "cabana-tatu-piscina": "Casa/22.jpg", // pileta con la cabaña de fondo
-  "cabana-tatu-amenities": "Casa/8.jpg", // cocina equipada
-  "cabana-tatu-living": "Casa/4.jpg", // living con TV
-  "cabana-tatu-cocina": "Casa/15.jpg", // cocina completa
-  "cabana-tatu-segundo-dormitorio": "Casa/7.jpg", // dormitorio con cuchetas
-  "cabana-tatu-comedor": "Casa/2.jpg", // comedor con ventana a la pileta
-  "cabana-tatu-estar": "Casa/3.jpg", // comedor y vajillero
+  "cabana-lapacho": "Dpto1/20.jpg", // living con sofá y Smart TV (portada)
+  // Cabaña Guatambú
+  "cabana-guatambu": "Casa/18.jpg", // lateral con jardín
+  "cabana-guatambu-interior": "Casa/1.jpg", // comedor
+  "cabana-guatambu-dormitorio": "Casa/5.jpg", // dormitorio principal
+  "cabana-guatambu-bano": "Casa/13.jpg", // baño
+  "cabana-guatambu-terraza": "Casa/18.jpg", // lateral con jardín
+  "cabana-guatambu-piscina": "Casa/22.jpg", // pileta con la cabaña de fondo
+  "cabana-guatambu-amenities": "Casa/8.jpg", // cocina equipada
+  "cabana-guatambu-living": "Casa/4.jpg", // living con TV
+  "cabana-guatambu-cocina": "Casa/15.jpg", // cocina completa
+  "cabana-guatambu-segundo-dormitorio": "Casa/7.jpg", // dormitorio con cuchetas
+  "cabana-guatambu-comedor": "Casa/2.jpg", // comedor con ventana a la pileta
+  "cabana-guatambu-estar": "Casa/3.jpg", // comedor y vajillero
   // Galería del home
   "piscina": "Casa/22.jpg",
 };
@@ -48,8 +48,8 @@ const PHOTO_TWEAKS: Record<string, { filter?: string; position?: string }> = {
 
 const PHOTO_MAP: Record<string, { id: string; w?: number; h?: number; q?: string }> = {
   "solta-la-foto-de-portada": { id: "photo-1505881502353-a1986add3762", w: 1920, h: 1280 }, // selva amanecer
-  "suite-yvyra": { id: "photo-1611892440504-42a792e24d32", w: 1200, h: 900 }, // suite madera
-  "departamento-mberu": { id: "photo-1631049307264-da0ec9d70304", w: 1200, h: 900 }, // depto moderno (fallback)
+  "cabana-timbo": { id: "photo-1611892440504-42a792e24d32", w: 1200, h: 900 }, // suite madera
+  "cabana-lapacho": { id: "photo-1631049307264-da0ec9d70304", w: 1200, h: 900 }, // depto moderno (fallback)
   "las-cataratas": { id: "photo-1433086966358-54859d0ed716", w: 1200, h: 1400 }, // cascada selva
   "arquitectura": { id: "photo-1517825738774-7de9363ef735", w: 1400, h: 1200 },
   "detalle": { id: "photo-1484154218962-a197022b5858", w: 1000, h: 1000 },

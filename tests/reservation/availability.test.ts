@@ -18,7 +18,7 @@ describe("getAvailability (cliente)", () => {
         ),
       ),
     );
-    const res = await getAvailability("yvyra", RANGE);
+    const res = await getAvailability("timbo", RANGE);
     expect(res.source).toBe("google-calendar");
     expect(res.disabledDates).toHaveLength(2);
     const d0 = res.disabledDates[0];
@@ -27,7 +27,7 @@ describe("getAvailability (cliente)", () => {
 
   it("fail-open (stub, sin fechas) si la respuesta no es ok", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response("", { status: 500 })));
-    const res = await getAvailability("yvyra", RANGE);
+    const res = await getAvailability("timbo", RANGE);
     expect(res).toEqual({ disabledDates: [], source: "stub" });
   });
 
@@ -35,7 +35,7 @@ describe("getAvailability (cliente)", () => {
     vi.stubGlobal("fetch", vi.fn(async () => {
       throw new Error("network");
     }));
-    const res = await getAvailability("yvyra", RANGE);
+    const res = await getAvailability("timbo", RANGE);
     expect(res).toEqual({ disabledDates: [], source: "stub" });
   });
 
@@ -47,9 +47,9 @@ describe("getAvailability (cliente)", () => {
       }),
     );
     vi.stubGlobal("fetch", fetchMock);
-    await getAvailability("mberu", RANGE);
+    await getAvailability("lapacho", RANGE);
     const calledUrl = fetchMock.mock.calls[0][0];
-    expect(calledUrl).toContain("/api/availability/mberu");
+    expect(calledUrl).toContain("/api/availability/lapacho");
     expect(calledUrl).toContain("from=");
     expect(calledUrl).toContain("to=");
   });
@@ -64,7 +64,7 @@ describe("getAvailability (cliente)", () => {
         }),
       ),
     );
-    const res = await getAvailability("yvyra", RANGE);
+    const res = await getAvailability("timbo", RANGE);
     expect(res).toEqual({ disabledDates: [], source: "google-calendar" });
   });
 });

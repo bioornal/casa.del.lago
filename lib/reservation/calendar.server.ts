@@ -4,9 +4,9 @@ import type { UnitId } from "./reducer";
 // Solo server. No importar desde código cliente.
 
 const CAL_ENV_BY_UNIT: Record<UnitId, string> = {
-  yvyra: "CDL_CAL_YVYRA",
-  mberu: "CDL_CAL_MBERU",
-  tatu: "CDL_CAL_TATU",
+  timbo: "CDL_CAL_TIMBO",
+  lapacho: "CDL_CAL_LAPACHO",
+  guatambu: "CDL_CAL_GUATAMBU",
 };
 
 type ServiceAccount = { client_email: string; private_key: string; token_uri: string };

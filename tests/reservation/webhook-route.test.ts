@@ -36,7 +36,7 @@ const APPROVED_PAYMENT = {
   status: "approved",
   externalReference: "CDL-2026-AB12",
   metadata: {
-    unit_id: "tatu", unit_name: "Cabaña Tatú", first_name: "Juan", last_name: "Pérez",
+    unit_id: "guatambu", unit_name: "Cabaña Guatambú", first_name: "Juan", last_name: "Pérez",
     email: "juan@test.com", phone: "+54", guests: 4,
     check_in: "2026-07-02", check_out: "2026-07-05", nights: 3, total: 815,
   },
@@ -87,7 +87,7 @@ describe("POST /api/webhooks/mercadopago", () => {
     const res = await POST(req("pay-1", "req-1", true));
     expect(res.status).toBe(200);
     expect(createBookingEvent).toHaveBeenCalledOnce();
-    expect(createBookingEvent.mock.calls[0][0]).toBe("tatu");
+    expect(createBookingEvent.mock.calls[0][0]).toBe("guatambu");
     expect(createBookingEvent.mock.calls[0][1]).toMatchObject({ code: "CDL-2026-AB12", paymentId: "pay-1" });
   });
 

@@ -14,7 +14,7 @@ import { findReservationForGuest } from "@/lib/reservation/lookup.server";
 
 const ROW = {
   code: "CDL-2026-AB12",
-  unit_name: "Cabaña Tatú",
+  unit_name: "Cabaña Guatambú",
   check_in: "2026-07-02",
   check_out: "2026-07-05",
   nights: 3,
@@ -44,7 +44,7 @@ describe("findReservationForGuest", () => {
     const v = await findReservationForGuest("CDL-2026-AB12", "huesped@test.com");
     expect(v).toEqual({
       code: "CDL-2026-AB12",
-      unitName: "Cabaña Tatú",
+      unitName: "Cabaña Guatambú",
       checkIn: "2026-07-02",
       checkOut: "2026-07-05",
       nights: 3,

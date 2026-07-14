@@ -27,8 +27,8 @@ describe("parseRateQuery", () => {
 
 describe("parseCheckoutQuery", () => {
   it("requiere además una unidad válida", () => {
-    expect(parseCheckoutQuery({ unit: "tatu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4" }))
-      .toEqual({ unitId: "tatu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 4 });
+    expect(parseCheckoutQuery({ unit: "guatambu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4" }))
+      .toEqual({ unitId: "guatambu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 4 });
     expect(parseCheckoutQuery({ unit: "xxx", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4" })).toBeNull();
     expect(parseCheckoutQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4" })).toBeNull();
   });
@@ -40,7 +40,7 @@ describe("builders", () => {
       .toBe("/tarifas?checkIn=2026-07-02&checkOut=2026-07-05&guests=4");
   });
   it("buildCheckoutUrl incluye la unidad", () => {
-    expect(buildCheckoutUrl({ unitId: "mberu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 3 }))
-      .toBe("/reservas?unit=mberu&checkIn=2026-07-02&checkOut=2026-07-05&guests=3");
+    expect(buildCheckoutUrl({ unitId: "lapacho", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 3 }))
+      .toBe("/reservas?unit=lapacho&checkIn=2026-07-02&checkOut=2026-07-05&guests=3");
   });
 });

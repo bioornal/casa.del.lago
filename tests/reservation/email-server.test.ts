@@ -14,7 +14,7 @@ vi.mock("@/lib/reservation/reservations.server", () => ({
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
 
 const ROW = {
-  code: "CDL-2026-AB12", unit_name: "Casa Tatú", first_name: "Juan",
+  code: "CDL-2026-AB12", unit_name: "Casa Guatambú", first_name: "Juan",
   email: "juan@test.com",
   check_in: "2026-07-02", check_out: "2026-07-05", nights: 3, guests: 4,
   total: 480000, locale: "es",

@@ -87,17 +87,17 @@
     "viewAll": "View all →",
     "fromPrice": "From $—",
     "perNight": "/ night",
-    "yvyra": {
-      "name": "Suite Yvyrá",
-      "sub": "up to 8 guests · 3-bedroom duplex · 3 bathrooms · pool with jacuzzi · wifi"
+    "timbo": {
+      "name": "Cabaña Timbó",
+      "sub": "up to 6 guests · 2 bedrooms · 1 bathroom · 65 m² · pool with jacuzzi · wifi"
     },
-    "mberu": {
-      "name": "Departamento Mberú",
-      "sub": "up to 6 guests · 2 bedrooms · 2 bathrooms (one en-suite) · upper floor · balcony overlooking the pool · equipped kitchen · wifi"
+    "lapacho": {
+      "name": "Cabaña Lapacho",
+      "sub": "up to 4 guests · 1 bedroom · 1 bathroom · 45 m² · equipped kitchen · wifi"
     },
-    "tatu": {
-      "name": "Cabaña Tatú",
-      "sub": "up to 5 guests · 2 bedrooms · full kitchen · washer · pool access · wifi · DirectTV"
+    "guatambu": {
+      "name": "Cabaña Guatambú",
+      "sub": "up to 5 guests · 2 bedrooms · 1 bathroom · 55 m² · full kitchen · wifi · DirectTV"
     }
   },
   "experiencias": {
@@ -219,9 +219,9 @@
     "subtitle": "Design, comfort and first-class amenities, on the shores of Lake Urugua-í.",
     "spaceTitle": "The space",
     "spaceBody": {
-      "yvyra": "A duplex designed for groups and families: 3 bedrooms (2 with a double bed and one with 3 single beds) plus a sofa in the living room, for up to 8 guests. 3 bathrooms, equipped kitchen, dining room and bedrooms on the upper floor. With free on-site parking and access to the pool with hydromassage jacuzzi, on the shores of Lake Urugua-í, between Iguazú and Libertad.",
-      "mberu": "A bright upper-floor apartment: 2 bedrooms, 2 bathrooms (one en-suite), an equipped kitchen, living and dining rooms, and a balcony overlooking the pool. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad.",
-      "tatu": "A cabin with everything you need: two bedrooms, a full bathroom, a fully equipped kitchen and a laundry room with washer. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad."
+      "timbo": "A cabin designed for groups and families: 2 bedrooms, a full bathroom, an equipped kitchen and dining room, for up to 6 guests. With access to the pool with hydromassage jacuzzi, on the shores of Lake Urugua-í, between Iguazú and Libertad.",
+      "lapacho": "A bright cabin: 1 bedroom, a full bathroom, an equipped kitchen, living and dining rooms. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad.",
+      "guatambu": "A cabin with everything you need: two bedrooms, a full bathroom, a fully equipped kitchen and a laundry room with washer. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad."
     },
     "featuresTitle": "Features",
     "featCapacity": "Capacity",
@@ -281,9 +281,9 @@
       "1": "Continue to payment →"
     },
     "units": {
-      "yvyra": "up to 8 guests · 3-bedroom duplex · 3 bathrooms · equipped kitchen · wifi",
-      "mberu": "up to 6 guests · 2 bedrooms · 2 bathrooms (one en-suite) · upper floor · equipped kitchen · wifi",
-      "tatu": "up to 5 guests · 2 bedrooms · 1 bathroom · full kitchen · washer · wifi · DirectTV"
+      "timbo": "up to 6 guests · 2 bedrooms · 1 bathroom · equipped kitchen · wifi",
+      "lapacho": "up to 4 guests · 1 bedroom · 1 bathroom · equipped kitchen · wifi",
+      "guatambu": "up to 5 guests · 2 bedrooms · 1 bathroom · full kitchen · washer · wifi · DirectTV"
     },
     "chooseStay": "Choose your stay",
     "perNight": "per night",

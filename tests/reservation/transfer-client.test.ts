@@ -4,7 +4,7 @@ import { createTransferReservation } from "@/lib/reservation/transfer";
 beforeEach(() => { vi.restoreAllMocks(); });
 
 const base = {
-  unitId: "tatu" as const, checkIn: "2026-07-02", checkOut: "2026-07-05",
+  unitId: "guatambu" as const, checkIn: "2026-07-02", checkOut: "2026-07-05",
   guests: 4, firstName: "Juan", lastName: "Pérez", email: "j@t.com", phone: "+54",
   file: new File([new Uint8Array([1])], "c.jpg", { type: "image/jpeg" }),
   locale: "es" as const,
