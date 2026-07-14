@@ -5,10 +5,6 @@ import { Link, usePathname } from "@/lib/i18n/navigation";
 import { LangSwitcher } from "@/components/ui/LangSwitcher";
 import { useSectionSpy } from "@/lib/hooks/useSectionSpy";
 
-// Logo oficial alargado (Cloudinary) servido en 192px para nitidez retina
-const LOGO_URL =
-  "https://res.cloudinary.com/djtvjkcu6/image/upload/f_auto,q_auto,w_256/v1783166702/ArumaLodge/ALARGADA_vs5bwo.png";
-
 export function SiteNav() {
   const t = useTranslations("nav");
   const [solid, setSolid] = useState(false);
@@ -17,9 +13,11 @@ export function SiteNav() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const sectionHref = (id: string) => (isHome ? `#${id}` : `/#${id}`);
+  // Transparente solo en Home, arriba de todo y con el drawer cerrado
+  const dark = isHome && !solid && !open;
 
   useEffect(() => {
-    const onScroll = () => setSolid(window.scrollY > 40);
+    const onScroll = () => setSolid(window.scrollY > 60);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
@@ -50,7 +48,7 @@ export function SiteNav() {
             href={`#${id}`}
             data-section={id}
             onClick={() => setOpen(false)}
-            className={linkClass(id, active)}
+            className={linkClass(id, active, dark)}
           >
             {label}
           </a>
@@ -59,7 +57,7 @@ export function SiteNav() {
             key={id}
             href={sectionHref(id)}
             onClick={() => setOpen(false)}
-            className={linkClass(id, active)}
+            className={linkClass(id, active, dark)}
           >
             {label}
           </Link>
@@ -79,10 +77,10 @@ export function SiteNav() {
       />
     <nav
       className={[
-        "fixed top-0 left-0 right-0 z-50 border-b border-[#E7E0D4] transition-[background-color,box-shadow] duration-300",
-        solid || open
-          ? "bg-marfil shadow-[0_1px_40px_-24px_rgba(29,29,29,.45)]"
-          : "bg-[rgba(248,245,240,.86)] backdrop-blur-[14px] shadow-[0_1px_40px_-24px_rgba(29,29,29,.2)]",
+        "fixed top-0 left-0 right-0 z-50 border-b transition-[background-color,border-color] duration-300",
+        dark
+          ? "bg-transparent border-transparent"
+          : "bg-[rgba(245,238,225,.92)] backdrop-blur-[14px] border-borde-medio",
       ].join(" ")}
     >
       <div className="max-w-[1320px] mx-auto px-5 md:px-12 py-2 flex items-center justify-between gap-5">
@@ -93,18 +91,30 @@ export function SiteNav() {
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="lg:hidden flex flex-col items-center justify-center w-8 h-8 -ml-1 text-carbon"
+            className={[
+              "lg:hidden flex flex-col items-center justify-center w-8 h-8 -ml-1",
+              dark ? "text-marfil" : "text-carbon",
+            ].join(" ")}
           >
             <span
-              className="block w-6 h-px bg-carbon transition-transform duration-300"
+              className={[
+                "block w-6 h-px transition-[transform,background-color] duration-300",
+                dark ? "bg-marfil" : "bg-carbon",
+              ].join(" ")}
               style={{ transform: open ? "translateY(4px) rotate(45deg)" : "none" }}
             />
             <span
-              className="block w-6 h-px bg-carbon transition-opacity duration-300 my-[5px]"
+              className={[
+                "block w-6 h-px transition-[opacity,background-color] duration-300 my-[5px]",
+                dark ? "bg-marfil" : "bg-carbon",
+              ].join(" ")}
               style={{ opacity: open ? 0 : 1 }}
             />
             <span
-              className="block w-6 h-px bg-carbon transition-transform duration-300"
+              className={[
+                "block w-6 h-px transition-[transform,background-color] duration-300",
+                dark ? "bg-marfil" : "bg-carbon",
+              ].join(" ")}
               style={{ transform: open ? "translateY(-4px) rotate(-45deg)" : "none" }}
             />
           </button>
@@ -118,11 +128,24 @@ export function SiteNav() {
             aria-label="La Casa del Lago Urugua-í"
             className="flex items-center no-underline"
           >
-            <img
-              src={LOGO_URL}
-              alt="La Casa del Lago Urugua-í"
-              className="h-14 md:h-[68px] w-auto"
-            />
+            <span className="flex flex-col items-center leading-none">
+              <span
+                className={[
+                  "font-display font-medium text-[19px] md:text-[21px] tracking-[0.01em] transition-colors duration-300",
+                  dark ? "text-marfil" : "text-lago",
+                ].join(" ")}
+              >
+                La Casa del Lago
+              </span>
+              <span
+                className={[
+                  "text-[9px] md:text-[10px] uppercase tracking-[0.38em] mt-1 transition-colors duration-300",
+                  dark ? "text-marfil/72" : "text-muted",
+                ].join(" ")}
+              >
+                Urugua-í
+              </span>
+            </span>
           </a>
         ) : (
           <Link
@@ -130,11 +153,14 @@ export function SiteNav() {
             aria-label="La Casa del Lago Urugua-í"
             className="flex items-center no-underline"
           >
-            <img
-              src={LOGO_URL}
-              alt="La Casa del Lago Urugua-í"
-              className="h-14 md:h-[68px] w-auto"
-            />
+            <span className="flex flex-col items-center leading-none">
+              <span className="font-display font-medium text-[19px] md:text-[21px] tracking-[0.01em] text-lago">
+                La Casa del Lago
+              </span>
+              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.38em] mt-1 text-muted">
+                Urugua-í
+              </span>
+            </span>
           </Link>
         )}
 
@@ -172,11 +198,14 @@ export function SiteNav() {
   );
 }
 
-function linkClass(section: string, active: string) {
+function linkClass(section: string, active: string, dark: boolean) {
+  const isActive = section === active;
   return [
-    "text-[15px] md:text-[13px] tracking-[.04em] no-underline transition-opacity duration-[250ms] py-3 md:py-0 md:whitespace-nowrap",
-    section === active
+    "text-[15px] md:text-[13px] tracking-[.04em] no-underline transition-colors duration-[250ms] py-3 md:py-0 md:whitespace-nowrap",
+    isActive
       ? "text-terracota opacity-100 md:font-medium"
-      : "text-carbon opacity-[.74] hover:opacity-100",
+      : dark
+        ? "text-marfil/90 opacity-100 hover:text-atardecer"
+        : "text-carbon opacity-[.82] hover:text-atardecer",
   ].join(" ");
 }
