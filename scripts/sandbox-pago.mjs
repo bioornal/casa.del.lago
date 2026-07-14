@@ -8,7 +8,7 @@
 // tokenización del navegador (public key) ya no funciona en sandbox (MP 2026).
 //
 // Uso (con `pnpm dev` corriendo):
-//   node scripts/sandbox-pago.mjs pagar APRO 2027-05-01 2027-05-03 [yvyra|mberu|tatu] [huespedes]
+//   node scripts/sandbox-pago.mjs pagar APRO 2027-05-01 2027-05-03 [timbo|lapacho|guatambu] [huespedes]
 //   node scripts/sandbox-pago.mjs borrar ARM-2026-XXXX   ← limpia la reserva de prueba (Supabase + Calendar)
 import crypto from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -32,7 +32,7 @@ if (!AT?.startsWith("TEST-")) {
   process.exit(1);
 }
 
-async function pagar([holder = "APRO", checkIn, checkOut, unitId = "yvyra", guests = "2"]) {
+async function pagar([holder = "APRO", checkIn, checkOut, unitId = "timbo", guests = "2"]) {
   if (!checkIn || !checkOut) {
     console.error("Uso: node scripts/sandbox-pago.mjs pagar APRO 2027-05-01 2027-05-03 [unidad] [huespedes]");
     process.exit(1);

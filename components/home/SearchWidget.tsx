@@ -221,7 +221,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
                 <button
                   type="button"
                   aria-label="+"
-                  onClick={() => setGuests((g) => Math.min(8, g + 1))}
+                  onClick={() => setGuests((g) => Math.min(6, g + 1))}
                   style={roundBtn}
                 >
                   +
