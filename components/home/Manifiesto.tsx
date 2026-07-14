@@ -2,14 +2,12 @@ import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealTitle } from "@/components/motion/RevealTitle";
-import { SelvaFigure } from "@/components/motion/SelvaFigure";
 
 export function Manifiesto() {
   const t = useTranslations("manifiesto");
 
   return (
     <section id="marca" className="relative bg-marfil py-16 md:py-[140px]">
-      <SelvaFigure kind="mariposa" className="top-14 right-[5%]" size={110} />
       <div className="relative z-[1] mx-auto max-w-[1240px] px-5 md:px-12">
         <Reveal>
           <Kicker>{t("kicker")}</Kicker>

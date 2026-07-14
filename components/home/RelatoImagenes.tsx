@@ -5,7 +5,6 @@ import { Kicker } from "@/components/ui/Kicker";
 import { ImageSlot } from "@/components/ui/ImageSlot";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealTitle } from "@/components/motion/RevealTitle";
-import { SelvaFigure } from "@/components/motion/SelvaFigure";
 import { GalleryLightbox, type GalleryItem } from "./GalleryLightbox";
 
 /**
@@ -52,8 +51,6 @@ export function RelatoImagenes() {
 
   return (
     <section id="galeria" className="relative bg-arena py-16 md:py-[110px] overflow-hidden">
-      <SelvaFigure kind="tucan" className="top-14 left-[4%]" size={130} flip />
-
       <div className="relative z-[1] mx-auto max-w-[1320px] px-5 md:px-12">
         {/* Header */}
         <div className="flex flex-wrap items-end justify-between gap-5 mb-9 md:mb-[48px]">

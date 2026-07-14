@@ -1,6 +1,5 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { SiteNav } from "@/components/layout/SiteNav";
-import { SelvaTrail } from "@/components/motion/SelvaTrail";
 import { Hero } from "@/components/home/Hero";
 import { SearchWidget } from "@/components/home/SearchWidget";
 import { Manifiesto } from "@/components/home/Manifiesto";
@@ -92,7 +91,6 @@ export default async function HomePage({
       />
       <SiteNav />
       <main className="relative">
-        <SelvaTrail />
         <Hero />
         <SearchWidget variant="hero" />
         <Manifiesto />

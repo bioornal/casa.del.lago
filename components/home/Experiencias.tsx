@@ -4,7 +4,6 @@ import { ImageSlot } from "@/components/ui/ImageSlot";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealTitle } from "@/components/motion/RevealTitle";
 import { Parallax } from "@/components/motion/Parallax";
-import { SelvaFigure } from "@/components/motion/SelvaFigure";
 
 export function Experiencias() {
   const t = useTranslations("experiencias");
@@ -21,7 +20,6 @@ export function Experiencias() {
       id="experiencias"
       className="bg-selva text-[#E8E1D5] relative py-16 md:py-[140px] overflow-hidden"
     >
-      <SelvaFigure kind="mariposa" color="#E8E1D5" className="bottom-12 right-[4%]" size={90} flip />
       <div className="relative z-[1] mx-auto max-w-[1320px] px-5 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-[1.15fr_1fr] gap-10 md:gap-[72px] items-center">
           {/* Left: feature image with parallax — vista aérea de las Cataratas */}
