@@ -43,19 +43,19 @@ export function SiteFooter() {
             </div>
             <div className="flex flex-col gap-[13px] text-[14px]">
               <a
-                href="#departamentos"
+                href="#cabanas"
                 className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("brand")}
               </a>
               <a
-                href="#departamentos"
+                href="#cabanas"
                 className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("apartments")}
               </a>
               <a
-                href="#experiencias"
+                href="#lugar"
                 className="text-[#cfc8bc] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("experiences")}

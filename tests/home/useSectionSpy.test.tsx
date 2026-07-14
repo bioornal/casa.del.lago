@@ -45,10 +45,10 @@ describe("useSectionSpy", () => {
     const { result } = renderHook(() => useSectionSpy());
     const io = MockIntersectionObserver.instances[0];
     const galeria = document.getElementById("galeria")!;
-    const marca = document.getElementById("marca")!;
+    const casa = document.getElementById("casa")!;
     act(() => {
       io.callback([
-        { isIntersecting: true, intersectionRatio: 0.2, target: marca },
+        { isIntersecting: true, intersectionRatio: 0.2, target: casa },
         { isIntersecting: true, intersectionRatio: 0.6, target: galeria },
       ]);
     });

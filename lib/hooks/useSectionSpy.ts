@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 
 export const HOME_SECTION_IDS = [
-  "marca",
-  "departamentos",
-  "experiencias",
+  "casa",
+  "cabanas",
+  "lugar",
   "galeria",
   "contacto",
 ] as const;

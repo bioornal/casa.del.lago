@@ -161,7 +161,7 @@ export function UnitDetail({ unit, locale }: { unit: Unit; locale: string }) {
         {/* Breadcrumb */}
         <div className="flex items-center gap-[10px] text-[12px] uppercase tracking-[.08em] text-bronce">
           <Link
-            href="/#departamentos"
+            href="/#cabanas"
             className="text-bronce no-underline transition-colors duration-[250ms] hover:text-terracota"
           >
             {t("breadcrumb")}
@@ -361,7 +361,7 @@ export function UnitDetail({ unit, locale }: { unit: Unit; locale: string }) {
                 {t("otherTitle")}
               </h2>
               <Link
-                href="/#departamentos"
+                href="/#cabanas"
                 className="inline-flex items-center gap-[9px] border-b border-[#c9bfae] pb-[5px] text-[13px] uppercase tracking-[.08em] text-carbon no-underline transition-[gap] duration-300 hover:gap-[16px]"
               >
                 {tn("apartments")} →

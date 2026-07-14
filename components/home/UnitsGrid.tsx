@@ -12,7 +12,7 @@ export function UnitsGrid() {
   const t = useTranslations("units");
 
   return (
-    <section id="departamentos" className="relative bg-arena-clara py-16 md:py-[130px]">
+    <section id="cabanas" className="relative bg-arena-clara py-16 md:py-[130px]">
       <div className="relative z-[1] mx-auto max-w-[1320px] px-5 md:px-12">
         {/* Section header */}
         <div className="mb-[44px] md:mb-[60px] flex flex-wrap items-end justify-between gap-6">
@@ -32,7 +32,7 @@ export function UnitsGrid() {
 
           <Reveal delay={0.12}>
             <a
-              href="#departamentos"
+              href="#cabanas"
               className="inline-flex items-center gap-[9px] self-end border-b border-[#c9bfae] pb-[5px] text-[13px] uppercase tracking-[.08em] text-carbon no-underline transition-[gap] duration-300 hover:gap-[16px]"
             >
               {t("viewAll")}

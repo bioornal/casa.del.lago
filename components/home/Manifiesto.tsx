@@ -7,7 +7,7 @@ export function Manifiesto() {
   const t = useTranslations("manifiesto");
 
   return (
-    <section id="marca" className="relative bg-marfil py-16 md:py-[140px]">
+    <section id="casa" className="relative bg-marfil py-16 md:py-[140px]">
       <div className="relative z-[1] mx-auto max-w-[1240px] px-5 md:px-12">
         <Reveal>
           <Kicker>{t("kicker")}</Kicker>
@@ -28,7 +28,7 @@ export function Manifiesto() {
               {t("body")}
             </p>
             <a
-              href="#marca"
+              href="#casa"
               className="mt-[28px] inline-flex items-center gap-[9px] border-b border-[#d8b9a8] pb-[5px] text-[13px] uppercase tracking-[.08em] text-terracota no-underline transition-[gap,border-color] duration-300 hover:gap-[16px] hover:border-terracota"
             >
               {t("link")}

@@ -34,9 +34,9 @@ export function SiteNav() {
   }, [open]);
 
   const sections: { id: string; label: string }[] = [
-    { id: "marca", label: t("brand") },
-    { id: "departamentos", label: t("apartments") },
-    { id: "experiencias", label: t("experiences") },
+    { id: "casa", label: t("brand") },
+    { id: "cabanas", label: t("apartments") },
+    { id: "lugar", label: t("experiences") },
     { id: "galeria", label: t("gallery") },
     { id: "contacto", label: t("contact") },
   ];

@@ -17,7 +17,7 @@ export function Experiencias() {
 
   return (
     <section
-      id="experiencias"
+      id="lugar"
       className="bg-selva text-[#E8E1D5] relative py-16 md:py-[140px] overflow-hidden"
     >
       <div className="relative z-[1] mx-auto max-w-[1320px] px-5 md:px-12">
