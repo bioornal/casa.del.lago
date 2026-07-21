@@ -12,7 +12,7 @@ const ENV = {
   GOOGLE_SERVICE_ACCOUNT_JSON: JSON.stringify({
     client_email: "svc@test.iam", private_key: TEST_PRIVATE_KEY, token_uri: "https://oauth2/token",
   }),
-  CDL_CAL_GUATAMBU: "cal-guatambu@group.calendar.google.com",
+  CDL_CAL_AGUARIBAY: "cal-aguaribay@group.calendar.google.com",
 };
 
 beforeEach(async () => {
@@ -29,18 +29,18 @@ beforeEach(async () => {
 
 afterEach(() => {
   delete process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-  delete process.env.CDL_CAL_GUATAMBU;
+  delete process.env.CDL_CAL_AGUARIBAY;
 });
 
 const INPUT = {
-  unitName: "Cabaña Guatambú", firstName: "Juan", lastName: "Pérez", email: "j@t.com",
+  unitName: "Cabaña Aguaribay", firstName: "Juan", lastName: "Pérez", email: "j@t.com",
   phone: "+54", guests: 4, checkIn: "2026-07-02", checkOut: "2026-07-05",
   nights: 3, total: 480000, code: "CDL-2026-AB12", paymentId: "transfer",
 };
 
 describe("calendar pending/confirm/delete", () => {
   it("createPendingEvent inserta con título [PENDIENTE] y devuelve eventId", async () => {
-    const res = await createPendingEvent("guatambu", INPUT);
+    const res = await createPendingEvent("aguaribay", INPUT);
     expect(res.eventId).toBe("evt-new");
     const lastCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls.at(-1)!;
     const body = JSON.parse((lastCall[1] as RequestInit).body as string);
@@ -49,14 +49,14 @@ describe("calendar pending/confirm/delete", () => {
   });
 
   it("confirmEvent hace PATCH del evento", async () => {
-    await confirmEvent("guatambu", "evt-1");
+    await confirmEvent("aguaribay", "evt-1");
     const lastCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls.at(-1)!;
     expect((lastCall[1] as RequestInit).method).toBe("PATCH");
     expect(String(lastCall[0])).toContain("/events/evt-1");
   });
 
   it("deleteEvent hace DELETE del evento", async () => {
-    await deleteEvent("guatambu", "evt-1");
+    await deleteEvent("aguaribay", "evt-1");
     const lastCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls.at(-1)!;
     expect((lastCall[1] as RequestInit).method).toBe("DELETE");
     expect(String(lastCall[0])).toContain("/events/evt-1");

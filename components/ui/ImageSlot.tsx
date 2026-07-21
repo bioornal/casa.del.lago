@@ -4,38 +4,28 @@ const UNSPLASH = "https://images.unsplash.com";
 // Tienen prioridad sobre PHOTO_MAP/placeholders cuando el seed coincide.
 const SUPABASE_FOTOS = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/casa-lago-fotos`;
 
-// ¿Bucket propio configurado? Mientras NEXT_PUBLIC_SUPABASE_URL siga siendo la
-// plantilla ("TU-PROYECTO") las rutas del bucket darían 404, así que todo cae a
-// placeholders temáticos (lago/cabañas/selva). Al configurar el proyecto real y
-// subir las fotos, las propias vuelven solas sin tocar código.
+// ¿Bucket propio cargado? Opt-in explícito: hasta que el bucket público
+// "casa-lago-fotos" exista Y tenga las fotos subidas, todo cae a placeholders
+// temáticos (lago/cabañas/selva). Antes esto se deducía de que
+// NEXT_PUBLIC_SUPABASE_URL siguiera siendo la plantilla ("TU-PROYECTO"), pero
+// configurar el proyecto Supabase y subir las fotos son dos pasos distintos:
+// la heurística rompía todas las imágenes en el medio. Poner en "1" recién
+// cuando las fotos estén arriba.
 const BUCKET_READY =
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("TU-PROYECTO");
+  process.env.NEXT_PUBLIC_PHOTOS_BUCKET_READY === "1";
 
 /** URL pública de una foto dentro del bucket casa-lago-fotos (p. ej. "Complejo/5.jpg"). */
 export function bucketSrc(path: string) {
   return `${SUPABASE_FOTOS}/${encodeURI(path)}`;
 }
 const REAL_PHOTOS: Record<string, string> = {
-  // Cabaña Timbó — la galería del detalle usa la prop `photo` (ver UnitDetail);
+  // Cabaña Aratirí — la galería del detalle usa la prop `photo` (ver UnitDetail);
   // este seed solo cubre las cards (home, tarifas, otros alojamientos).
-  "cabana-timbo": "Dpto2/4.jpg", // living con sofá esquinero
-  // Cabaña Lapacho — la galería del detalle usa la prop `photo` (ver UnitDetail);
+  "cabana-aratiri": "Dpto2/4.jpg", // living con sofá esquinero
+  // Cabaña Aguaribay — la galería del detalle usa la prop `photo` (ver UnitDetail);
   // este seed solo cubre las cards (home, tarifas, otros alojamientos).
-  "cabana-lapacho": "Dpto1/20.jpg", // living con sofá y Smart TV (portada)
-  // Cabaña Guatambú
-  "cabana-guatambu": "Casa/18.jpg", // lateral con jardín
-  "cabana-guatambu-interior": "Casa/1.jpg", // comedor
-  "cabana-guatambu-dormitorio": "Casa/5.jpg", // dormitorio principal
-  "cabana-guatambu-bano": "Casa/13.jpg", // baño
-  "cabana-guatambu-terraza": "Casa/18.jpg", // lateral con jardín
-  "cabana-guatambu-piscina": "Casa/22.jpg", // pileta con la cabaña de fondo
-  "cabana-guatambu-amenities": "Casa/8.jpg", // cocina equipada
-  "cabana-guatambu-living": "Casa/4.jpg", // living con TV
-  "cabana-guatambu-cocina": "Casa/15.jpg", // cocina completa
-  "cabana-guatambu-segundo-dormitorio": "Casa/7.jpg", // dormitorio con cuchetas
-  "cabana-guatambu-comedor": "Casa/2.jpg", // comedor con ventana a la pileta
-  "cabana-guatambu-estar": "Casa/3.jpg", // comedor y vajillero
+  "cabana-aguaribay": "Dpto1/20.jpg", // living con sofá y Smart TV (portada)
   // Galería del home
   "piscina": "Casa/22.jpg",
 };
@@ -56,8 +46,8 @@ const PHOTO_TWEAKS: Record<string, { filter?: string; position?: string }> = {
 
 const PHOTO_MAP: Record<string, { id: string; w?: number; h?: number; q?: string }> = {
   "solta-la-foto-de-portada": { id: "photo-1505881502353-a1986add3762", w: 1920, h: 1280 }, // selva amanecer
-  "cabana-timbo": { id: "photo-1611892440504-42a792e24d32", w: 1200, h: 900 }, // suite madera
-  "cabana-lapacho": { id: "photo-1631049307264-da0ec9d70304", w: 1200, h: 900 }, // depto moderno (fallback)
+  "cabana-aratiri": { id: "photo-1611892440504-42a792e24d32", w: 1200, h: 900 }, // suite madera
+  "cabana-aguaribay": { id: "photo-1631049307264-da0ec9d70304", w: 1200, h: 900 }, // depto moderno (fallback)
   "las-cataratas": { id: "photo-1433086966358-54859d0ed716", w: 1200, h: 1400 }, // cascada selva
   "arquitectura": { id: "photo-1517825738774-7de9363ef735", w: 1400, h: 1200 },
   "detalle": { id: "photo-1484154218962-a197022b5858", w: 1000, h: 1000 },

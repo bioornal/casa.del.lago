@@ -36,6 +36,7 @@
     "pickDatesHint": "Prices per night, per cabin. Select check-in and check-out to see availability and the total for your stay.",
     "from": "from",
     "perNight": "per night",
+    "transferNote": "Paying by bank transfer: {total} · you save {savings}",
     "nights": "nights",
     "night": "night",
     "cleaning": "Cleaning",
@@ -85,25 +86,22 @@
     "sectionKicker": "Cabins",
     "sectionTitle": "Each cabin, another way to look at the lake.",
     "viewAll": "View rates →",
-    "fromPrice": "From $—",
+    "fromPrice": "From {price}",
     "perNight": "/ night",
-    "timbo": {
-      "name": "Cabaña Timbó",
+    "aratiri": {
+      "name": "Cabaña Aratirí",
       "sub": "up to 6 guests · 2 bedrooms · covered deck with grill · lake view · wifi"
     },
-    "lapacho": {
-      "name": "Cabaña Lapacho",
+    "aguaribay": {
+      "name": "Cabaña Aguaribay",
       "sub": "up to 4 guests · 1 bedroom · wood stove · deck on the water · wifi"
-    },
-    "guatambu": {
-      "name": "Cabaña Guatambú",
-      "sub": "up to 5 guests · 2 bedrooms · full kitchen · pool access · wifi"
     }
   },
   "experiencias": {
     "kicker": "The place",
     "title": "The lake, unhurried.",
     "body": "A private dock, kayaks and sunsets reflected on the water. And once the sun goes down, fire: a wood stove inside, an asado outside.",
+    "caption": "Lake Urugua-í · Misiones",
     "items": {
       "nature": {
         "title": "The water",
@@ -220,9 +218,8 @@
     "subtitle": "Design, comfort and first-class amenities, on the shores of Lake Urugua-í.",
     "spaceTitle": "The space",
     "spaceBody": {
-      "timbo": "Wood and brick facing the lake: two bedrooms, a covered deck with a grill and a deck where the day ends watching the sunset over the water. The Timbó is the roomiest cabin in the house, with a full kitchen, a wood stove for cool nights and direct access to the dock and the pool — perfect for families or two couples who want to disconnect without giving up comfort.",
-      "lapacho": "A bright cabin: 1 bedroom, a full bathroom, an equipped kitchen, living and dining rooms. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad.",
-      "guatambu": "A cabin with everything you need: 2 bedrooms, a full bathroom, a fully equipped kitchen and a laundry room with washer. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad."
+      "aratiri": "Wood and brick facing the lake: two bedrooms, a covered deck with a grill and a deck where the day ends watching the sunset over the water. The Aratirí is the roomiest cabin in the house, with a full kitchen, a wood stove for cool nights and direct access to the dock and the pool — perfect for families or two couples who want to disconnect without giving up comfort.",
+      "aguaribay": "A bright cabin: 1 bedroom, a full bathroom, an equipped kitchen, living and dining rooms. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad."
     },
     "featuresTitle": "Features",
     "featCapacity": "Capacity",
@@ -282,9 +279,8 @@
       "1": "Continue to payment →"
     },
     "units": {
-      "timbo": "up to 6 guests · 2 bedrooms · 1 bathroom · equipped kitchen · wifi",
-      "lapacho": "up to 4 guests · 1 bedroom · 1 bathroom · equipped kitchen · wifi",
-      "guatambu": "up to 5 guests · 2 bedrooms · 1 bathroom · full kitchen · washer · wifi · DirectTV"
+      "aratiri": "up to 6 guests · 2 bedrooms · 1 bathroom · equipped kitchen · wifi",
+      "aguaribay": "up to 4 guests · 1 bedroom · 1 bathroom · equipped kitchen · wifi"
     },
     "chooseStay": "Choose your stay",
     "perNight": "per night",
@@ -349,6 +345,8 @@
     "transferProcessing": "Processing…",
     "transferMissingFile": "Attach the receipt to continue.",
     "transferErrorServer": "We couldn't process the booking. Please try again.",
+    "transferSaves": "Pay by bank transfer and save {amount}",
+    "transferTotalLabel": "Total by bank transfer",
     "checkStatus": "Check your reservation status"
   },
   "miReserva": {

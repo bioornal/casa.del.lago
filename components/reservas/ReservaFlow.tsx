@@ -12,8 +12,10 @@ import { StepPago } from "./StepPago";
 import { Confirmacion } from "./Confirmacion";
 import { reservationReducer, hydrateState, canAdvance, initialState } from "@/lib/reservation/reducer";
 import { parseCheckoutQuery, buildTarifasUrl } from "@/lib/reservation/search";
+import type { RateSettings } from "@/lib/reservation/rate-settings";
+import type { PaymentMethod } from "@/lib/reservation/method-pricing";
 
-export function ReservaFlow() {
+export function ReservaFlow({ settings }: { settings: RateSettings }) {
   const t = useTranslations("reservas");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -34,6 +36,9 @@ export function ReservaFlow() {
   );
   const [code, setCode] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  // El método vive acá (no en StepPago) para que el resumen y la confirmación
+  // muestren el total del método elegido (los precios difieren por canal).
+  const [method, setMethod] = useState<PaymentMethod>("card");
 
   // Guard: deep-link inválido → volver a tarifas.
   useEffect(() => {
@@ -116,6 +121,9 @@ export function ReservaFlow() {
               {state.step === 2 && (
                 <StepPago
                   state={state}
+                  settings={settings}
+                  method={method}
+                  onMethodChange={setMethod}
                   onApproved={(c) => { setCode(c); setPending(false); dispatch({ type: "NEXT" }); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                   onPending={(c) => { setCode(c); setPending(true); dispatch({ type: "NEXT" }); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 />
@@ -160,11 +168,11 @@ export function ReservaFlow() {
             </div>
 
             <div className="order-first lg:order-none lg:sticky lg:top-[100px]">
-              <OrderSummary state={state} />
+              <OrderSummary state={state} settings={settings} method={method} />
             </div>
           </div>
         ) : (
-          <Confirmacion state={state} code={code ?? ""} pending={pending} />
+          <Confirmacion state={state} settings={settings} method={method} code={code ?? ""} pending={pending} />
         )}
       </div>
     </div>

@@ -4,6 +4,8 @@ import { Hero } from "@/components/home/Hero";
 import { SearchWidget } from "@/components/home/SearchWidget";
 import { Manifiesto } from "@/components/home/Manifiesto";
 import { UnitsGrid } from "@/components/home/UnitsGrid";
+import { getRateSettings } from "@/lib/reservation/rate-settings.server";
+import { methodRates } from "@/lib/reservation/method-pricing";
 import { Experiencias } from "@/components/home/Experiencias";
 import { RelatoImagenes } from "@/components/home/RelatoImagenes";
 import { CtaReserva } from "@/components/home/CtaReserva";
@@ -83,6 +85,9 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  // Mismo precio de lista que /tarifas (tarjeta, con el costo del canal incluido):
+  // si el home mostrara el neto, no coincidiría con lo que ve el huésped al reservar.
+  const listPrices = methodRates(await getRateSettings(), "card").nightly;
   return (
     <>
       <script
@@ -100,7 +105,7 @@ export default async function HomePage({
           </div>
         </div>
         <Manifiesto />
-        <UnitsGrid />
+        <UnitsGrid prices={listPrices} />
         <Experiencias />
         <RelatoImagenes />
         <CtaReserva />

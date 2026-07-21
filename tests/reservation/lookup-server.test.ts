@@ -14,7 +14,7 @@ import { findReservationForGuest } from "@/lib/reservation/lookup.server";
 
 const ROW = {
   code: "CDL-2026-AB12",
-  unit_name: "Cabaña Guatambú",
+  unit_name: "Cabaña Aguaribay",
   check_in: "2026-07-02",
   check_out: "2026-07-05",
   nights: 3,
@@ -44,7 +44,7 @@ describe("findReservationForGuest", () => {
     const v = await findReservationForGuest("CDL-2026-AB12", "huesped@test.com");
     expect(v).toEqual({
       code: "CDL-2026-AB12",
-      unitName: "Cabaña Guatambú",
+      unitName: "Cabaña Aguaribay",
       checkIn: "2026-07-02",
       checkOut: "2026-07-05",
       nights: 3,
@@ -56,7 +56,7 @@ describe("findReservationForGuest", () => {
   });
 
   it("normaliza código (mayúsculas) y email (minúsculas + espacios)", async () => {
-    const v = await findReservationForGuest("  arm-2026-ab12 ", "  HUESPED@test.com ");
+    const v = await findReservationForGuest("  cdl-2026-ab12 ", "  HUESPED@test.com ");
     expect(v).not.toBeNull();
     expect(eq).toHaveBeenCalledWith("code", "CDL-2026-AB12");
   });

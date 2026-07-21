@@ -15,19 +15,15 @@ export function SiteFooter() {
         <div
           className="grid gap-10 md:gap-12 pb-12 md:pb-16 border-b border-white/10 grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]"
         >
-          {/* 1. Brand — wordmark tipográfico (logo oficial pendiente) */}
+          {/* 1. Brand — logo oficial, variante marfil (el fondo es teal oscuro) */}
           <div className="col-span-2 lg:col-span-1">
-            <div className="flex flex-col leading-none">
-              <span className="font-display font-medium text-[24px] md:text-[27px] tracking-[0.01em] text-marfil">
-                La Casa del Lago
-              </span>
-              <span
-                className="text-[10px] uppercase mt-2 text-[#7FC9D6]"
-                style={{ letterSpacing: "0.38em" }}
-              >
-                Urugua-í
-              </span>
-            </div>
+            <img
+              src="/logo-lago-marfil.png"
+              alt="La Casa del Lago Urugua-í"
+              width={560}
+              height={402}
+              className="w-[190px] md:w-[215px] h-auto"
+            />
             <p className="text-[14px] leading-[1.7] font-light text-[#A9CBD5] mt-[22px] max-w-[34ch]">
               {tf("tagline")}
             </p>

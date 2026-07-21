@@ -2,7 +2,7 @@ import { isValidEmail } from "./validation";
 import { parseDateOnly } from "./booking";
 import type { CheckoutQuery } from "./search";
 
-export type UnitId = "timbo" | "lapacho" | "guatambu";
+export type UnitId = "aratiri" | "aguaribay";
 export type GuestField = "firstName" | "lastName" | "email" | "phone";
 export type State = {
   step: 1 | 2 | 3;
@@ -25,7 +25,7 @@ export const initialState: State = {
   checkIn: null,
   checkOut: null,
   guests: 2,
-  unitId: "timbo",
+  unitId: "aratiri",
   firstName: "",
   lastName: "",
   email: "",

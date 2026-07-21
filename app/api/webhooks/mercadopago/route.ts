@@ -9,7 +9,7 @@ import { upsertConfirmedByCode, type Locale } from "@/lib/reservation/reservatio
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
 import type { UnitId } from "@/lib/reservation/reducer";
 
-const VALID_UNITS: UnitId[] = ["timbo", "lapacho", "guatambu"];
+const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
 
 export async function POST(req: Request) {
   let body: { type?: string; data?: { id?: string } };

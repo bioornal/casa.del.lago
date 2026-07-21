@@ -36,6 +36,7 @@
     "pickDatesHint": "Preços por noite, por cabana. Selecione chegada e saída para ver disponibilidade e o total da sua estadia.",
     "from": "a partir de",
     "perNight": "por noite",
+    "transferNote": "Pagando por transferência: {total} · você economiza {savings}",
     "nights": "noites",
     "night": "noite",
     "cleaning": "Limpeza",
@@ -85,25 +86,22 @@
     "sectionKicker": "Cabanas",
     "sectionTitle": "Cada cabana, um jeito de olhar o lago.",
     "viewAll": "Ver tarifas →",
-    "fromPrice": "A partir de $—",
+    "fromPrice": "A partir de {price}",
     "perNight": "/ noite",
-    "timbo": {
-      "name": "Cabaña Timbó",
+    "aratiri": {
+      "name": "Cabaña Aratirí",
       "sub": "até 6 hóspedes · 2 quartos · varanda com churrasqueira · vista para o lago · wifi"
     },
-    "lapacho": {
-      "name": "Cabaña Lapacho",
+    "aguaribay": {
+      "name": "Cabaña Aguaribay",
       "sub": "até 4 hóspedes · 1 quarto · lareira a lenha · deck sobre a água · wifi"
-    },
-    "guatambu": {
-      "name": "Cabaña Guatambú",
-      "sub": "até 5 hóspedes · 2 quartos · cozinha completa · acesso à piscina · wifi"
     }
   },
   "experiencias": {
     "kicker": "O lugar",
     "title": "O lago, sem pressa.",
     "body": "Píer próprio, caiaques e pores do sol refletidos na água. E quando o sol se põe, fogo: lareira a lenha por dentro, churrasco por fora.",
+    "caption": "Lago Urugua-í · Misiones",
     "items": {
       "nature": {
         "title": "A água",
@@ -220,9 +218,8 @@
     "subtitle": "Design, conforto e equipamento de primeira, às margens do lago Urugua-í.",
     "spaceTitle": "O espaço",
     "spaceBody": {
-      "timbo": "Madeira e tijolo de frente para o lago: dois quartos, varanda com churrasqueira e um deck onde o dia termina olhando o pôr do sol sobre a água. A Timbó é a cabana mais ampla da casa, com cozinha completa, lareira a lenha para as noites frescas e acesso direto ao píer e à piscina — ideal para famílias ou dois casais que querem desconectar sem abrir mão do conforto.",
-      "lapacho": "Um apartamento luminoso: 1 quarto, banheiro completo, cozinha equipada, sala de estar e jantar. Com acesso à piscina, às margens do lago Urugua-í, entre Iguazú e Libertad.",
-      "guatambu": "Uma cabana com tudo o que você precisa: 2 quartos, banheiro completo, cozinha totalmente equipada e lavanderia com máquina de lavar. Com acesso à piscina, às margens do lago Urugua-í, entre Iguazú e Libertad."
+      "aratiri": "Madeira e tijolo de frente para o lago: dois quartos, varanda com churrasqueira e um deck onde o dia termina olhando o pôr do sol sobre a água. A Aratirí é a cabana mais ampla da casa, com cozinha completa, lareira a lenha para as noites frescas e acesso direto ao píer e à piscina — ideal para famílias ou dois casais que querem desconectar sem abrir mão do conforto.",
+      "aguaribay": "Um apartamento luminoso: 1 quarto, banheiro completo, cozinha equipada, sala de estar e jantar. Com acesso à piscina, às margens do lago Urugua-í, entre Iguazú e Libertad."
     },
     "featuresTitle": "Características",
     "featCapacity": "Capacidade",
@@ -282,9 +279,8 @@
       "1": "Continuar para o pagamento →"
     },
     "units": {
-      "timbo": "até 6 hóspedes · 2 quartos · 1 banheiro · cozinha equipada · wifi",
-      "lapacho": "até 4 hóspedes · 1 quarto · 1 banheiro · cozinha equipada · wifi",
-      "guatambu": "até 5 hóspedes · 2 quartos · 1 banheiro · cozinha completa · máquina de lavar · wifi · DirectTV"
+      "aratiri": "até 6 hóspedes · 2 quartos · 1 banheiro · cozinha equipada · wifi",
+      "aguaribay": "até 4 hóspedes · 1 quarto · 1 banheiro · cozinha equipada · wifi"
     },
     "chooseStay": "Escolha sua acomodação",
     "perNight": "por noite",
@@ -349,6 +345,8 @@
     "transferProcessing": "Processando…",
     "transferMissingFile": "Anexe o comprovante para continuar.",
     "transferErrorServer": "Não foi possível processar a reserva. Tente novamente.",
+    "transferSaves": "Pagando por transferência você economiza {amount}",
+    "transferTotalLabel": "Total por transferência",
     "checkStatus": "Consulte o status da sua reserva"
   },
   "miReserva": {

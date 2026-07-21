@@ -35,7 +35,7 @@ beforeEach(() => {
 describe("reservations.server", () => {
   it("insertReservation inserta la fila y lanza si hay error", async () => {
     await insertReservation({
-      code: "CDL-2026-AB12", unitId: "guatambu", unitName: "Cabaña Guatambú",
+      code: "CDL-2026-AB12", unitId: "aguaribay", unitName: "Cabaña Aguaribay",
       checkIn: "2026-07-02", checkOut: "2026-07-05", nights: 3, guests: 4,
       firstName: "Juan", lastName: "Pérez", email: "j@t.com", phone: "+54",
       total: 480000, paymentMethod: "transfer", status: "pending",
@@ -50,7 +50,7 @@ describe("reservations.server", () => {
 
     insert.mockResolvedValueOnce({ error: { message: "boom" } });
     await expect(insertReservation({
-      code: "CDL-2026-AB13", unitId: "guatambu", unitName: "Cabaña Guatambú",
+      code: "CDL-2026-AB13", unitId: "aguaribay", unitName: "Cabaña Aguaribay",
       checkIn: "2026-07-02", checkOut: "2026-07-05", nights: 3, guests: 4,
       firstName: "A", lastName: "B", email: "a@b.com", phone: "",
       total: 1, paymentMethod: "card", status: "confirmed",
@@ -59,7 +59,7 @@ describe("reservations.server", () => {
 
   it("upsertConfirmedByCode es idempotente por code (onConflict)", async () => {
     await upsertConfirmedByCode({
-      code: "CDL-2026-AB12", unitId: "guatambu", unitName: "Cabaña Guatambú",
+      code: "CDL-2026-AB12", unitId: "aguaribay", unitName: "Cabaña Aguaribay",
       checkIn: "2026-07-02", checkOut: "2026-07-05", nights: 3, guests: 4,
       firstName: "Juan", lastName: "Pérez", email: "j@t.com", phone: "+54",
       total: 480000, paymentId: "pay-1", calendarEventId: "evt-1",
@@ -89,7 +89,7 @@ describe("reservations.server", () => {
 
   it("insertReservation incluye locale (default es si no se pasa)", async () => {
     await insertReservation({
-      code: "CDL-2026-LC01", unitId: "guatambu", unitName: "Casa Guatambú",
+      code: "CDL-2026-LC01", unitId: "aguaribay", unitName: "Casa Aguaribay",
       checkIn: "2026-07-02", checkOut: "2026-07-05", nights: 3, guests: 4,
       firstName: "Ana", lastName: "Gómez", email: "a@g.com", phone: "",
       total: 1, paymentMethod: "transfer", status: "pending", locale: "pt",
@@ -97,7 +97,7 @@ describe("reservations.server", () => {
     expect(insert.mock.calls[0][0].locale).toBe("pt");
 
     await insertReservation({
-      code: "CDL-2026-LC02", unitId: "guatambu", unitName: "Casa Guatambú",
+      code: "CDL-2026-LC02", unitId: "aguaribay", unitName: "Casa Aguaribay",
       checkIn: "2026-07-02", checkOut: "2026-07-05", nights: 3, guests: 4,
       firstName: "Ana", lastName: "Gómez", email: "a@g.com", phone: "",
       total: 1, paymentMethod: "transfer", status: "pending",

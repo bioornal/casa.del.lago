@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAvailabilityServer } from "@/lib/reservation/availability.server";
 import type { UnitId } from "@/lib/reservation/reducer";
 
-const VALID_UNITS: UnitId[] = ["timbo", "lapacho", "guatambu"];
+const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
 
 function isUnitId(v: string): v is UnitId {
   return (VALID_UNITS as string[]).includes(v);

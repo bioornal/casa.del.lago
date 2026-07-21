@@ -11,7 +11,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   process.env.ADMIN_EMAILS = "spezialichristian@gmail.com, otro@aruma.com";
 });
-afterEach(() => { delete process.env.ADMIN_EMAILS; });
+afterEach(() => {
+  delete process.env.ADMIN_EMAILS;
+});
 
 describe("admin auth", () => {
   it("isAdminEmail respeta la allowlist (case-insensitive, trim)", () => {
@@ -35,5 +37,15 @@ describe("admin auth", () => {
   it("getAdminUser devuelve null si el email no está autorizado", async () => {
     getUser.mockResolvedValue({ data: { user: { email: "intruso@x.com" } }, error: null });
     expect(await getAdminUser()).toBeNull();
+  });
+
+  // Regresión: el bypass temporal se eliminó. Ninguna env var debe poder
+  // abrir el panel sin sesión de Supabase Auth.
+  it("ADMIN_AUTH_BYPASS ya no existe: no abre el panel sin sesión", async () => {
+    process.env.ADMIN_AUTH_BYPASS = "1";
+    getUser.mockResolvedValue({ data: { user: null }, error: null });
+    expect(await getAdminUser()).toBeNull();
+    expect(getUser).toHaveBeenCalled();
+    delete process.env.ADMIN_AUTH_BYPASS;
   });
 });

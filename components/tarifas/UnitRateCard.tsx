@@ -3,7 +3,7 @@ import { Link } from "@/lib/i18n/navigation";
 import { ImageSlot } from "@/components/ui/ImageSlot";
 import { buildCheckoutUrl, type RateQuery } from "@/lib/reservation/search";
 import type { UnitRate } from "@/lib/reservation/rates.server";
-import { type Unit, pricePerNight } from "@/lib/units";
+import type { Unit, UnitSlug } from "@/lib/units";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { waLink } from "@/lib/contact";
 
@@ -27,15 +27,16 @@ interface UnitRateCardProps {
   unit: Unit;
   rate: UnitRate | null; // null = sin fechas elegidas (modo "desde")
   query: RateQuery | null;
+  prices: Record<UnitSlug, number>; // tarifa de lista por noche (DB, vía getRateSettings)
 }
 
-export function UnitRateCard({ unit, rate, query }: UnitRateCardProps) {
+export function UnitRateCard({ unit, rate, query, prices }: UnitRateCardProps) {
   const t = useTranslations("tarifas");
   const locale = useLocale();
   const whatsappMode = isWhatsAppBookingMode();
   const overCapacity = !!query && query.guests > unit.specs.guests;
   const bookable = !!rate && rate.available && !overCapacity;
-  const nightly = query ? pricePerNight(unit.slug, query.guests) : unit.price;
+  const nightly = rate ? rate.nightly : prices[unit.slug];
   const chips = t("specs", {
     guests: unit.specs.guests,
     bedrooms: unit.specs.bedrooms,
@@ -70,10 +71,15 @@ export function UnitRateCard({ unit, rate, query }: UnitRateCardProps) {
                 <div className="mt-[2px] text-[12px] text-muted">
                   {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} · {money(nightly)} {t("perNight")}
                 </div>
+                {!whatsappMode && rate.savings > 0 && (
+                  <div className="mt-[6px] text-[12.5px] font-medium text-[#2f6b46]">
+                    {t("transferNote", { total: money(rate.transferTotal), savings: money(rate.savings) })}
+                  </div>
+                )}
               </>
             ) : (
               <div className="font-display text-[24px] text-muted">
-                {t("from")} {money(unit.price)} <span className="text-[14px]">{t("perNight")}</span>
+                {t("from")} {money(prices[unit.slug])} <span className="text-[14px]">{t("perNight")}</span>
               </div>
             )}
           </div>

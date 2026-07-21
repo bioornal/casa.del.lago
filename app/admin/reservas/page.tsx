@@ -15,7 +15,15 @@ export default async function AdminReservasPage({
     ? raw
     : "pending") as ReservationStatus | "all";
 
-  const rows = await listReservations(filter);
+  // Fail-open: sin el proyecto Supabase configurado (o DB caída) el panel igual
+  // entra y muestra el aviso, en vez de romper con un 500.
+  let dbError: string | null = null;
+  let rows: Awaited<ReturnType<typeof listReservations>> = [];
+  try {
+    rows = await listReservations(filter);
+  } catch (err) {
+    dbError = err instanceof Error ? err.message : String(err);
+  }
   const withUrls = await Promise.all(
     rows.map(async (r) => ({
       r,
@@ -31,11 +39,19 @@ export default async function AdminReservasPage({
         <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 30, margin: 0 }}>
           Reservas
         </h1>
-        <form action={signOut}>
-          <button type="submit" style={{ background: "transparent", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: "#6b665d" }}>
-            Cerrar sesión
-          </button>
-        </form>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <a href="/admin/tarifas" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
+            Tarifas
+          </a>
+          <a href="/admin/pago-prueba" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
+            Pago de prueba
+          </a>
+          <form action={signOut}>
+            <button type="submit" style={{ background: "transparent", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: "#6b665d" }}>
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
@@ -52,7 +68,14 @@ export default async function AdminReservasPage({
         ))}
       </div>
 
-      {withUrls.length === 0 && <p style={{ color: "#6b665d" }}>No hay reservas en este filtro.</p>}
+      {dbError && (
+        <div role="alert" style={{ padding: "14px 16px", borderRadius: 6, background: "#fef6e7", border: "1px solid #e9d6a8", color: "#7a5a18", fontSize: 13, marginBottom: 20 }}>
+          No se pudo leer Supabase ({dbError}). ¿Ya configuraste el proyecto nuevo
+          (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY) y corriste el setup.sql?
+        </div>
+      )}
+
+      {withUrls.length === 0 && !dbError && <p style={{ color: "#6b665d" }}>No hay reservas en este filtro.</p>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {withUrls.map(({ r, comprobanteUrl }) => (

@@ -3,7 +3,7 @@ import { buildConfirmationEmail } from "@/lib/reservation/email-template";
 
 const base = {
   code: "CDL-2026-AB12",
-  unitName: "Casa Guatambú",
+  unitName: "Casa Aguaribay",
   firstName: "Juan",
   checkIn: "2026-07-02",
   checkOut: "2026-07-05",
@@ -25,7 +25,7 @@ describe("buildConfirmationEmail", () => {
 
   it("incluye total, unidad y la URL a mi-reserva en el cuerpo", () => {
     const out = buildConfirmationEmail({ ...base, locale: "es" });
-    expect(out.html).toContain("Casa Guatambú");
+    expect(out.html).toContain("Casa Aguaribay");
     expect(out.html).toContain(base.miReservaUrl);
     expect(out.html).toContain("480.000"); // formato es-AR
     expect(out.text).toContain(base.miReservaUrl);

@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { UnitDetail } from "@/components/departamento/UnitDetail";
 import { UNITS, getUnit } from "@/lib/units";
+import { getRateSettings } from "@/lib/reservation/rate-settings.server";
+import { methodRates } from "@/lib/reservation/method-pricing";
 import { routing } from "@/lib/i18n/routing";
 
 export function generateStaticParams() {
@@ -46,11 +48,15 @@ export default async function DepartamentoPage({
   const unit = getUnit(slug);
   if (!unit) notFound();
 
+  const settings = await getRateSettings();
+  // "Desde $" público = precio de lista (método tarjeta, ver method-pricing.ts)
+  const listPrices = methodRates(settings, "card").nightly;
+
   return (
     <>
       <SiteNav />
       <main>
-        <UnitDetail unit={unit} locale={locale} />
+        <UnitDetail unit={unit} locale={locale} prices={listPrices} />
       </main>
       <SiteFooter />
       <WhatsAppFab />

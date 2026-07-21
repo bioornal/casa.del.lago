@@ -36,6 +36,7 @@
     "pickDatesHint": "Precios por noche, por cabaña. Seleccioná llegada y salida para ver disponibilidad y el total de tu estadía.",
     "from": "desde",
     "perNight": "por noche",
+    "transferNote": "Pagando por transferencia: {total} · ahorrás {savings}",
     "nights": "noches",
     "night": "noche",
     "cleaning": "Limpieza",
@@ -85,25 +86,22 @@
     "sectionKicker": "Cabañas",
     "sectionTitle": "Cada cabaña, una forma de mirar el lago.",
     "viewAll": "Ver tarifas →",
-    "fromPrice": "Desde $—",
+    "fromPrice": "Desde {price}",
     "perNight": "/ noche",
-    "timbo": {
-      "name": "Cabaña Timbó",
+    "aratiri": {
+      "name": "Cabaña Aratirí",
       "sub": "hasta 6 huéspedes · 2 dormitorios · galería con parrilla · vista al lago · wifi"
     },
-    "lapacho": {
-      "name": "Cabaña Lapacho",
+    "aguaribay": {
+      "name": "Cabaña Aguaribay",
       "sub": "hasta 4 huéspedes · 1 dormitorio · salamandra · deck al agua · wifi"
-    },
-    "guatambu": {
-      "name": "Cabaña Guatambú",
-      "sub": "hasta 5 huéspedes · 2 dormitorios · cocina completa · acceso a pileta · wifi"
     }
   },
   "experiencias": {
     "kicker": "El lugar",
     "title": "El lago, sin apuro.",
     "body": "Muelle propio, kayaks y atardeceres que se reflejan en el agua. Y cuando baja el sol, fuego: salamandra adentro, asado afuera.",
+    "caption": "Lago Urugua-í · Misiones",
     "items": {
       "nature": {
         "title": "El agua",
@@ -220,9 +218,8 @@
     "subtitle": "Diseño, confort y equipamiento de primera, a orillas del lago Urugua-í.",
     "spaceTitle": "El espacio",
     "spaceBody": {
-      "timbo": "Madera y ladrillo frente al lago: dos dormitorios, galería con parrilla y un deck donde el día termina mirando el atardecer sobre el agua. La Timbó es la cabaña más amplia de la casa, con cocina completa, salamandra para las noches frescas y acceso directo al muelle y la pileta — ideal para familias o dos parejas que quieren desconectar sin resignar comodidad.",
-      "lapacho": "Una cabaña luminosa: 1 dormitorio, baño completo, cocina equipada, living y comedor. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad.",
-      "guatambu": "Una cabaña con todo lo necesario: 2 dormitorios, baño completo, cocina equipada completa y lavadero con lavarropas. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad."
+      "aratiri": "Madera y ladrillo frente al lago: dos dormitorios, galería con parrilla y un deck donde el día termina mirando el atardecer sobre el agua. La Aratirí es la cabaña más amplia de la casa, con cocina completa, salamandra para las noches frescas y acceso directo al muelle y la pileta — ideal para familias o dos parejas que quieren desconectar sin resignar comodidad.",
+      "aguaribay": "Una cabaña luminosa: 1 dormitorio, baño completo, cocina equipada, living y comedor. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad."
     },
     "featuresTitle": "Características",
     "featCapacity": "Capacidad",
@@ -282,9 +279,8 @@
       "1": "Continuar al pago →"
     },
     "units": {
-      "timbo": "hasta 6 huéspedes · 2 dormitorios · 1 baño · cocina equipada · wifi",
-      "lapacho": "hasta 4 huéspedes · 1 dormitorio · 1 baño · cocina equipada · wifi",
-      "guatambu": "hasta 5 huéspedes · 2 dormitorios · 1 baño · cocina completa · lavarropas · wifi · DirectTV"
+      "aratiri": "hasta 6 huéspedes · 2 dormitorios · 1 baño · cocina equipada · wifi",
+      "aguaribay": "hasta 4 huéspedes · 1 dormitorio · 1 baño · cocina equipada · wifi"
     },
     "chooseStay": "Elegí tu alojamiento",
     "perNight": "por noche",
@@ -349,6 +345,8 @@
     "transferProcessing": "Procesando…",
     "transferMissingFile": "Adjuntá el comprobante para continuar.",
     "transferErrorServer": "No pudimos procesar la reserva. Probá de nuevo.",
+    "transferSaves": "Pagando por transferencia ahorrás {amount}",
+    "transferTotalLabel": "Total por transferencia",
     "checkStatus": "Consultá el estado de tu reserva"
   },
   "miReserva": {

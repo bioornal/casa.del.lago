@@ -17,7 +17,7 @@ function req(body: unknown, ip = String(Math.random())) {
 }
 
 const VIEW = {
-  code: "CDL-2026-AB12", unitName: "Cabaña Guatambú",
+  code: "CDL-2026-AB12", unitName: "Cabaña Aguaribay",
   checkIn: "2026-07-02", checkOut: "2026-07-05",
   nights: 3, guests: 4, total: 480000,
   paymentMethod: "transfer", status: "pending",

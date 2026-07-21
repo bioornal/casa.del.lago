@@ -5,16 +5,18 @@ import { useTranslations, useLocale } from "next-intl";
 import type { State } from "@/lib/reservation/reducer";
 import { createTransferReservation } from "@/lib/reservation/transfer";
 import { formatDateOnly } from "@/lib/reservation/booking";
-import { CLEANING_FEE, pricePerNight } from "@/lib/units";
-import { computeNights, computeTotal } from "@/lib/reservation/pricing";
+import type { RateSettings } from "@/lib/reservation/rate-settings";
+import { computeNights } from "@/lib/reservation/pricing";
+import { methodTotal, transferSavings } from "@/lib/reservation/method-pricing";
 import { BANK_DETAILS } from "@/lib/site";
 
 interface Props {
   state: State;
+  settings: RateSettings;
   onPending: (code: string) => void;
 }
 
-export function StepTransferencia({ state, onPending }: Props) {
+export function StepTransferencia({ state, settings, onPending }: Props) {
   const t = useTranslations("reservas");
   const locale = useLocale();
   const [file, setFile] = useState<File | null>(null);
@@ -22,7 +24,9 @@ export function StepTransferencia({ state, onPending }: Props) {
   const [processing, setProcessing] = useState(false);
 
   const nights = computeNights(state.checkIn!, state.checkOut!);
-  const total = computeTotal(pricePerNight(state.unitId, state.guests), nights, CLEANING_FEE);
+  // Total del método TRANSFERENCIA (más barato que el precio de lista).
+  const total = methodTotal(settings, "transfer", state.unitId, nights);
+  const savings = transferSavings(settings, state.unitId, nights);
   const money = (n: number) => `$${new Intl.NumberFormat("es-AR").format(n)}`;
 
   const submit = async () => {
@@ -66,6 +70,12 @@ export function StepTransferencia({ state, onPending }: Props) {
         <div style={row}><span style={{ color: "#6b665d" }}>{t("transferHolder")}</span><strong>{BANK_DETAILS.holder}</strong></div>
         <div style={{ ...row, borderBottom: "none" }}><span style={{ color: "#6b665d" }}>{t("transferAmount")}</span><strong>{money(total)}</strong></div>
       </div>
+
+      {savings > 0 && (
+        <p style={{ fontSize: 12.5, color: "#2f6b46", margin: "-12px 0 22px" }}>
+          {t("transferSaves", { amount: money(savings) })}
+        </p>
+      )}
 
       <label style={{ display: "block", fontSize: 13, color: "#6b665d", marginBottom: 8 }}>
         {t("transferUpload")}

@@ -39,7 +39,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   getAdminUser.mockResolvedValue({ email: "admin@aruma.com" });
   getReservationById.mockResolvedValue({
-    id: "abc", unit_id: "guatambu", calendar_event_id: "evt-1",
+    id: "abc", unit_id: "aguaribay", calendar_event_id: "evt-1",
     payment_method: "transfer", status: "pending", code: "CDL-2026-AB12",
   });
 });
@@ -48,7 +48,7 @@ describe("POST /api/admin/reservations/[id]", () => {
   it("confirm → confirmEvent + status confirmed", async () => {
     const res = await POST(post("confirm"), ctx);
     expect(res.status).toBe(200);
-    expect(confirmEvent).toHaveBeenCalledWith("guatambu", "evt-1");
+    expect(confirmEvent).toHaveBeenCalledWith("aguaribay", "evt-1");
     expect(setReservationStatus).toHaveBeenCalledWith("abc", "confirmed");
     expect(sendConfirmationEmailOnce).toHaveBeenCalledWith("CDL-2026-AB12");
   });
@@ -56,7 +56,7 @@ describe("POST /api/admin/reservations/[id]", () => {
   it("release → deleteEvent + status released", async () => {
     const res = await POST(post("release"), ctx);
     expect(res.status).toBe(200);
-    expect(deleteEvent).toHaveBeenCalledWith("guatambu", "evt-1");
+    expect(deleteEvent).toHaveBeenCalledWith("aguaribay", "evt-1");
     expect(setReservationStatus).toHaveBeenCalledWith("abc", "released");
   });
 

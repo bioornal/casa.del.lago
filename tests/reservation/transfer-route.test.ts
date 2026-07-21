@@ -32,6 +32,14 @@ vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
 }));
 
+// Tarifas: siempre los defaults — el test no depende de la DB ni del admin.
+vi.mock("@/lib/reservation/rate-settings.server", async () => {
+  const { DEFAULT_RATE_SETTINGS } = await vi.importActual<
+    typeof import("@/lib/reservation/rate-settings")
+  >("@/lib/reservation/rate-settings");
+  return { getRateSettings: () => Promise.resolve(DEFAULT_RATE_SETTINGS) };
+});
+
 import { POST } from "@/app/api/reservations/transfer/route";
 
 function form(fields: Record<string, string>, file?: File) {
@@ -42,7 +50,7 @@ function form(fields: Record<string, string>, file?: File) {
 }
 
 const VALID = {
-  unitId: "guatambu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4",
+  unitId: "aguaribay", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4",
   firstName: "Juan", lastName: "Pérez", email: "juan@test.com", phone: "+54",
   locale: "pt",
 };
@@ -51,7 +59,7 @@ const goodFile = () => new File([new Uint8Array([1, 2, 3])], "c.jpg", { type: "i
 beforeEach(() => {
   vi.clearAllMocks();
   isRangeAvailable.mockResolvedValue(true);
-  uploadComprobante.mockResolvedValue("guatambu-path/x.jpg");
+  uploadComprobante.mockResolvedValue("aguaribay-path/x.jpg");
   createPendingEvent.mockResolvedValue({ eventId: "evt-1" });
   insertReservation.mockResolvedValue(undefined);
 });
@@ -116,8 +124,8 @@ describe("POST /api/reservations/transfer", () => {
     insertReservation.mockRejectedValue(new Error("db down"));
     const res = await POST(form(VALID, goodFile()));
     expect(res.status).toBe(502);
-    expect(deleteEvent).toHaveBeenCalledWith("guatambu", "evt-1");
-    expect(removeComprobante).toHaveBeenCalledWith("guatambu-path/x.jpg");
+    expect(deleteEvent).toHaveBeenCalledWith("aguaribay", "evt-1");
+    expect(removeComprobante).toHaveBeenCalledWith("aguaribay-path/x.jpg");
   });
 
   it("propaga locale al insert (default es si falta o es inválido)", async () => {

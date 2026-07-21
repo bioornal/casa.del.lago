@@ -4,19 +4,23 @@ import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { ImageSlot } from "@/components/ui/ImageSlot";
 import { Reveal } from "@/components/motion/Reveal";
+import { Asentar } from "@/components/motion/Asentar";
 import { RevealTitle } from "@/components/motion/RevealTitle";
+import { FiguraAgua } from "@/components/motion/FiguraAgua";
 import { GalleryLightbox, type GalleryItem } from "./GalleryLightbox";
 
 /**
  * Relato en imágenes — grilla bento compacta con las diez fotos reales del
  * bucket "casa-lago-fotos/Complejo". Todas visibles; cada tile abre el lightbox
- * en su índice. El orden de PHOTOS es el orden narrativo (numeración 01–10).
+ * en su índice. El orden de PHOTOS sigue el orden visual de la grilla, así la
+ * numeración 01–10 es correlativa en pantalla y coincide con el contador
+ * del lightbox (y la navegación prev/next respeta ese mismo orden).
  */
 const PHOTOS: GalleryItem[] = [
-  { label: "La llegada", photo: "Complejo/5.jpg" },          // 0 · pileta + dracaena
-  { label: "El descenso", photo: "Complejo/16.jpg" },        // 1 · escalera otoñal
-  { label: "El agua", photo: "Complejo/7.jpg" },             // 2 · borde ocre (H)
-  { label: "El refugio", photo: "Complejo/10.jpg" },         // 3 · cabaña A-frame
+  { label: "El agua", photo: "Complejo/7.jpg" },             // 0 · borde ocre (H)
+  { label: "La llegada", photo: "Complejo/5.jpg" },          // 1 · pileta + dracaena
+  { label: "El refugio", photo: "Complejo/10.jpg" },         // 2 · cabaña A-frame
+  { label: "El descenso", photo: "Complejo/16.jpg" },        // 3 · escalera otoñal
   { label: "La selva alrededor", photo: "Complejo/4.jpg" },  // 4 · orquídeas + arce
   { label: "Iris de la selva", photo: "Complejo/2.jpg" },    // 5 · iris con rocío
   { label: "Heliconia", photo: "Complejo/1.jpg" },           // 6 · pinza de langosta
@@ -27,10 +31,10 @@ const PHOTOS: GalleryItem[] = [
 
 /** Tiles de la grilla (orden = colocación en el grid). `at` apunta a PHOTOS. */
 const TILES: { key: string; at: number; span: string; pos?: string }[] = [
-  { key: "agua", at: 2, span: "col-span-2 row-span-1 md:row-span-2" },          // hero H
-  { key: "llegada", at: 0, span: "col-span-1 row-span-2", pos: "50% 45%" },     // tall V
-  { key: "refugio", at: 3, span: "col-span-1 row-span-2", pos: "50% 22%" },     // tall V
-  { key: "descenso", at: 1, span: "col-span-1 row-span-1", pos: "50% 62%" },
+  { key: "agua", at: 0, span: "col-span-2 row-span-1 md:row-span-2" },          // hero H
+  { key: "llegada", at: 1, span: "col-span-1 row-span-2", pos: "50% 45%" },     // tall V
+  { key: "refugio", at: 2, span: "col-span-1 row-span-2", pos: "50% 22%" },     // tall V
+  { key: "descenso", at: 3, span: "col-span-1 row-span-1", pos: "50% 62%" },
   { key: "selva", at: 4, span: "col-span-1 row-span-1", pos: "50% 30%" },
   { key: "iris", at: 5, span: "col-span-1 row-span-1", pos: "50% 52%" },
   { key: "heliconia", at: 6, span: "col-span-1 row-span-1", pos: "50% 42%" },
@@ -67,7 +71,17 @@ export function RelatoImagenes() {
               </h2>
             </RevealTitle>
           </div>
-          <Reveal delay={0.14}>
+          {/* La fogata se ancla AL BOTÓN, no a la sección: centrada con
+              left-1/2 queda alineada con él sea cual sea su ancho —"Ver
+              completa" / "View full" / "Ver completa" miden distinto— y en
+              cualquier viewport, sin porcentajes a ojo. Sube al aire del
+              padding superior con bottom-full. */}
+          <Reveal delay={0.14} className="relative">
+            <FiguraAgua
+              kind="fuego"
+              className="bottom-full left-1/2 -translate-x-1/2 mb-5"
+              size={88}
+            />
             <button
               type="button"
               onClick={() => openAt(0)}
@@ -80,9 +94,12 @@ export function RelatoImagenes() {
         </div>
 
         {/* Grilla bento: 2 col mobile, 4 col desktop — las 10 fotos visibles */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-[14px] [grid-auto-rows:150px] md:[grid-auto-rows:208px]">
-          {TILES.map((tile, i) => (
-            <Reveal key={tile.key} delay={0.04 + i * 0.04} className={`${tile.span} h-full`}>
+        <Asentar className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-[14px] [grid-auto-rows:150px] md:[grid-auto-rows:208px]">
+          {TILES.map((tile) => (
+            // El <div> intermedio no es redundante: lleva las clases de span de
+            // la grilla y es el hijo directo que Asentar anima. Rotar el
+            // <button> (que tiene overflow-hidden) haría asomar su borde.
+            <div key={tile.key} className={`${tile.span} h-full`}>
               <button
                 type="button"
                 onClick={() => openAt(tile.at)}
@@ -117,9 +134,9 @@ export function RelatoImagenes() {
                   </span>
                 </span>
               </button>
-            </Reveal>
+            </div>
           ))}
-        </div>
+        </Asentar>
       </div>
 
       <GalleryLightbox

@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { Link } from "@/lib/i18n/navigation";
 import { Reveal } from "@/components/motion/Reveal";
+import { FiguraAgua } from "@/components/motion/FiguraAgua";
 import { RevealTitle } from "@/components/motion/RevealTitle";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { waLink } from "@/lib/contact";
@@ -12,6 +13,10 @@ export function CtaReserva() {
 
   return (
     <section id="reservar" className="relative bg-marfil py-20 md:py-[150px]">
+      {/* Las gotas viven acá y no en la galería: es la sección del agua ("tu
+          lugar junto al agua"). El contenido va centrado en 880px, así que el
+          margen izquierdo es aire de sobra en cualquier viewport ancho. */}
+      <FiguraAgua kind="gotas" className="top-16 left-[7%]" size={92} />
       <div className="relative z-[1] mx-auto text-center max-w-[880px] px-5 md:px-12">
         <Reveal>
           <Kicker>{t("kicker")}</Kicker>

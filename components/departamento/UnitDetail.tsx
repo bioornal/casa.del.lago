@@ -12,23 +12,17 @@ const UNIT_FEAT: Record<
   UnitSlug,
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
-  timbo: {
+  aratiri: {
     bedroom: "2 (matrimonial + twin)",
     bath: "1 completo",
     view: "Al lago",
     exterior: "Galería con parrilla + deck",
   },
-  lapacho: {
+  aguaribay: {
     bedroom: "1 dormitorio",
     bath: "1 completo",
     view: "Jardín y pileta",
     exterior: "Balcón con vista a la pileta",
-  },
-  guatambu: {
-    bedroom: "1 matrimonial + 3 individuales",
-    bath: "1 completo",
-    view: "Jardín y pileta",
-    exterior: "Acceso a la piscina",
   },
 };
 
@@ -37,36 +31,31 @@ const UNIT_FEAT_EN: Record<
   UnitSlug,
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
-  timbo: { bedroom: "2 (double + twin)", bath: "1 full", view: "Lake view", exterior: "Covered deck with grill" },
-  lapacho: { bedroom: "1 bedroom", bath: "1 full", view: "Garden & pool", exterior: "Balcony overlooking the pool" },
-  guatambu: { bedroom: "1 double + 3 single beds", bath: "1 full", view: "Garden & pool", exterior: "Pool access" },
+  aratiri: { bedroom: "2 (double + twin)", bath: "1 full", view: "Lake view", exterior: "Covered deck with grill" },
+  aguaribay: { bedroom: "1 bedroom", bath: "1 full", view: "Garden & pool", exterior: "Balcony overlooking the pool" },
 };
 
 const UNIT_FEAT_PT: Record<
   UnitSlug,
   { bedroom: string; bath: string; view: string; exterior: string }
 > = {
-  timbo: { bedroom: "2 (casal + solteiro)", bath: "1 completo", view: "Vista para o lago", exterior: "Varanda com churrasqueira" },
-  lapacho: { bedroom: "1 quarto", bath: "1 completo", view: "Jardim e piscina", exterior: "Sacada com vista para a piscina" },
-  guatambu: { bedroom: "1 casal + 3 individuais", bath: "1 completo", view: "Jardim e piscina", exterior: "Acesso à piscina" },
+  aratiri: { bedroom: "2 (casal + solteiro)", bath: "1 completo", view: "Vista para o lago", exterior: "Varanda com churrasqueira" },
+  aguaribay: { bedroom: "1 quarto", bath: "1 completo", view: "Jardim e piscina", exterior: "Sacada com vista para a piscina" },
 };
 
 // Per-unit extra services appended to the shared services list, per locale.
 const UNIT_EXTRAS: Record<string, Record<UnitSlug, string[]>> = {
   es: {
-    timbo: ["Dúplex con dormitorios en planta alta", "Sala de estar con sofá", "Sala comedor", "Balcón con vista a la calle", "Estacionamiento gratuito en el predio"],
-    lapacho: [],
-    guatambu: ["DirectTV", "Lavadero con lavarropas", "Acceso a la piscina", "Estacionamiento gratuito en el mismo predio"],
+    aratiri: ["Dúplex con dormitorios en planta alta", "Sala de estar con sofá", "Sala comedor", "Balcón con vista a la calle", "Estacionamiento gratuito en el predio"],
+    aguaribay: [],
   },
   en: {
-    timbo: ["Duplex with upstairs bedrooms", "Living room with sofa", "Dining room", "Balcony with street view", "Free on-site parking"],
-    lapacho: [],
-    guatambu: ["DirectTV", "Laundry with washer", "Pool access", "Free on-site parking"],
+    aratiri: ["Duplex with upstairs bedrooms", "Living room with sofa", "Dining room", "Balcony with street view", "Free on-site parking"],
+    aguaribay: [],
   },
   pt: {
-    timbo: ["Duplex com quartos no andar superior", "Sala de estar com sofá", "Sala de jantar", "Sacada com vista para a rua", "Estacionamento gratuito no local"],
-    lapacho: [],
-    guatambu: ["DirectTV", "Lavanderia com máquina de lavar", "Acesso à piscina", "Estacionamento gratuito no mesmo local"],
+    aratiri: ["Duplex com quartos no andar superior", "Sala de estar com sofá", "Sala de jantar", "Sacada com vista para a rua", "Estacionamento gratuito no local"],
+    aguaribay: [],
   },
 };
 
@@ -74,8 +63,8 @@ const UNIT_EXTRAS: Record<string, Record<UnitSlug, string[]>> = {
 // cuadrícula asimétrica. `span` marca el tamaño: hero 2x2, wide 2x1, tall 1x2.
 type GalleryPhoto = { photo: string; alt: string; span?: "hero" | "wide" | "tall" };
 
-// Cabaña Timbó — carpeta Dpto2 del bucket.
-const TIMBO_PHOTOS: GalleryPhoto[] = [
+// Cabaña Aratirí — carpeta Dpto2 del bucket.
+const ARATIRI_PHOTOS: GalleryPhoto[] = [
   { photo: "Dpto2/4.jpg", alt: "Living con sofá esquinero y rack de TV", span: "hero" },
   { photo: "Dpto2/11.jpg", alt: "Dormitorio principal con cama king" },
   { photo: "Dpto2/3.jpg", alt: "Escalera de doble altura", span: "tall" },
@@ -99,8 +88,8 @@ const TIMBO_PHOTOS: GalleryPhoto[] = [
   { photo: "Dpto2/19 (1).jpg", alt: "Escalera desde la planta alta" },
 ];
 
-// Cabaña Lapacho — carpeta Dpto1 del bucket (21 fotos: 1-9, 11-22).
-const LAPACHO_PHOTOS: GalleryPhoto[] = [
+// Cabaña Aguaribay — carpeta Dpto1 del bucket (21 fotos: 1-9, 11-22).
+const AGUARIBAY_PHOTOS: GalleryPhoto[] = [
   { photo: "Dpto1/20.jpg", alt: "Living con sofá y Smart TV", span: "hero" },
   { photo: "Dpto1/9.jpg", alt: "Dormitorio principal con cama matrimonial", span: "wide" },
   { photo: "Dpto1/1.jpg", alt: "Escalera de acceso a la planta alta", span: "tall" },
@@ -125,8 +114,8 @@ const LAPACHO_PHOTOS: GalleryPhoto[] = [
 ];
 
 const UNIT_GALLERY: Partial<Record<UnitSlug, GalleryPhoto[]>> = {
-  timbo: TIMBO_PHOTOS,
-  lapacho: LAPACHO_PHOTOS,
+  aratiri: ARATIRI_PHOTOS,
+  aguaribay: AGUARIBAY_PHOTOS,
 };
 
 const SPAN_CLS: Record<NonNullable<GalleryPhoto["span"]>, string> = {
@@ -141,7 +130,15 @@ function useFeatValues(slug: UnitSlug, locale: string) {
   return UNIT_FEAT[slug];
 }
 
-export function UnitDetail({ unit, locale }: { unit: Unit; locale: string }) {
+export function UnitDetail({
+  unit,
+  locale,
+  prices,
+}: {
+  unit: Unit;
+  locale: string;
+  prices: Record<UnitSlug, number>; // tarifa de lista por noche (DB, vía getRateSettings)
+}) {
   const t = useTranslations("departamento");
   const tn = useTranslations("nav");
   const feat = useFeatValues(unit.slug as UnitSlug, locale);
@@ -345,7 +342,7 @@ export function UnitDetail({ unit, locale }: { unit: Unit; locale: string }) {
           </div>
 
           {/* RIGHT — sticky booking card */}
-          <StickyBookingCard unit={unit} />
+          <StickyBookingCard unit={unit} price={prices[unit.slug]} />
         </div>
       </section>
 
@@ -384,7 +381,7 @@ export function UnitDetail({ unit, locale }: { unit: Unit; locale: string }) {
                       {other.name}
                     </h3>
                     <span className="text-[13px] text-bronce">
-                      ${new Intl.NumberFormat("es-AR").format(other.price)} {t("perNight")}
+                      ${new Intl.NumberFormat("es-AR").format(prices[other.slug])} {t("perNight")}
                     </span>
                   </div>
                 </Link>

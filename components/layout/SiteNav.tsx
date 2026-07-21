@@ -31,6 +31,49 @@ export function SiteNav() {
     };
   }, [open]);
 
+  // Isotipo + wordmark tipográfico. El isotipo va en dos versiones (carbón y
+  // marfil) cruzadas por opacidad: evita el parpadeo que daría cambiar el src
+  // al pasar el nav de transparente a sólido. El wordmark sigue siendo texto
+  // porque el lockup completo, apilado, es ilegible a la altura del nav.
+  const brandLockup = (
+    <span className="flex items-center gap-[11px] md:gap-[15px]">
+      <span className="relative block h-[42px] md:h-[52px] aspect-[320/253] shrink-0">
+        <img
+          src="/isotipo-lago.png"
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
+          style={{ opacity: dark ? 0 : 1 }}
+        />
+        <img
+          src="/isotipo-lago-marfil.png"
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
+          style={{ opacity: dark ? 1 : 0 }}
+        />
+      </span>
+      <span className="flex flex-col items-start leading-none">
+        <span
+          className={[
+            "font-display font-medium text-[20px] md:text-[23px] tracking-[0.01em] transition-colors duration-300",
+            dark ? "text-marfil" : "text-lago",
+          ].join(" ")}
+        >
+          La Casa del Lago
+        </span>
+        <span
+          className={[
+            "text-[9.5px] md:text-[11px] uppercase tracking-[0.38em] mt-[5px] transition-colors duration-300",
+            dark ? "text-marfil/72" : "text-muted",
+          ].join(" ")}
+        >
+          Urugua-í
+        </span>
+      </span>
+    </span>
+  );
+
   const sections: { id: string; label: string }[] = [
     { id: "casa", label: t("brand") },
     { id: "cabanas", label: t("apartments") },
@@ -83,7 +126,9 @@ export function SiteNav() {
           : "bg-[rgba(245,238,225,.92)] backdrop-blur-[14px] border-borde-medio",
       ].join(" ")}
     >
-      <div className="max-w-[1320px] mx-auto px-5 md:px-12 py-2 flex items-center justify-between gap-5">
+      {/* Ancho completo a propósito (el resto del sitio usa max-w-[1320px]): un nav
+          fijo que respira lee mejor que uno "casi alineado" con el contenido. */}
+      <div className="w-full px-5 md:px-10 lg:px-16 py-[10px] md:py-3 flex items-center justify-between gap-5">
         {/* LEFT — desktop nav links / mobile: hamburger */}
         <div className="flex items-center gap-[30px]">
           <button
@@ -128,24 +173,7 @@ export function SiteNav() {
             aria-label="La Casa del Lago Urugua-í"
             className="flex items-center no-underline"
           >
-            <span className="flex flex-col items-center leading-none">
-              <span
-                className={[
-                  "font-display font-medium text-[19px] md:text-[21px] tracking-[0.01em] transition-colors duration-300",
-                  dark ? "text-marfil" : "text-lago",
-                ].join(" ")}
-              >
-                La Casa del Lago
-              </span>
-              <span
-                className={[
-                  "text-[9px] md:text-[10px] uppercase tracking-[0.38em] mt-1 transition-colors duration-300",
-                  dark ? "text-marfil/72" : "text-muted",
-                ].join(" ")}
-              >
-                Urugua-í
-              </span>
-            </span>
+            {brandLockup}
           </a>
         ) : (
           <Link
@@ -153,14 +181,7 @@ export function SiteNav() {
             aria-label="La Casa del Lago Urugua-í"
             className="flex items-center no-underline"
           >
-            <span className="flex flex-col items-center leading-none">
-              <span className="font-display font-medium text-[19px] md:text-[21px] tracking-[0.01em] text-lago">
-                La Casa del Lago
-              </span>
-              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.38em] mt-1 text-muted">
-                Urugua-í
-              </span>
-            </span>
+            {brandLockup}
           </Link>
         )}
 

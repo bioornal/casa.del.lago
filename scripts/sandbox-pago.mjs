@@ -8,8 +8,8 @@
 // tokenización del navegador (public key) ya no funciona en sandbox (MP 2026).
 //
 // Uso (con `pnpm dev` corriendo):
-//   node scripts/sandbox-pago.mjs pagar APRO 2027-05-01 2027-05-03 [timbo|lapacho|guatambu] [huespedes]
-//   node scripts/sandbox-pago.mjs borrar ARM-2026-XXXX   ← limpia la reserva de prueba (Supabase + Calendar)
+//   node scripts/sandbox-pago.mjs pagar APRO 2027-05-01 2027-05-03 [aratiri|aguaribay] [huespedes]
+//   node scripts/sandbox-pago.mjs borrar CDL-2026-XXXX   ← limpia la reserva de prueba (Supabase + Calendar)
 import crypto from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -32,7 +32,7 @@ if (!AT?.startsWith("TEST-")) {
   process.exit(1);
 }
 
-async function pagar([holder = "APRO", checkIn, checkOut, unitId = "timbo", guests = "2"]) {
+async function pagar([holder = "APRO", checkIn, checkOut, unitId = "aratiri", guests = "2"]) {
   if (!checkIn || !checkOut) {
     console.error("Uso: node scripts/sandbox-pago.mjs pagar APRO 2027-05-01 2027-05-03 [unidad] [huespedes]");
     process.exit(1);
@@ -75,7 +75,7 @@ async function pagar([holder = "APRO", checkIn, checkOut, unitId = "timbo", gues
 }
 
 async function borrar([code]) {
-  if (!code) { console.error("Uso: node scripts/sandbox-pago.mjs borrar ARM-2026-XXXX"); process.exit(1); }
+  if (!code) { console.error("Uso: node scripts/sandbox-pago.mjs borrar CDL-2026-XXXX"); process.exit(1); }
   const sbUrl = env.NEXT_PUBLIC_SUPABASE_URL;
   const sbKey = env.SUPABASE_SERVICE_ROLE_KEY;
   const sbHeaders = { apikey: sbKey, Authorization: `Bearer ${sbKey}` };
@@ -89,7 +89,7 @@ async function borrar([code]) {
 
   if (calendar_event_id) {
     const sa = JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON);
-    const calendarId = env[`ARUMA_CAL_${unit_id.toUpperCase()}`];
+    const calendarId = env[`CDL_CAL_${unit_id.toUpperCase()}`];
     const b64url = (b) => Buffer.from(b).toString("base64url");
     const now = Math.floor(Date.now() / 1000);
     const unsigned = `${b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }))}.${b64url(JSON.stringify({

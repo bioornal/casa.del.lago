@@ -1,7 +1,11 @@
 -- =============================================================
--- Aruma Lodge — setup completo de Supabase
+-- La Casa del Lago Urugua-í — setup completo de Supabase
 -- Pegar en: Dashboard → SQL Editor → New query → Run
--- Replica exacta del esquema original (proyecto dckpnzkvuzrajvakiusc)
+--
+-- Aplicado al proyecto aqknzqtxhgsrhfaskoeo el 2026-07-21 como tres
+-- migraciones: create_reservations, create_comprobantes_bucket,
+-- create_rate_settings. Este archivo queda como referencia consolidada
+-- (idempotente: se puede volver a correr sin romper nada).
 -- =============================================================
 
 -- Trigger function: mantiene updated_at al día en cada UPDATE
@@ -59,3 +63,33 @@ create trigger reservations_set_updated_at
 insert into storage.buckets (id, name, public)
 values ('comprobantes', 'comprobantes', false)
 on conflict (id) do nothing;
+
+-- Tarifas editables desde /admin/tarifas (fila única id=1).
+-- extra_guest_fee se guarda pero AÚN no se aplica al cálculo (tarifa plana).
+create table if not exists public.rate_settings (
+  id               smallint primary key default 1 check (id = 1),
+  nightly_aratiri    integer not null default 130000,
+  nightly_aguaribay  integer not null default 95000,
+  cleaning_fee     integer not null default 30000,
+  base_guests      integer not null default 2,
+  extra_guest_fee  integer not null default 0,
+  updated_at       timestamptz not null default now()
+);
+
+-- Fila inicial con los mismos valores que lib/units.ts
+insert into public.rate_settings (id) values (1) on conflict (id) do nothing;
+
+-- Mismo criterio que reservations: RLS sin policies, solo service role.
+alter table public.rate_settings enable row level security;
+
+drop trigger if exists rate_settings_set_updated_at on public.rate_settings;
+create trigger rate_settings_set_updated_at
+  before update on public.rate_settings
+  for each row execute function public.set_updated_at();
+
+-- Precios por método de pago (2026-07-20): % de costo por canal, editables en
+-- /admin/tarifas. El precio público = neto ÷ (1 − pct/100) (ver method-pricing.ts).
+-- Para bases que ya tienen rate_settings creada, este ALTER agrega las columnas.
+alter table public.rate_settings
+  add column if not exists card_fee_pct     numeric(5,2) not null default 7.7,
+  add column if not exists transfer_fee_pct numeric(5,2) not null default 5;

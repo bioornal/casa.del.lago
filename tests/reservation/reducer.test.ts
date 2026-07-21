@@ -9,13 +9,13 @@ import {
 } from "@/lib/reservation/reducer";
 
 describe("reservationReducer (checkout 3 pasos)", () => {
-  it("estado inicial: step 1, 2 huéspedes, unidad timbo, sin fechas", () => {
-    expect(initialState).toMatchObject({ step: 1, guests: 2, unitId: "timbo", checkIn: null, checkOut: null });
+  it("estado inicial: step 1, 2 huéspedes, unidad aratiri, sin fechas", () => {
+    expect(initialState).toMatchObject({ step: 1, guests: 2, unitId: "aratiri", checkIn: null, checkOut: null });
   });
 
   it("hydrateState arma el estado desde la query del checkout", () => {
-    const s = hydrateState({ unitId: "guatambu", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 4 });
-    expect(s).toMatchObject({ step: 1, unitId: "guatambu", guests: 4 });
+    const s = hydrateState({ unitId: "aguaribay", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 4 });
+    expect(s).toMatchObject({ step: 1, unitId: "aguaribay", guests: 4 });
     expect(s.checkIn).toEqual(new Date(2026, 6, 2));
     expect(s.checkOut).toEqual(new Date(2026, 6, 5));
   });

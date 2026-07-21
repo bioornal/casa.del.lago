@@ -7,15 +7,17 @@ import {
   type PaymentOutcome,
 } from "@/lib/reservation/payments.server";
 import { generateBookingCode } from "@/lib/reservation/code";
-import { getUnit, CLEANING_FEE, pricePerNight } from "@/lib/units";
-import { computeNights, computeTotal } from "@/lib/reservation/pricing";
+import { getUnit } from "@/lib/units";
+import { computeNights } from "@/lib/reservation/pricing";
+import { methodTotal } from "@/lib/reservation/method-pricing";
+import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
 import { insertReservation } from "@/lib/reservation/reservations.server";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
 import type { UnitId } from "@/lib/reservation/reducer";
 
-const VALID_UNITS: UnitId[] = ["timbo", "lapacho", "guatambu"];
+const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function isUnitId(v: unknown): v is UnitId {
@@ -78,7 +80,9 @@ export async function POST(req: Request) {
   }
 
   const nights = computeNights(new Date(checkIn), new Date(checkOut));
-  const total = computeTotal(pricePerNight(unit.slug, guests as number), nights, CLEANING_FEE);
+  const settings = await getRateSettings();
+  // Precio de lista = método tarjeta (comisión MP incluida; ver method-pricing.ts)
+  const total = methodTotal(settings, "card", unit.slug, nights);
 
   // Re-chequeo en tiempo real (fail-closed)
   let available: boolean;

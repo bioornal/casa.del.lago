@@ -29,11 +29,19 @@ vi.mock("@/lib/reservation/email.server", () => ({
   sendConfirmationEmailOnce: (...a: unknown[]) => sendConfirmationEmailOnce(...a),
 }));
 
+// Tarifas: siempre los defaults — el test no depende de la DB ni del admin.
+vi.mock("@/lib/reservation/rate-settings.server", async () => {
+  const { DEFAULT_RATE_SETTINGS } = await vi.importActual<
+    typeof import("@/lib/reservation/rate-settings")
+  >("@/lib/reservation/rate-settings");
+  return { getRateSettings: () => Promise.resolve(DEFAULT_RATE_SETTINGS) };
+});
+
 import { POST } from "@/app/api/payments/route";
 
 const CARD = { token: "tok-1", paymentMethodId: "visa", installments: 1 };
 const VALID = {
-  unitId: "guatambu",
+  unitId: "aguaribay",
   checkIn: "2026-07-02",
   checkOut: "2026-07-05",
   guests: 4,
@@ -82,8 +90,9 @@ describe("POST /api/payments", () => {
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
     createBookingEvent.mockResolvedValue({ eventId: "evt-1" });
     await POST(post({ ...VALID, amount: 1, total: 1 }));
-    // guatambu 4 huéspedes → $110.000 × 3 noches + $30.000 limpieza = $360.000
-    expect(createCardPayment.mock.calls[0][0].amount).toBe(360000);
+    // aguaribay 3 noches, precio de lista (tarjeta): 95.000 ÷ 0,923 → $103.000/noche
+    // × 3 + limpieza grosseada $32.600 = $341.600 (ver method-pricing.ts)
+    expect(createCardPayment.mock.calls[0][0].amount).toBe(341600);
   });
 
   it("rejected → NO crea evento, responde 200 rejected", async () => {
