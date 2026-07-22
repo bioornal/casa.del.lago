@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { isRangeAvailable, createBookingEvent } from "@/lib/reservation/calendar.server";
 import {
   createCardPayment,
   mockPayment,
@@ -12,7 +11,12 @@ import { computeNights } from "@/lib/reservation/pricing";
 import { methodTotal } from "@/lib/reservation/method-pricing";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
-import { insertReservation } from "@/lib/reservation/reservations.server";
+import {
+  insertReservation,
+  upsertConfirmedByCode,
+  setReservationStatusByCode,
+  OverlapError,
+} from "@/lib/reservation/reservations.server";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
 import type { UnitId } from "@/lib/reservation/reducer";
@@ -84,19 +88,24 @@ export async function POST(req: Request) {
   // Precio de lista = método tarjeta (comisión MP incluida; ver method-pricing.ts)
   const total = methodTotal(settings, "card", unit.slug, nights);
 
-  // Re-chequeo en tiempo real (fail-closed)
-  let available: boolean;
+  const code = generateBookingCode();
+
+  // Retención ANTES de cobrar: la constraint de exclusión es el candado atómico.
+  // Si las fechas están tomadas, nunca se cobra.
   try {
-    available = await isRangeAvailable(unitId, { from: checkIn, to: checkOut });
+    await insertReservation({
+      code, unitId, unitName: unit.name, checkIn, checkOut, nights,
+      guests, firstName, lastName, email: email as string, phone: phoneStr, total,
+      paymentMethod: "card", status: "pending", locale,
+    });
   } catch (err) {
-    console.error("[payments] re-chequeo fallo:", err instanceof Error ? err.message : err);
-    return NextResponse.json({ error: "calendar" }, { status: 502 });
-  }
-  if (!available) {
-    return NextResponse.json({ error: "conflict" }, { status: 409 });
+    if (err instanceof OverlapError) {
+      return NextResponse.json({ error: "conflict" }, { status: 409 });
+    }
+    console.error("[payments] retencion fallo:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: "db" }, { status: 502 });
   }
 
-  const code = generateBookingCode();
   const metadata = {
     unit_id: unitId,
     unit_name: unit.name,
@@ -149,41 +158,20 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error("[payments] cobro fallo:", err instanceof Error ? err.message : err);
+    await setReservationStatusByCode(code, "released");
     return NextResponse.json({ error: "payment" }, { status: 502 });
   }
 
   if (outcome.status === "approved") {
-    let ev: { eventId: string };
     try {
-      ev = await createBookingEvent(unitId, {
-        unitName: unit.name,
-        firstName: firstName as string,
-        lastName: lastName as string,
-        email: email as string,
-        phone: phoneStr,
-        guests: guests as number,
-        checkIn,
-        checkOut,
-        nights,
-        total,
-        code,
-        paymentId: outcome.id,
-      });
-    } catch (err) {
-      console.error("[payments] insert fallo:", err instanceof Error ? err.message : err);
-      return NextResponse.json({ error: "calendar" }, { status: 502 });
-    }
-    try {
-      await insertReservation({
+      await upsertConfirmedByCode({
         code, unitId, unitName: unit.name, checkIn, checkOut, nights,
-        guests: guests as number, firstName: firstName as string, lastName: lastName as string,
+        guests, firstName: firstName as string, lastName: lastName as string,
         email: email as string, phone: phoneStr, total,
-        paymentMethod: "card", status: "confirmed",
-        paymentId: outcome.id, calendarEventId: ev.eventId,
-        locale,
+        paymentId: outcome.id, locale,
       });
     } catch (err) {
-      console.error("[payments] persist supabase (approved) fallo:", err instanceof Error ? err.message : err);
+      console.error("[payments] confirmar supabase fallo:", err instanceof Error ? err.message : err);
     }
     try { await sendConfirmationEmailOnce(code); }
     catch (err) { console.error("[payments] email fallo:", err instanceof Error ? err.message : err); }
@@ -191,19 +179,9 @@ export async function POST(req: Request) {
   }
 
   if (outcome.status === "pending" || outcome.status === "in_process") {
-    try {
-      await insertReservation({
-        code, unitId, unitName: unit.name, checkIn, checkOut, nights,
-        guests: guests as number, firstName: firstName as string, lastName: lastName as string,
-        email: email as string, phone: phoneStr, total,
-        paymentMethod: "card", status: "pending", paymentId: outcome.id,
-        locale,
-      });
-    } catch (err) {
-      console.error("[payments] persist supabase (pending) fallo:", err instanceof Error ? err.message : err);
-    }
     return NextResponse.json({ status: "pending", code });
   }
 
+  await setReservationStatusByCode(code, "released");
   return NextResponse.json({ status: "rejected", detail: outcome.statusDetail ?? null });
 }

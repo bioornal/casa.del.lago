@@ -1,12 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-const isRangeAvailable = vi.fn();
-const createBookingEvent = vi.fn();
-vi.mock("@/lib/reservation/calendar.server", () => ({
-  isRangeAvailable: (...a: unknown[]) => isRangeAvailable(...a),
-  createBookingEvent: (...a: unknown[]) => createBookingEvent(...a),
-}));
-
 const createCardPayment = vi.fn();
 vi.mock("@/lib/reservation/payments.server", async () => {
   const actual = await vi.importActual<typeof import("@/lib/reservation/payments.server")>(
@@ -18,10 +11,18 @@ vi.mock("@/lib/reservation/payments.server", async () => {
   };
 });
 
+const { OverlapError } = vi.hoisted(() => {
+  class OverlapError extends Error { constructor() { super("overlap"); this.name = "OverlapError"; } }
+  return { OverlapError };
+});
 const insertReservation = vi.fn();
+const upsertConfirmedByCode = vi.fn();
+const setReservationStatusByCode = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
-  upsertConfirmedByCode: vi.fn(),
+  upsertConfirmedByCode: (...a: unknown[]) => upsertConfirmedByCode(...a),
+  setReservationStatusByCode: (...a: unknown[]) => setReservationStatusByCode(...a),
+  OverlapError,
 }));
 
 const sendConfirmationEmailOnce = vi.fn();
@@ -61,62 +62,83 @@ function post(body: unknown) {
 }
 
 beforeEach(() => {
-  isRangeAvailable.mockReset();
-  createBookingEvent.mockReset();
   createCardPayment.mockReset();
   insertReservation.mockReset();
   insertReservation.mockResolvedValue(undefined);
+  upsertConfirmedByCode.mockReset();
+  upsertConfirmedByCode.mockResolvedValue(undefined);
+  setReservationStatusByCode.mockReset();
+  setReservationStatusByCode.mockResolvedValue(undefined);
   sendConfirmationEmailOnce.mockReset();
   delete process.env.PAYMENTS_MOCK;
 });
 afterEach(() => { delete process.env.PAYMENTS_MOCK; });
 
 describe("POST /api/payments", () => {
-  it("approved → crea evento y responde 200 con código", async () => {
-    isRangeAvailable.mockResolvedValue(true);
+  it("409 sin cobrar si las fechas están tomadas (OverlapError antes del cobro)", async () => {
+    process.env.PAYMENTS_MOCK = "1";
+    insertReservation.mockRejectedValueOnce(new OverlapError());
+    const res = await POST(post({ ...VALID, payment: { mockOutcome: "approved" } }));
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toBe("conflict");
+    // no se cobró ni se confirmó nada
+    expect(createCardPayment).not.toHaveBeenCalled();
+    expect(upsertConfirmedByCode).not.toHaveBeenCalled();
+  });
+
+  it("502 si el insert de la retención falla por un error que no es overlap", async () => {
+    insertReservation.mockRejectedValueOnce(new Error("db down"));
+    const res = await POST(post(VALID));
+    expect(res.status).toBe(502);
+    expect(createCardPayment).not.toHaveBeenCalled();
+  });
+
+  it("approved → retiene, cobra y confirma por code", async () => {
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
-    createBookingEvent.mockResolvedValue({ eventId: "evt-1" });
     const res = await POST(post(VALID));
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.status).toBe("approved");
     expect(body.code).toMatch(/^CDL-\d{4}-[A-Z2-9]{4}$/);
-    expect(createBookingEvent).toHaveBeenCalledOnce();
+    expect(insertReservation.mock.calls[0][0].status).toBe("pending");
+    expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("card");
+    expect(upsertConfirmedByCode).toHaveBeenCalledOnce();
+    expect(upsertConfirmedByCode.mock.calls[0][0].paymentId).toBe("pay-1");
+    expect(setReservationStatusByCode).not.toHaveBeenCalled();
     expect(sendConfirmationEmailOnce).toHaveBeenCalledWith(expect.stringMatching(/^CDL-/));
   });
 
   it("cobra el total recalculado server-side, ignorando lo que mande el cliente", async () => {
-    isRangeAvailable.mockResolvedValue(true);
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
-    createBookingEvent.mockResolvedValue({ eventId: "evt-1" });
     await POST(post({ ...VALID, amount: 1, total: 1 }));
     // aguaribay 3 noches, precio de lista (tarjeta): 95.000 ÷ 0,923 → $103.000/noche
     // × 3 + limpieza grosseada $32.600 = $341.600 (ver method-pricing.ts)
     expect(createCardPayment.mock.calls[0][0].amount).toBe(341600);
   });
 
-  it("rejected → NO crea evento, responde 200 rejected", async () => {
-    isRangeAvailable.mockResolvedValue(true);
+  it("rejected → libera la retención por code, responde 200 rejected", async () => {
     createCardPayment.mockResolvedValue({ id: "pay-2", status: "rejected", statusDetail: "cc_rejected" });
     const res = await POST(post(VALID));
     expect(res.status).toBe(200);
     expect((await res.json()).status).toBe("rejected");
-    expect(createBookingEvent).not.toHaveBeenCalled();
+    expect(setReservationStatusByCode).toHaveBeenCalledWith(expect.any(String), "released");
+    expect(upsertConfirmedByCode).not.toHaveBeenCalled();
   });
 
-  it("pending → NO crea evento, responde 200 pending", async () => {
-    isRangeAvailable.mockResolvedValue(true);
+  it("pending → deja la fila en pending, no confirma ni libera", async () => {
     createCardPayment.mockResolvedValue({ id: "pay-3", status: "in_process" });
     const res = await POST(post(VALID));
     expect(res.status).toBe(200);
     expect((await res.json()).status).toBe("pending");
-    expect(createBookingEvent).not.toHaveBeenCalled();
+    expect(upsertConfirmedByCode).not.toHaveBeenCalled();
+    expect(setReservationStatusByCode).not.toHaveBeenCalled();
   });
 
   it("400 si el payload de reserva es inválido", async () => {
     const res = await POST(post({ ...VALID, email: "no-es-email" }));
     expect(res.status).toBe(400);
     expect(createCardPayment).not.toHaveBeenCalled();
+    expect(insertReservation).not.toHaveBeenCalled();
   });
 
   it("400 si falta el método de pago", async () => {
@@ -125,43 +147,20 @@ describe("POST /api/payments", () => {
     expect(res.status).toBe(400);
   });
 
-  it("409 si las fechas ya no están disponibles", async () => {
-    isRangeAvailable.mockResolvedValue(false);
-    const res = await POST(post(VALID));
-    expect(res.status).toBe(409);
-    expect(createCardPayment).not.toHaveBeenCalled();
-  });
-
-  it("502 fail-closed si el re-chequeo lanza", async () => {
-    isRangeAvailable.mockRejectedValue(new Error("calendar down"));
-    const res = await POST(post(VALID));
-    expect(res.status).toBe(502);
-  });
-
-  it("502 si MP lanza", async () => {
-    isRangeAvailable.mockResolvedValue(true);
+  it("502 y libera la retención si el cobro lanza", async () => {
     createCardPayment.mockRejectedValue(new Error("mp down"));
     const res = await POST(post(VALID));
     expect(res.status).toBe(502);
+    expect(setReservationStatusByCode).toHaveBeenCalledWith(expect.any(String), "released");
   });
 
-  it("502 si el insert del evento lanza tras approved", async () => {
-    isRangeAvailable.mockResolvedValue(true);
-    createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
-    createBookingEvent.mockRejectedValue(new Error("insert fail"));
-    const res = await POST(post(VALID));
-    expect(res.status).toBe(502);
-  });
-
-  it("modo mock: mockOutcome approved crea evento sin llamar a MP", async () => {
+  it("modo mock: mockOutcome approved confirma sin llamar a MP", async () => {
     process.env.PAYMENTS_MOCK = "1";
-    isRangeAvailable.mockResolvedValue(true);
-    createBookingEvent.mockResolvedValue({ eventId: "evt-mock" });
     const res = await POST(post({ ...VALID, payment: { mockOutcome: "approved" } }));
     expect(res.status).toBe(200);
     expect((await res.json()).status).toBe("approved");
     expect(createCardPayment).not.toHaveBeenCalled();
-    expect(createBookingEvent).toHaveBeenCalledOnce();
+    expect(upsertConfirmedByCode).toHaveBeenCalledOnce();
   });
 
   it("mockOutcome se ignora si PAYMENTS_MOCK está apagado (400 sin token)", async () => {
@@ -169,35 +168,19 @@ describe("POST /api/payments", () => {
     expect(res.status).toBe(400);
   });
 
-  it("approved → inserta reserva card/confirmed en Supabase", async () => {
-    isRangeAvailable.mockResolvedValue(true);
+  it("approved sigue 200 aunque la confirmación en Supabase falle (best-effort)", async () => {
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
-    createBookingEvent.mockResolvedValue({ eventId: "evt-1" });
-    await POST(post(VALID));
-    expect(insertReservation).toHaveBeenCalledOnce();
-    const row = insertReservation.mock.calls[0][0];
-    expect(row.paymentMethod).toBe("card");
-    expect(row.status).toBe("confirmed");
-    expect(row.paymentId).toBe("pay-1");
-    expect(row.calendarEventId).toBe("evt-1");
-  });
-
-  it("approved sigue 200 aunque el insert Supabase falle (best-effort)", async () => {
-    isRangeAvailable.mockResolvedValue(true);
-    createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
-    createBookingEvent.mockResolvedValue({ eventId: "evt-1" });
-    insertReservation.mockRejectedValue(new Error("db down"));
+    upsertConfirmedByCode.mockRejectedValue(new Error("db down"));
     const res = await POST(post(VALID));
     expect(res.status).toBe(200);
     expect((await res.json()).status).toBe("approved");
   });
 
-  it("pending → inserta reserva card/pending sin evento", async () => {
-    isRangeAvailable.mockResolvedValue(true);
+  it("pending → la fila de retención queda con paymentMethod card / status pending", async () => {
     createCardPayment.mockResolvedValue({ id: "pay-3", status: "in_process" });
     await POST(post(VALID));
     expect(insertReservation).toHaveBeenCalledOnce();
     expect(insertReservation.mock.calls[0][0].status).toBe("pending");
-    expect(createBookingEvent).not.toHaveBeenCalled();
+    expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("card");
   });
 });
