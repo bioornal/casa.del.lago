@@ -1,7 +1,7 @@
 import type { UnitId } from "./reducer";
 
 export type DateRange = { from: Date; to: Date };
-export type AvailabilitySource = "stub" | "google-calendar" | "channel-manager";
+export type AvailabilitySource = "stub" | "supabase";
 export type Availability = { disabledDates: Date[]; source: AvailabilitySource };
 
 /** Convierte "YYYY-MM-DD" a un Date a medianoche LOCAL (sin corrimiento de TZ). */

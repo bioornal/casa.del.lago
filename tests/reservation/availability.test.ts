@@ -13,13 +13,13 @@ describe("getAvailability (cliente)", () => {
       "fetch",
       vi.fn(async () =>
         new Response(
-          JSON.stringify({ disabledDates: ["2026-06-10", "2026-06-11"], source: "google-calendar" }),
+          JSON.stringify({ disabledDates: ["2026-06-10", "2026-06-11"], source: "supabase" }),
           { status: 200, headers: { "Content-Type": "application/json" } },
         ),
       ),
     );
     const res = await getAvailability("aratiri", RANGE);
-    expect(res.source).toBe("google-calendar");
+    expect(res.source).toBe("supabase");
     expect(res.disabledDates).toHaveLength(2);
     const d0 = res.disabledDates[0];
     expect([d0.getFullYear(), d0.getMonth(), d0.getDate()]).toEqual([2026, 5, 10]);
@@ -41,7 +41,7 @@ describe("getAvailability (cliente)", () => {
 
   it("consulta el endpoint correcto con la unidad y el rango", async () => {
     const fetchMock = vi.fn(async (_url: string) =>
-      new Response(JSON.stringify({ disabledDates: [], source: "google-calendar" }), {
+      new Response(JSON.stringify({ disabledDates: [], source: "supabase" }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       }),
@@ -58,13 +58,13 @@ describe("getAvailability (cliente)", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async () =>
-        new Response(JSON.stringify({ disabledDates: [], source: "google-calendar" }), {
+        new Response(JSON.stringify({ disabledDates: [], source: "supabase" }), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         }),
       ),
     );
     const res = await getAvailability("aratiri", RANGE);
-    expect(res).toEqual({ disabledDates: [], source: "google-calendar" });
+    expect(res).toEqual({ disabledDates: [], source: "supabase" });
   });
 });
