@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPayment, verifyWebhookSignature } from "@/lib/reservation/payments.server";
-import {
-  isRangeAvailable,
-  createBookingEvent,
-  findBookingEventByCode,
-} from "@/lib/reservation/calendar.server";
-import { upsertConfirmedByCode, type Locale } from "@/lib/reservation/reservations.server";
+import { upsertConfirmedByCode, OverlapError, type Locale } from "@/lib/reservation/reservations.server";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
 import type { UnitId } from "@/lib/reservation/reducer";
 
@@ -49,73 +44,36 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true }); // metadata incompleta; nada que hacer
   }
 
+  const upsertInput = {
+    code,
+    unitId: unitId as UnitId,
+    unitName: String(m.unit_name),
+    checkIn: String(m.check_in),
+    checkOut: String(m.check_out),
+    nights: Number(m.nights),
+    guests: Number(m.guests),
+    firstName: String(m.first_name),
+    lastName: String(m.last_name),
+    email: String(m.email),
+    phone: String(m.phone ?? ""),
+    total: Number(m.total),
+    paymentId: String(payment.id),
+    locale: (m.locale === "en" || m.locale === "pt" ? m.locale : "es") as Locale,
+  };
+
   try {
-    const existing = await findBookingEventByCode(unitId as UnitId, code);
-
-    const upsertInput = {
-      code,
-      unitId: unitId as UnitId,
-      unitName: String(m.unit_name),
-      checkIn: String(m.check_in),
-      checkOut: String(m.check_out),
-      nights: Number(m.nights),
-      guests: Number(m.guests),
-      firstName: String(m.first_name),
-      lastName: String(m.last_name),
-      email: String(m.email),
-      phone: String(m.phone ?? ""),
-      total: Number(m.total),
-      paymentId: String(payment.id),
-      locale: (m.locale === "en" || m.locale === "pt" ? m.locale : "es") as Locale,
-    };
-
-    if (existing) {
-      // idempotente: no recrea el evento, pero igual refleja el estado en Supabase
-      try {
-        await upsertConfirmedByCode({ ...upsertInput, calendarEventId: existing.eventId });
-      } catch (err) {
-        console.error("[webhook] persist supabase (idempotente) fallo:", err instanceof Error ? err.message : err);
-      }
-      try { await sendConfirmationEmailOnce(code); }
-      catch (err) { console.error("[webhook] email fallo:", err instanceof Error ? err.message : err); }
+    await upsertConfirmedByCode(upsertInput);
+  } catch (err) {
+    if (err instanceof OverlapError) {
+      console.error(`[webhook] pago ${payment.id} aprobado pero fechas ocupadas (code ${code}); requiere reembolso manual`);
       return NextResponse.json({ ok: true });
     }
-
-    const available = await isRangeAvailable(unitId as UnitId, {
-      from: String(m.check_in),
-      to: String(m.check_out),
-    });
-    if (!available) {
-      console.error(`[webhook] pago ${payment.id} aprobado pero fechas ocupadas (code ${code})`);
-      return NextResponse.json({ ok: true }); // requiere intervención manual / reembolso
-    }
-
-    const ev = await createBookingEvent(unitId as UnitId, {
-      unitName: String(m.unit_name),
-      firstName: String(m.first_name),
-      lastName: String(m.last_name),
-      email: String(m.email),
-      phone: String(m.phone ?? ""),
-      guests: Number(m.guests),
-      checkIn: String(m.check_in),
-      checkOut: String(m.check_out),
-      nights: Number(m.nights),
-      total: Number(m.total),
-      code,
-      paymentId: payment.id,
-    });
-
-    try {
-      await upsertConfirmedByCode({ ...upsertInput, calendarEventId: ev.eventId });
-    } catch (err) {
-      console.error("[webhook] persist supabase fallo:", err instanceof Error ? err.message : err);
-    }
-    try { await sendConfirmationEmailOnce(code); }
-    catch (err) { console.error("[webhook] email fallo:", err instanceof Error ? err.message : err); }
-  } catch (err) {
-    console.error("[webhook] confirmación fallo:", err instanceof Error ? err.message : err);
-    return NextResponse.json({ error: "confirm" }, { status: 502 });
+    console.error("[webhook] persist supabase fallo:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ ok: true });
   }
+
+  try { await sendConfirmationEmailOnce(code); }
+  catch (err) { console.error("[webhook] email fallo:", err instanceof Error ? err.message : err); }
 
   return NextResponse.json({ ok: true });
 }

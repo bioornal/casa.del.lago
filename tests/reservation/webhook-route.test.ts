@@ -1,15 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import crypto from "node:crypto";
 
-const isRangeAvailable = vi.fn();
-const createBookingEvent = vi.fn();
-const findBookingEventByCode = vi.fn();
-vi.mock("@/lib/reservation/calendar.server", () => ({
-  isRangeAvailable: (...a: unknown[]) => isRangeAvailable(...a),
-  createBookingEvent: (...a: unknown[]) => createBookingEvent(...a),
-  findBookingEventByCode: (...a: unknown[]) => findBookingEventByCode(...a),
-}));
-
 const getPayment = vi.fn();
 vi.mock("@/lib/reservation/payments.server", async () => {
   const actual = await vi.importActual<typeof import("@/lib/reservation/payments.server")>(
@@ -18,9 +9,18 @@ vi.mock("@/lib/reservation/payments.server", async () => {
   return { ...actual, getPayment: (...a: unknown[]) => getPayment(...a) };
 });
 
-const upsertConfirmedByCode = vi.fn();
+const { OverlapError, upsertConfirmedByCode } = vi.hoisted(() => {
+  class OverlapError extends Error {
+    constructor() {
+      super("overlap");
+      this.name = "OverlapError";
+    }
+  }
+  return { OverlapError, upsertConfirmedByCode: vi.fn() };
+});
 vi.mock("@/lib/reservation/reservations.server", () => ({
   upsertConfirmedByCode: (...a: unknown[]) => upsertConfirmedByCode(...a),
+  OverlapError,
 }));
 
 const sendConfirmationEmailOnce = vi.fn();
@@ -59,11 +59,13 @@ function req(dataId: string, requestId: string, valid: boolean) {
   });
 }
 
+function approvedReq() {
+  return req("pay-1", "req-1", true);
+}
+
 beforeEach(() => {
-  isRangeAvailable.mockReset();
-  createBookingEvent.mockReset();
-  findBookingEventByCode.mockReset();
   getPayment.mockReset();
+  getPayment.mockResolvedValue(APPROVED_PAYMENT);
   upsertConfirmedByCode.mockReset();
   upsertConfirmedByCode.mockResolvedValue(undefined);
   sendConfirmationEmailOnce.mockReset();
@@ -79,57 +81,30 @@ describe("POST /api/webhooks/mercadopago", () => {
     expect(upsertConfirmedByCode).not.toHaveBeenCalled();
   });
 
-  it("approved nuevo → crea el evento y responde 200", async () => {
-    getPayment.mockResolvedValue(APPROVED_PAYMENT);
-    findBookingEventByCode.mockResolvedValue(null);
-    isRangeAvailable.mockResolvedValue(true);
-    createBookingEvent.mockResolvedValue({ eventId: "evt-1" });
-    const res = await POST(req("pay-1", "req-1", true));
+  it("pago aprobado: confirma por code y responde ok", async () => {
+    const res = await POST(approvedReq());
     expect(res.status).toBe(200);
-    expect(createBookingEvent).toHaveBeenCalledOnce();
-    expect(createBookingEvent.mock.calls[0][0]).toBe("aguaribay");
-    expect(createBookingEvent.mock.calls[0][1]).toMatchObject({ code: "CDL-2026-AB12", paymentId: "pay-1" });
-  });
-
-  it("approved nuevo → upsert confirmado en Supabase con el eventId creado", async () => {
-    getPayment.mockResolvedValue(APPROVED_PAYMENT);
-    findBookingEventByCode.mockResolvedValue(null);
-    isRangeAvailable.mockResolvedValue(true);
-    createBookingEvent.mockResolvedValue({ eventId: "evt-1" });
-    const res = await POST(req("pay-1", "req-1", true));
-    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true });
     expect(upsertConfirmedByCode).toHaveBeenCalledOnce();
     const row = upsertConfirmedByCode.mock.calls[0][0];
     expect(row.code).toBe("CDL-2026-AB12");
-    expect(row.calendarEventId).toBe("evt-1");
     expect(row.paymentId).toBe("pay-1");
     expect(sendConfirmationEmailOnce).toHaveBeenCalledWith("CDL-2026-AB12");
   });
 
-  it("idempotente: si el evento ya existe, no lo duplica", async () => {
-    getPayment.mockResolvedValue(APPROVED_PAYMENT);
-    findBookingEventByCode.mockResolvedValue({ eventId: "evt-existing" });
-    const res = await POST(req("pay-1", "req-1", true));
+  it("fechas tomadas al confirmar: loguea y responde ok (sin error a MP)", async () => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    upsertConfirmedByCode.mockRejectedValueOnce(new OverlapError());
+    const res = await POST(approvedReq());
     expect(res.status).toBe(200);
-    expect(createBookingEvent).not.toHaveBeenCalled();
+    expect(await res.json()).toEqual({ ok: true });
+    errSpy.mockRestore();
   });
 
-  it("idempotente: igual hace upsert en Supabase reflejando el eventId existente", async () => {
-    getPayment.mockResolvedValue(APPROVED_PAYMENT);
-    findBookingEventByCode.mockResolvedValue({ eventId: "evt-existing" });
-    const res = await POST(req("pay-1", "req-1", true));
-    expect(res.status).toBe(200);
-    expect(createBookingEvent).not.toHaveBeenCalled();
-    expect(upsertConfirmedByCode).toHaveBeenCalledOnce();
-    expect(upsertConfirmedByCode.mock.calls[0][0].calendarEventId).toBe("evt-existing");
-    expect(sendConfirmationEmailOnce).toHaveBeenCalledWith("CDL-2026-AB12");
-  });
-
-  it("pago no aprobado → 200 sin crear evento", async () => {
+  it("pago no aprobado → 200 sin confirmar", async () => {
     getPayment.mockResolvedValue({ ...APPROVED_PAYMENT, status: "rejected" });
     const res = await POST(req("pay-1", "req-1", true));
     expect(res.status).toBe(200);
-    expect(createBookingEvent).not.toHaveBeenCalled();
     expect(upsertConfirmedByCode).not.toHaveBeenCalled();
   });
 });
