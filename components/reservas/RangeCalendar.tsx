@@ -9,9 +9,10 @@ import { pickDay, type RangeValue } from "@/lib/reservation/range";
 interface RangeCalendarProps {
   value: RangeValue;
   onChange: (next: RangeValue) => void;
+  disabledDates?: Date[];
 }
 
-export function RangeCalendar({ value, onChange }: RangeCalendarProps) {
+export function RangeCalendar({ value, onChange, disabledDates = [] }: RangeCalendarProps) {
   const locale = useLocale();
   const dateFnsLocale =
     locale === "en" ? enUS : locale === "pt" ? ptBR : esLocale;
@@ -33,7 +34,7 @@ export function RangeCalendar({ value, onChange }: RangeCalendarProps) {
       locale={dateFnsLocale}
       defaultMonth={checkIn ?? new Date()}
       weekStartsOn={1}
-      disabled={{ before: new Date() }}
+      disabled={[{ before: new Date() }, ...disabledDates]}
       modifiers={modifiers}
       modifiersClassNames={modifiersClassNames}
       onDayClick={(day) => onChange(pickDay(value, day))}
