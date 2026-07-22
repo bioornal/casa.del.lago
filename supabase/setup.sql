@@ -93,3 +93,32 @@ create trigger rate_settings_set_updated_at
 alter table public.rate_settings
   add column if not exists card_fee_pct     numeric(5,2) not null default 7.7,
   add column if not exists transfer_fee_pct numeric(5,2) not null default 5;
+
+-- =============================================================
+-- 2026-07-22 — Supabase como fuente única de disponibilidad.
+-- Candado anti-doble-booking + reservas manuales. Google Calendar retirado.
+-- Aplicado al proyecto aqknzqtxhgsrhfaskoeo como migración
+-- supabase_fuente_disponibilidad.
+-- =============================================================
+create extension if not exists btree_gist;
+
+-- Ninguna reserva activa (status != released) puede solaparse con otra de la
+-- misma unidad. Rango semiabierto [check_in, check_out): el día de salida queda
+-- libre. Una inserción que la viole falla con SQLSTATE 23P01.
+alter table public.reservations
+  drop constraint if exists reservations_no_overlap;
+alter table public.reservations
+  add constraint reservations_no_overlap
+  exclude using gist (
+    unit_id with =,
+    daterange(check_in, check_out, '[)') with &&
+  ) where (status <> 'released');
+
+-- Reservas cargadas a mano por el admin (clientes de Meta Ads/WhatsApp).
+alter table public.reservations
+  drop constraint if exists reservations_payment_method_check,
+  add constraint reservations_payment_method_check
+    check (payment_method in ('card', 'transfer', 'manual'));
+
+-- Columna vestigial del viejo Google Calendar.
+alter table public.reservations drop column if exists calendar_event_id;
