@@ -5,15 +5,6 @@
 // de undici, donde el tamaño se preserva correctamente.
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const isRangeAvailable = vi.fn();
-const createPendingEvent = vi.fn();
-const deleteEvent = vi.fn();
-vi.mock("@/lib/reservation/calendar.server", () => ({
-  isRangeAvailable: (...a: unknown[]) => isRangeAvailable(...a),
-  createPendingEvent: (...a: unknown[]) => createPendingEvent(...a),
-  deleteEvent: (...a: unknown[]) => deleteEvent(...a),
-}));
-
 const uploadComprobante = vi.fn();
 const removeComprobante = vi.fn();
 vi.mock("@/lib/reservation/comprobante.server", async () => {
@@ -27,9 +18,14 @@ vi.mock("@/lib/reservation/comprobante.server", async () => {
   };
 });
 
+const { OverlapError } = vi.hoisted(() => {
+  class OverlapError extends Error { constructor() { super("overlap"); this.name = "OverlapError"; } }
+  return { OverlapError };
+});
 const insertReservation = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
+  OverlapError,
 }));
 
 // Tarifas: siempre los defaults — el test no depende de la DB ni del admin.
@@ -58,29 +54,35 @@ const goodFile = () => new File([new Uint8Array([1, 2, 3])], "c.jpg", { type: "i
 
 beforeEach(() => {
   vi.clearAllMocks();
-  isRangeAvailable.mockResolvedValue(true);
-  uploadComprobante.mockResolvedValue("aguaribay-path/x.jpg");
-  createPendingEvent.mockResolvedValue({ eventId: "evt-1" });
+  uploadComprobante.mockResolvedValue("comprobantes/x.jpg");
+  removeComprobante.mockResolvedValue(undefined);
   insertReservation.mockResolvedValue(undefined);
 });
 
 describe("POST /api/reservations/transfer", () => {
-  it("happy path → 200 pending + code, en orden disponibilidad→upload→evento→insert", async () => {
+  it("inserta pending y responde 200 con code", async () => {
     const res = await POST(form(VALID, goodFile()));
-    expect(res.status).toBe(200);
     const body = await res.json();
+    expect(res.status).toBe(200);
     expect(body.status).toBe("pending");
     expect(body.code).toMatch(/^CDL-\d{4}-[A-Z2-9]{4}$/);
-    expect(isRangeAvailable).toHaveBeenCalledOnce();
-    expect(uploadComprobante).toHaveBeenCalledOnce();
-    expect(createPendingEvent).toHaveBeenCalledOnce();
     expect(insertReservation).toHaveBeenCalledOnce();
+    expect(insertReservation.mock.calls[0][0].status).toBe("pending");
+    expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("transfer");
+  });
+
+  it("responde 409 y borra el comprobante si las fechas se solapan", async () => {
+    insertReservation.mockRejectedValueOnce(new OverlapError());
+    const res = await POST(form(VALID, goodFile()));
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toBe("conflict");
+    expect(removeComprobante).toHaveBeenCalledWith("comprobantes/x.jpg");
   });
 
   it("400 si falta el comprobante", async () => {
     const res = await POST(form(VALID));
     expect(res.status).toBe(400);
-    expect(isRangeAvailable).not.toHaveBeenCalled();
+    expect(uploadComprobante).not.toHaveBeenCalled();
   });
 
   it("400 si el tipo de archivo no está permitido", async () => {
@@ -100,32 +102,18 @@ describe("POST /api/reservations/transfer", () => {
     expect(res.status).toBe(400);
   });
 
-  it("409 si las fechas ya no están disponibles", async () => {
-    isRangeAvailable.mockResolvedValue(false);
-    const res = await POST(form(VALID, goodFile()));
-    expect(res.status).toBe(409);
-    expect(uploadComprobante).not.toHaveBeenCalled();
-  });
-
-  it("502 fail-closed si el re-chequeo lanza", async () => {
-    isRangeAvailable.mockRejectedValue(new Error("cal down"));
-    const res = await POST(form(VALID, goodFile()));
-    expect(res.status).toBe(502);
-  });
-
-  it("502 si la subida del comprobante falla (no crea evento)", async () => {
+  it("502 si la subida del comprobante falla (no llega a insertar)", async () => {
     uploadComprobante.mockRejectedValue(new Error("storage down"));
     const res = await POST(form(VALID, goodFile()));
     expect(res.status).toBe(502);
-    expect(createPendingEvent).not.toHaveBeenCalled();
+    expect(insertReservation).not.toHaveBeenCalled();
   });
 
-  it("502 + revierte (borra evento y comprobante) si el insert falla", async () => {
+  it("502 + borra el comprobante si el insert falla por un error que no es overlap", async () => {
     insertReservation.mockRejectedValue(new Error("db down"));
     const res = await POST(form(VALID, goodFile()));
     expect(res.status).toBe(502);
-    expect(deleteEvent).toHaveBeenCalledWith("aguaribay", "evt-1");
-    expect(removeComprobante).toHaveBeenCalledWith("aguaribay-path/x.jpg");
+    expect(removeComprobante).toHaveBeenCalledWith("comprobantes/x.jpg");
   });
 
   it("propaga locale al insert (default es si falta o es inválido)", async () => {

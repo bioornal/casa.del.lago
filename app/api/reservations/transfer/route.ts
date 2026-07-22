@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { isRangeAvailable, createPendingEvent, deleteEvent } from "@/lib/reservation/calendar.server";
 import { uploadComprobante, removeComprobante, isAllowedMime, MAX_BYTES } from "@/lib/reservation/comprobante.server";
-import { insertReservation } from "@/lib/reservation/reservations.server";
+import { insertReservation, OverlapError } from "@/lib/reservation/reservations.server";
 import { generateBookingCode } from "@/lib/reservation/code";
 import { getUnit } from "@/lib/units";
 import { computeNights } from "@/lib/reservation/pricing";
@@ -81,19 +80,9 @@ export async function POST(req: Request) {
   // Total del método TRANSFERENCIA (menor al precio de lista; ver method-pricing.ts)
   const total = methodTotal(settings, "transfer", unit.slug, nights);
 
-  // 1. Re-chequeo de disponibilidad (fail-closed).
-  let available: boolean;
-  try {
-    available = await isRangeAvailable(unitId, { from: checkIn, to: checkOut });
-  } catch (err) {
-    console.error("[transfer] re-chequeo fallo:", err instanceof Error ? err.message : err);
-    return NextResponse.json({ error: "calendar" }, { status: 502 });
-  }
-  if (!available) return NextResponse.json({ error: "conflict" }, { status: 409 });
-
   const code = generateBookingCode();
 
-  // 2. Subir comprobante.
+  // 1. Subir comprobante.
   let comprobantePath: string;
   try {
     comprobantePath = await uploadComprobante(code, file);
@@ -102,33 +91,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "storage" }, { status: 502 });
   }
 
-  // 3. Crear evento PENDIENTE (bloquea fechas).
-  let eventId: string;
-  try {
-    const ev = await createPendingEvent(unitId, {
-      unitName: unit.name, firstName, lastName, email, phone, guests,
-      checkIn, checkOut, nights, total, code, paymentId: "transfer",
-    });
-    eventId = ev.eventId;
-  } catch (err) {
-    console.error("[transfer] evento fallo:", err instanceof Error ? err.message : err);
-    await removeComprobante(comprobantePath);
-    return NextResponse.json({ error: "calendar" }, { status: 502 });
-  }
-
-  // 4. Insertar en Supabase. Si falla, revertir evento + comprobante.
+  // 2. Insertar PENDIENTE. La constraint de exclusión es el candado: si las
+  //    fechas están tomadas, insertReservation lanza OverlapError → 409.
   try {
     await insertReservation({
       code, unitId, unitName: unit.name, checkIn, checkOut, nights, guests,
       firstName, lastName, email, phone, total,
       paymentMethod: "transfer", status: "pending",
-      comprobantePath, calendarEventId: eventId,
-      locale,
+      comprobantePath, locale,
     });
   } catch (err) {
-    console.error("[transfer] insert fallo:", err instanceof Error ? err.message : err);
-    await deleteEvent(unitId, eventId);
     await removeComprobante(comprobantePath);
+    if (err instanceof OverlapError) {
+      return NextResponse.json({ error: "conflict" }, { status: 409 });
+    }
+    console.error("[transfer] insert fallo:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "db" }, { status: 502 });
   }
 
