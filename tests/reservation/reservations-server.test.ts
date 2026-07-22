@@ -18,7 +18,9 @@ import {
   upsertConfirmedByCode,
   listReservations,
   setReservationStatus,
+  setReservationStatusByCode,
   markConfirmationEmailSent,
+  OverlapError,
 } from "@/lib/reservation/reservations.server";
 
 beforeEach(() => {
@@ -39,7 +41,7 @@ describe("reservations.server", () => {
       checkIn: "2026-07-02", checkOut: "2026-07-05", nights: 3, guests: 4,
       firstName: "Juan", lastName: "Pérez", email: "j@t.com", phone: "+54",
       total: 480000, paymentMethod: "transfer", status: "pending",
-      comprobantePath: "comprobantes/x.jpg", calendarEventId: "evt-1",
+      comprobantePath: "comprobantes/x.jpg",
     });
     expect(from).toHaveBeenCalledWith("reservations");
     expect(insert).toHaveBeenCalledOnce();
@@ -62,7 +64,7 @@ describe("reservations.server", () => {
       code: "CDL-2026-AB12", unitId: "aguaribay", unitName: "Cabaña Aguaribay",
       checkIn: "2026-07-02", checkOut: "2026-07-05", nights: 3, guests: 4,
       firstName: "Juan", lastName: "Pérez", email: "j@t.com", phone: "+54",
-      total: 480000, paymentId: "pay-1", calendarEventId: "evt-1",
+      total: 480000, paymentId: "pay-1",
     });
     expect(upsert).toHaveBeenCalledOnce();
     expect(upsert.mock.calls[0][1]).toEqual({ onConflict: "code" });
@@ -85,6 +87,25 @@ describe("reservations.server", () => {
     expect(patch.status).toBe("confirmed");
     expect(patch.confirmed_at).toBeTypeOf("string");
     expect(eq).toHaveBeenCalledWith("id", "id-1");
+  });
+
+  it("insertReservation lanza OverlapError si la DB devuelve 23P01", async () => {
+    insert.mockResolvedValueOnce({ error: { code: "23P01", message: "exclusion" } });
+    await expect(insertReservation({
+      code: "CDL-2026-OV01", unitId: "aratiri", unitName: "x",
+      checkIn: "2026-07-02", checkOut: "2026-07-05", nights: 3, guests: 2,
+      firstName: "A", lastName: "B", email: "a@b.com", phone: "",
+      total: 1, paymentMethod: "manual", status: "confirmed",
+    })).rejects.toBeInstanceOf(OverlapError);
+  });
+
+  it("setReservationStatusByCode actualiza por code", async () => {
+    const eqByCode = vi.fn().mockResolvedValue({ error: null });
+    const updateFn = vi.fn().mockReturnValue({ eq: eqByCode });
+    from.mockReturnValue({ update: updateFn });
+    await setReservationStatusByCode("CDL-2026-OV01", "released");
+    expect(updateFn.mock.calls[0][0].status).toBe("released");
+    expect(eqByCode).toHaveBeenCalledWith("code", "CDL-2026-OV01");
   });
 
   it("insertReservation incluye locale (default es si no se pasa)", async () => {

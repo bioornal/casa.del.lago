@@ -1,6 +1,14 @@
 import { getServiceClient } from "@/lib/supabase/server";
 import type { UnitId } from "./reducer";
 
+/** Se lanza cuando la constraint de exclusión rechaza fechas superpuestas (SQLSTATE 23P01). */
+export class OverlapError extends Error {
+  constructor() {
+    super("date range overlaps an existing active reservation");
+    this.name = "OverlapError";
+  }
+}
+
 export type ReservationStatus = "pending" | "confirmed" | "released";
 export type PaymentMethod = "card" | "transfer";
 export type Locale = "es" | "en" | "pt";
@@ -25,7 +33,6 @@ export type ReservationRow = {
   status: ReservationStatus;
   comprobante_path: string | null;
   payment_id: string | null;
-  calendar_event_id: string | null;
   created_at: string;
   confirmed_at: string | null;
   updated_at: string;
@@ -48,7 +55,6 @@ export type InsertReservationInput = {
   status: ReservationStatus;
   comprobantePath?: string;
   paymentId?: string;
-  calendarEventId?: string;
   locale?: Locale;
 };
 
@@ -71,20 +77,22 @@ function toRow(i: InsertReservationInput) {
     status: i.status,
     comprobante_path: i.comprobantePath ?? null,
     payment_id: i.paymentId ?? null,
-    calendar_event_id: i.calendarEventId ?? null,
   };
 }
 
 export async function insertReservation(input: InsertReservationInput): Promise<void> {
   const { error } = await getServiceClient().from("reservations").insert(toRow(input));
-  if (error) throw new Error(`insertReservation: ${error.message}`);
+  if (error) {
+    if (error.code === "23P01") throw new OverlapError();
+    throw new Error(`insertReservation: ${error.message}`);
+  }
 }
 
 /** Idempotente por `code`: usado por el webhook (puede reintentarse). */
 export async function upsertConfirmedByCode(input: {
   code: string; unitId: UnitId; unitName: string; checkIn: string; checkOut: string;
   nights: number; guests: number; firstName: string; lastName: string; email: string;
-  phone: string; total: number; paymentId: string; calendarEventId: string;
+  phone: string; total: number; paymentId: string;
   locale?: Locale;
 }): Promise<void> {
   const row = {
@@ -94,7 +102,10 @@ export async function upsertConfirmedByCode(input: {
   const { error } = await getServiceClient()
     .from("reservations")
     .upsert(row, { onConflict: "code" });
-  if (error) throw new Error(`upsertConfirmedByCode: ${error.message}`);
+  if (error) {
+    if (error.code === "23P01") throw new OverlapError();
+    throw new Error(`upsertConfirmedByCode: ${error.message}`);
+  }
 }
 
 export async function listReservations(
@@ -122,6 +133,16 @@ export async function setReservationStatus(
   const { error } = await getServiceClient()
     .from("reservations").update(patch).eq("id", id);
   if (error) throw new Error(`setReservationStatus: ${error.message}`);
+}
+
+export async function setReservationStatusByCode(
+  code: string, status: ReservationStatus,
+): Promise<void> {
+  const patch: Record<string, unknown> = { status };
+  if (status === "confirmed") patch.confirmed_at = new Date().toISOString();
+  const { error } = await getServiceClient()
+    .from("reservations").update(patch).eq("code", code);
+  if (error) throw new Error(`setReservationStatusByCode: ${error.message}`);
 }
 
 /**
