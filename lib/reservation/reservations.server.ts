@@ -145,6 +145,17 @@ export async function setReservationStatusByCode(
   if (error) throw new Error(`setReservationStatusByCode: ${error.message}`);
 }
 
+/** Libera (status=released) una reserva por code SOLO si sigue pending. Idempotente y
+ *  seguro ante rejected/refunded tardíos: nunca toca una confirmada. */
+export async function releasePendingByCode(code: string): Promise<void> {
+  const { error } = await getServiceClient()
+    .from("reservations")
+    .update({ status: "released" })
+    .eq("code", code)
+    .eq("status", "pending");
+  if (error) throw new Error(`releasePendingByCode: ${error.message}`);
+}
+
 /**
  * Flip atómico exactly-once: marca confirmation_email_sent_at solo si estaba en null.
  * Devuelve la fila (para enviar el email) si este llamado ganó el flip, o null si

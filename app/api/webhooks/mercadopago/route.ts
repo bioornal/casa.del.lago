@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPayment, verifyWebhookSignature } from "@/lib/reservation/payments.server";
-import { upsertConfirmedByCode, OverlapError, type Locale } from "@/lib/reservation/reservations.server";
+import { upsertConfirmedByCode, OverlapError, releasePendingByCode, type Locale } from "@/lib/reservation/reservations.server";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
 import type { UnitId } from "@/lib/reservation/reducer";
 
@@ -35,12 +35,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "fetch" }, { status: 502 });
   }
 
+  const code = payment.externalReference;
+
+  // Rechazo/cancelación terminal: liberar el hold pending (auto-sanación del
+  // caso tarjeta in_process -> rejected). Solo afecta filas pending.
+  if (payment.status === "rejected" || payment.status === "cancelled") {
+    if (code) {
+      try { await releasePendingByCode(String(code)); }
+      catch (err) { console.error("[webhook] release hold fallo:", err instanceof Error ? err.message : err); }
+    }
+    return NextResponse.json({ ok: true });
+  }
+
+  // pending/in_process/otros no terminales: dejar el hold como está.
   if (payment.status !== "approved") return NextResponse.json({ ok: true });
+
+  if (!code) return NextResponse.json({ ok: true }); // sin external_reference; nada que hacer
 
   const m = (payment.metadata ?? {}) as Record<string, unknown>;
   const unitId = m.unit_id;
-  const code = payment.externalReference;
-  if (typeof unitId !== "string" || !(VALID_UNITS as string[]).includes(unitId) || !code) {
+  if (typeof unitId !== "string" || !(VALID_UNITS as string[]).includes(unitId)) {
     return NextResponse.json({ ok: true }); // metadata incompleta; nada que hacer
   }
 

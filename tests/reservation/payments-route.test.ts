@@ -154,6 +154,22 @@ describe("POST /api/payments", () => {
     expect(setReservationStatusByCode).toHaveBeenCalledWith(expect.any(String), "released");
   });
 
+  it("502: si el release tras fallo de cobro también falla, igual responde 502 (no 500)", async () => {
+    createCardPayment.mockRejectedValue(new Error("mp down"));
+    setReservationStatusByCode.mockRejectedValueOnce(new Error("db down"));
+    const res = await POST(post(VALID));
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("payment");
+  });
+
+  it("rejected: si el release falla, igual responde rejected (no 500)", async () => {
+    process.env.PAYMENTS_MOCK = "1";
+    setReservationStatusByCode.mockRejectedValueOnce(new Error("db down"));
+    const res = await POST(post({ ...VALID, payment: { mockOutcome: "rejected" } }));
+    expect(res.status).toBe(200);
+    expect((await res.json()).status).toBe("rejected");
+  });
+
   it("modo mock: mockOutcome approved confirma sin llamar a MP", async () => {
     process.env.PAYMENTS_MOCK = "1";
     const res = await POST(post({ ...VALID, payment: { mockOutcome: "approved" } }));

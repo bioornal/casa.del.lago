@@ -119,8 +119,8 @@ export default async function AdminReservasPage({
               )}
             </div>
             <div>
-              {r.payment_method === "transfer" && r.status === "pending" && (
-                <ReservationActions id={r.id} />
+              {r.status === "pending" && (
+                <ReservationActions id={r.id} canConfirm={r.payment_method === "transfer"} />
               )}
             </div>
           </div>

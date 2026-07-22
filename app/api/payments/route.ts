@@ -158,7 +158,8 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error("[payments] cobro fallo:", err instanceof Error ? err.message : err);
-    await setReservationStatusByCode(code, "released");
+    try { await setReservationStatusByCode(code, "released"); }
+    catch (relErr) { console.error("[payments] release tras fallo de cobro:", relErr instanceof Error ? relErr.message : relErr); }
     return NextResponse.json({ error: "payment" }, { status: 502 });
   }
 
@@ -182,6 +183,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ status: "pending", code });
   }
 
-  await setReservationStatusByCode(code, "released");
+  try { await setReservationStatusByCode(code, "released"); }
+  catch (relErr) { console.error("[payments] release tras rejected:", relErr instanceof Error ? relErr.message : relErr); }
   return NextResponse.json({ status: "rejected", detail: outcome.statusDetail ?? null });
 }

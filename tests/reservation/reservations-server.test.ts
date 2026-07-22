@@ -19,6 +19,7 @@ import {
   listReservations,
   setReservationStatus,
   setReservationStatusByCode,
+  releasePendingByCode,
   markConfirmationEmailSent,
   OverlapError,
 } from "@/lib/reservation/reservations.server";
@@ -124,6 +125,17 @@ describe("reservations.server", () => {
       total: 1, paymentMethod: "transfer", status: "pending",
     });
     expect(insert.mock.calls[1][0].locale).toBe("es");
+  });
+
+  it("releasePendingByCode actualiza a released filtrando por code y status pending", async () => {
+    const eq2 = vi.fn().mockResolvedValue({ error: null });
+    const eq1 = vi.fn().mockReturnValue({ eq: eq2 });
+    const updateFn = vi.fn().mockReturnValue({ eq: eq1 });
+    from.mockReturnValue({ update: updateFn });
+    await releasePendingByCode("CDL-2026-RP01");
+    expect(updateFn.mock.calls[0][0]).toEqual({ status: "released" });
+    expect(eq1).toHaveBeenCalledWith("code", "CDL-2026-RP01");
+    expect(eq2).toHaveBeenCalledWith("status", "pending");
   });
 
   it("markConfirmationEmailSent devuelve la fila solo si ganó el flip (data no vacía)", async () => {

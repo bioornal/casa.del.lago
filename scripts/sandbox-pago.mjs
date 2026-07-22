@@ -9,8 +9,7 @@
 //
 // Uso (con `pnpm dev` corriendo):
 //   node scripts/sandbox-pago.mjs pagar APRO 2027-05-01 2027-05-03 [aratiri|aguaribay] [huespedes]
-//   node scripts/sandbox-pago.mjs borrar CDL-2026-XXXX   ← limpia la reserva de prueba (Supabase + Calendar)
-import crypto from "node:crypto";
+//   node scripts/sandbox-pago.mjs borrar CDL-2026-XXXX   ← limpia la reserva de prueba (Supabase)
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -81,33 +80,10 @@ async function borrar([code]) {
   const sbHeaders = { apikey: sbKey, Authorization: `Bearer ${sbKey}` };
 
   const rows = await (await fetch(
-    `${sbUrl}/rest/v1/reservations?code=eq.${code}&select=code,unit_id,calendar_event_id`,
+    `${sbUrl}/rest/v1/reservations?code=eq.${code}&select=code,unit_id`,
     { headers: sbHeaders },
   )).json();
   if (!rows.length) { console.log("No existe esa reserva en Supabase."); return; }
-  const { unit_id, calendar_event_id } = rows[0];
-
-  if (calendar_event_id) {
-    const sa = JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON);
-    const calendarId = env[`CDL_CAL_${unit_id.toUpperCase()}`];
-    const b64url = (b) => Buffer.from(b).toString("base64url");
-    const now = Math.floor(Date.now() / 1000);
-    const unsigned = `${b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }))}.${b64url(JSON.stringify({
-      iss: sa.client_email, scope: "https://www.googleapis.com/auth/calendar.events",
-      aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 3600,
-    }))}`;
-    const jwt = `${unsigned}.${b64url(crypto.sign("RSA-SHA256", Buffer.from(unsigned), sa.private_key))}`;
-    const { access_token } = await (await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `grant_type=${encodeURIComponent("urn:ietf:params:oauth:grant-type:jwt-bearer")}&assertion=${jwt}`,
-    })).json();
-    const del = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${calendar_event_id}`,
-      { method: "DELETE", headers: { Authorization: `Bearer ${access_token}` } },
-    );
-    console.log(`evento Calendar (${unit_id}):`, del.status === 204 || del.status === 410 ? "borrado" : `HTTP ${del.status}`);
-  }
 
   const del = await fetch(`${sbUrl}/rest/v1/reservations?code=eq.${code}`, { method: "DELETE", headers: sbHeaders });
   console.log("fila Supabase:", del.status === 204 ? "borrada" : `HTTP ${del.status}`);

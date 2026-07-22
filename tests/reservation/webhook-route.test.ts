@@ -9,17 +9,18 @@ vi.mock("@/lib/reservation/payments.server", async () => {
   return { ...actual, getPayment: (...a: unknown[]) => getPayment(...a) };
 });
 
-const { OverlapError, upsertConfirmedByCode } = vi.hoisted(() => {
+const { OverlapError, upsertConfirmedByCode, releasePendingByCode } = vi.hoisted(() => {
   class OverlapError extends Error {
     constructor() {
       super("overlap");
       this.name = "OverlapError";
     }
   }
-  return { OverlapError, upsertConfirmedByCode: vi.fn() };
+  return { OverlapError, upsertConfirmedByCode: vi.fn(), releasePendingByCode: vi.fn() };
 });
 vi.mock("@/lib/reservation/reservations.server", () => ({
   upsertConfirmedByCode: (...a: unknown[]) => upsertConfirmedByCode(...a),
+  releasePendingByCode: (...a: unknown[]) => releasePendingByCode(...a),
   OverlapError,
 }));
 
@@ -68,6 +69,8 @@ beforeEach(() => {
   getPayment.mockResolvedValue(APPROVED_PAYMENT);
   upsertConfirmedByCode.mockReset();
   upsertConfirmedByCode.mockResolvedValue(undefined);
+  releasePendingByCode.mockReset();
+  releasePendingByCode.mockResolvedValue(undefined);
   sendConfirmationEmailOnce.mockReset();
   process.env.MERCADOPAGO_WEBHOOK_SECRET = SECRET;
 });
@@ -101,10 +104,35 @@ describe("POST /api/webhooks/mercadopago", () => {
     errSpy.mockRestore();
   });
 
-  it("pago no aprobado → 200 sin confirmar", async () => {
-    getPayment.mockResolvedValue({ ...APPROVED_PAYMENT, status: "rejected" });
+  it("pago pending/in_process → 200 sin confirmar ni liberar", async () => {
+    getPayment.mockResolvedValue({ ...APPROVED_PAYMENT, status: "in_process" });
     const res = await POST(req("pay-1", "req-1", true));
     expect(res.status).toBe(200);
     expect(upsertConfirmedByCode).not.toHaveBeenCalled();
+    expect(releasePendingByCode).not.toHaveBeenCalled();
+  });
+
+  it("pago rejected libera el hold pending por code y responde ok", async () => {
+    getPayment.mockResolvedValue({ ...APPROVED_PAYMENT, status: "rejected" });
+    const res = await POST(req("pay-1", "req-1", true));
+    expect(res.status).toBe(200);
+    expect(releasePendingByCode).toHaveBeenCalledWith(expect.any(String));
+    expect(releasePendingByCode).toHaveBeenCalledWith("CDL-2026-AB12");
+    expect(upsertConfirmedByCode).not.toHaveBeenCalled();
+  });
+
+  it("pago cancelled libera el hold pending por code y responde ok", async () => {
+    getPayment.mockResolvedValue({ ...APPROVED_PAYMENT, status: "cancelled" });
+    const res = await POST(req("pay-1", "req-1", true));
+    expect(res.status).toBe(200);
+    expect(releasePendingByCode).toHaveBeenCalledWith("CDL-2026-AB12");
+    expect(upsertConfirmedByCode).not.toHaveBeenCalled();
+  });
+
+  it("pago rejected sin externalReference: no llama a release, igual responde ok", async () => {
+    getPayment.mockResolvedValue({ ...APPROVED_PAYMENT, status: "rejected", externalReference: undefined });
+    const res = await POST(req("pay-1", "req-1", true));
+    expect(res.status).toBe(200);
+    expect(releasePendingByCode).not.toHaveBeenCalled();
   });
 });

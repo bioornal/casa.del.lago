@@ -21,7 +21,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
   const r = await getReservationById(id);
   if (!r) return NextResponse.json({ error: "not_found" }, { status: 404 });
-  if (r.payment_method !== "transfer" || r.status !== "pending") {
+  if (r.status !== "pending") {
+    return NextResponse.json({ error: "invalid_state" }, { status: 400 });
+  }
+  if (action === "confirm" && r.payment_method !== "transfer") {
     return NextResponse.json({ error: "invalid_state" }, { status: 400 });
   }
 

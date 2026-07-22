@@ -57,7 +57,7 @@ describe("POST /api/admin/reservations/[id]", () => {
     expect(res.status).toBe(401);
   });
 
-  it("400 si la reserva no es transfer/pending", async () => {
+  it("400 si la reserva no está pending", async () => {
     getReservationById.mockResolvedValue({ id: "abc", payment_method: "card", status: "confirmed" });
     const res = await POST(post("confirm"), ctx);
     expect(res.status).toBe(400);
@@ -68,5 +68,25 @@ describe("POST /api/admin/reservations/[id]", () => {
     getReservationById.mockResolvedValue(null);
     const res = await POST(post("confirm"), ctx);
     expect(res.status).toBe(404);
+  });
+
+  it("release funciona para un hold de tarjeta pending", async () => {
+    getReservationById.mockResolvedValueOnce({
+      id: "id-c", code: "CDL-C", unit_id: "aratiri",
+      payment_method: "card", status: "pending",
+    });
+    const res = await POST(post("release"), ctx);
+    expect(res.status).toBe(200);
+    expect(setReservationStatus).toHaveBeenCalledWith("abc", "released");
+  });
+
+  it("confirm sigue rechazando una reserva de tarjeta (invalid_state)", async () => {
+    getReservationById.mockResolvedValueOnce({
+      id: "id-c2", code: "CDL-C2", unit_id: "aratiri",
+      payment_method: "card", status: "pending",
+    });
+    const res = await POST(post("confirm"), ctx);
+    expect(res.status).toBe(400);
+    expect(setReservationStatus).not.toHaveBeenCalled();
   });
 });
