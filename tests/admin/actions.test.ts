@@ -7,13 +7,6 @@ vi.mock("@/lib/reservation/reservations.server", () => ({
   setReservationStatus: (...a: unknown[]) => setReservationStatus(...a),
 }));
 
-const confirmEvent = vi.fn();
-const deleteEvent = vi.fn();
-vi.mock("@/lib/reservation/calendar.server", () => ({
-  confirmEvent: (...a: unknown[]) => confirmEvent(...a),
-  deleteEvent: (...a: unknown[]) => deleteEvent(...a),
-}));
-
 const getAdminUser = vi.fn();
 vi.mock("@/lib/admin/auth", () => ({
   getAdminUser: (...a: unknown[]) => getAdminUser(...a),
@@ -39,24 +32,22 @@ beforeEach(() => {
   vi.clearAllMocks();
   getAdminUser.mockResolvedValue({ email: "admin@aruma.com" });
   getReservationById.mockResolvedValue({
-    id: "abc", unit_id: "aguaribay", calendar_event_id: "evt-1",
+    id: "abc", unit_id: "aguaribay",
     payment_method: "transfer", status: "pending", code: "CDL-2026-AB12",
   });
 });
 
 describe("POST /api/admin/reservations/[id]", () => {
-  it("confirm → confirmEvent + status confirmed", async () => {
+  it("confirm → status confirmed + email", async () => {
     const res = await POST(post("confirm"), ctx);
     expect(res.status).toBe(200);
-    expect(confirmEvent).toHaveBeenCalledWith("aguaribay", "evt-1");
     expect(setReservationStatus).toHaveBeenCalledWith("abc", "confirmed");
     expect(sendConfirmationEmailOnce).toHaveBeenCalledWith("CDL-2026-AB12");
   });
 
-  it("release → deleteEvent + status released", async () => {
+  it("release → status released", async () => {
     const res = await POST(post("release"), ctx);
     expect(res.status).toBe(200);
-    expect(deleteEvent).toHaveBeenCalledWith("aguaribay", "evt-1");
     expect(setReservationStatus).toHaveBeenCalledWith("abc", "released");
   });
 
@@ -70,7 +61,7 @@ describe("POST /api/admin/reservations/[id]", () => {
     getReservationById.mockResolvedValue({ id: "abc", payment_method: "card", status: "confirmed" });
     const res = await POST(post("confirm"), ctx);
     expect(res.status).toBe(400);
-    expect(confirmEvent).not.toHaveBeenCalled();
+    expect(setReservationStatus).not.toHaveBeenCalled();
   });
 
   it("404 si la reserva no existe", async () => {

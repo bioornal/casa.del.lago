@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/admin/auth";
 import { getReservationById, setReservationStatus } from "@/lib/reservation/reservations.server";
-import { confirmEvent, deleteEvent } from "@/lib/reservation/calendar.server";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
-import type { UnitId } from "@/lib/reservation/reducer";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   // Defensa en profundidad (el middleware ya bloquea, pero re-verificamos).
@@ -23,18 +21,16 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
 
   const r = await getReservationById(id);
   if (!r) return NextResponse.json({ error: "not_found" }, { status: 404 });
-  if (r.payment_method !== "transfer" || r.status !== "pending" || !r.calendar_event_id) {
+  if (r.payment_method !== "transfer" || r.status !== "pending") {
     return NextResponse.json({ error: "invalid_state" }, { status: 400 });
   }
 
   try {
     if (action === "confirm") {
-      await confirmEvent(r.unit_id as UnitId, r.calendar_event_id);
       await setReservationStatus(id, "confirmed");
       try { await sendConfirmationEmailOnce(r.code); }
       catch (err) { console.error("[admin] email fallo:", err instanceof Error ? err.message : err); }
     } else {
-      await deleteEvent(r.unit_id as UnitId, r.calendar_event_id);
       await setReservationStatus(id, "released");
     }
   } catch (err) {
