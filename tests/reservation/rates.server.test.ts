@@ -25,7 +25,7 @@ beforeEach(() => mocked.mockReset());
 
 describe("getRatesForRange", () => {
   it("disponible + montos públicos = método tarjeta (comisión incluida) + ahorro transferencia", async () => {
-    mocked.mockResolvedValue({ disabledDates: [], source: "google-calendar" });
+    mocked.mockResolvedValue({ disabledDates: [], source: "supabase" });
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     expect(rates).toHaveLength(UNITS.length);
     const aratiri = rates.find((r) => r.unit.slug === "aratiri")!;
@@ -40,7 +40,7 @@ describe("getRatesForRange", () => {
   });
 
   it("tarifa plana: mismo precio sin importar el número de huéspedes", async () => {
-    mocked.mockResolvedValue({ disabledDates: [], source: "google-calendar" });
+    mocked.mockResolvedValue({ disabledDates: [], source: "supabase" });
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 6);
     const aratiri = rates.find((r) => r.unit.slug === "aratiri")!;
     expect(aratiri.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aratiri", 3));
@@ -49,7 +49,7 @@ describe("getRatesForRange", () => {
   });
 
   it("aguaribay: total de lista consistente con method-pricing", async () => {
-    mocked.mockResolvedValue({ disabledDates: [], source: "google-calendar" });
+    mocked.mockResolvedValue({ disabledDates: [], source: "supabase" });
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     const aguaribay = rates.find((r) => r.unit.slug === "aguaribay")!;
     expect(aguaribay.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aguaribay", 3));
@@ -57,13 +57,13 @@ describe("getRatesForRange", () => {
   });
 
   it("no disponible si alguna noche del rango está ocupada", async () => {
-    mocked.mockResolvedValue({ disabledDates: [new Date(2026, 6, 3)], source: "google-calendar" });
+    mocked.mockResolvedValue({ disabledDates: [new Date(2026, 6, 3)], source: "supabase" });
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     expect(rates.every((r) => r.available === false)).toBe(true);
   });
 
   it("el check-out es exclusivo: una fecha ocupada igual al check-out no afecta", async () => {
-    mocked.mockResolvedValue({ disabledDates: [new Date(2026, 6, 5)], source: "google-calendar" });
+    mocked.mockResolvedValue({ disabledDates: [new Date(2026, 6, 5)], source: "supabase" });
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     expect(rates.every((r) => r.available === true)).toBe(true);
   });
