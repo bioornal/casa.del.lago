@@ -10,7 +10,7 @@ export class OverlapError extends Error {
 }
 
 export type ReservationStatus = "pending" | "confirmed" | "released";
-export type PaymentMethod = "card" | "transfer";
+export type PaymentMethod = "card" | "transfer" | "manual";
 export type Locale = "es" | "en" | "pt";
 
 export type ReservationRow = {

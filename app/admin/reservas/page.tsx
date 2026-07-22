@@ -1,7 +1,9 @@
 import { listReservations, type ReservationStatus } from "@/lib/reservation/reservations.server";
 import { signComprobanteUrl } from "@/lib/reservation/comprobante.server";
+import { getAvailabilityServer } from "@/lib/reservation/availability.server";
 import { signOut } from "../login/actions";
 import { ReservationActions } from "./ReservationActions";
+import { ManualReservationForm } from "./ManualReservationForm";
 
 const money = (n: number) => `$${new Intl.NumberFormat("es-AR").format(n)}`;
 
@@ -33,6 +35,13 @@ export default async function AdminReservasPage({
 
   const tabs: Array<ReservationStatus | "all"> = ["pending", "confirmed", "released", "all"];
 
+  const winFrom = new Date();
+  const winTo = new Date(winFrom.getFullYear() + 1, winFrom.getMonth(), 1);
+  const [avAra, avAgu] = await Promise.all([
+    getAvailabilityServer("aratiri", { from: winFrom, to: winTo }),
+    getAvailabilityServer("aguaribay", { from: winFrom, to: winTo }),
+  ]);
+
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px 80px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
@@ -53,6 +62,8 @@ export default async function AdminReservasPage({
           </form>
         </div>
       </div>
+
+      <ManualReservationForm disabledByUnit={{ aratiri: avAra.disabledDates, aguaribay: avAgu.disabledDates }} />
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
         {tabs.map((tb) => (
