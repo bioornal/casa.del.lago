@@ -1,4 +1,5 @@
 import { getServiceClient } from "@/lib/supabase/server";
+import { generateBookingCode } from "@/lib/reservation/code";
 import type { UnitId } from "./reducer";
 
 /** Se lanza cuando la constraint de exclusión rechaza fechas superpuestas (SQLSTATE 23P01). */
@@ -78,6 +79,34 @@ function toRow(i: InsertReservationInput) {
     comprobante_path: i.comprobantePath ?? null,
     payment_id: i.paymentId ?? null,
   };
+}
+
+/** true si ya hay una reserva con ese código. Propaga el error de DB. */
+export async function codeExists(code: string): Promise<boolean> {
+  const { data, error } = await getServiceClient()
+    .from("reservations")
+    .select("code")
+    .eq("code", code)
+    .maybeSingle();
+  if (error) throw new Error(`codeExists: ${error.message}`);
+  return data !== null;
+}
+
+/**
+ * Código de reserva garantizado libre.
+ *
+ * `generateBookingCode` sortea sobre 32^4 ≈ 1M combinaciones sin mirar la base, y
+ * reservations.code es UNIQUE. Hay que llamar a esto ANTES de crear el pago de MP
+ * o registrar la transferencia, porque ambos incrustan el código.
+ */
+export async function generateUniqueBookingCode(attempts = 5): Promise<string> {
+  for (let i = 0; i < attempts; i++) {
+    const code = generateBookingCode();
+    if (!(await codeExists(code))) return code;
+  }
+  throw new Error(
+    `generateUniqueBookingCode: no se encontró un código libre en ${attempts} intentos`,
+  );
 }
 
 export async function insertReservation(input: InsertReservationInput): Promise<void> {

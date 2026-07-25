@@ -122,3 +122,28 @@ alter table public.reservations
 
 -- Columna vestigial del viejo Google Calendar.
 alter table public.reservations drop column if exists calendar_event_id;
+
+-- =============================================================
+-- Configuración operativa del sitio (2026-07-23), editable desde
+-- /admin/configuracion. Fila única id=1, mismo criterio que rate_settings.
+-- booking_mode='whatsapp' pausa la reserva online: los CTAs derivan a WhatsApp,
+-- /reservas redirige a /tarifas y los APIs de pago responden 503.
+-- =============================================================
+create table if not exists public.site_settings (
+  id           smallint primary key default 1 check (id = 1),
+  booking_mode text not null default 'whatsapp'
+               check (booking_mode in ('whatsapp', 'online')),
+  updated_at   timestamptz not null default now()
+);
+
+-- Fila inicial en el modo CERRADO: abrir el cobro es siempre una acción explícita.
+insert into public.site_settings (id) values (1) on conflict (id) do nothing;
+
+-- RLS sin policies: solo la service role key (server-only) entra.
+alter table public.site_settings enable row level security;
+
+drop trigger if exists site_settings_set_updated_at on public.site_settings;
+create trigger site_settings_set_updated_at
+  before update on public.site_settings
+  for each row execute function public.set_updated_at();
+

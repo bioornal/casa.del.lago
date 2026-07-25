@@ -18,6 +18,7 @@ import {
   OverlapError,
 } from "@/lib/reservation/reservations.server";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
+import { getBookingMode } from "@/lib/site-settings.server";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
 import type { UnitId } from "@/lib/reservation/reducer";
 
@@ -44,7 +45,7 @@ function isMockPay(v: unknown): v is MockPay {
 
 export async function POST(req: Request) {
   // Reservas online pausadas (modo WhatsApp): no se aceptan pagos.
-  if (isWhatsAppBookingMode()) {
+  if (isWhatsAppBookingMode(await getBookingMode())) {
     return NextResponse.json({ error: "bookings_paused" }, { status: 503 });
   }
 

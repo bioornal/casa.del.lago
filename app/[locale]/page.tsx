@@ -12,6 +12,7 @@ import { CtaReserva } from "@/components/home/CtaReserva";
 import { Contacto } from "@/components/home/Contacto";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
+import { getBookingMode } from "@/lib/site-settings.server";
 
 const LODGING_JSONLD = {
   "@context": "https://schema.org",
@@ -87,7 +88,11 @@ export default async function HomePage({
   setRequestLocale(locale);
   // Mismo precio de lista que /tarifas (tarjeta, con el costo del canal incluido):
   // si el home mostrara el neto, no coincidiría con lo que ve el huésped al reservar.
-  const listPrices = methodRates(await getRateSettings(), "card").nightly;
+  const [rateSettings, bookingMode] = await Promise.all([
+    getRateSettings(),
+    getBookingMode(),
+  ]);
+  const listPrices = methodRates(rateSettings, "card").nightly;
   return (
     <>
       <script
@@ -108,7 +113,7 @@ export default async function HomePage({
         <UnitsGrid prices={listPrices} />
         <Experiencias />
         <RelatoImagenes />
-        <CtaReserva />
+        <CtaReserva bookingMode={bookingMode} />
         <Contacto />
       </main>
       <SiteFooter />

@@ -36,6 +36,10 @@ vi.mock("@/lib/reservation/rate-settings.server", async () => {
   return { getRateSettings: () => Promise.resolve(DEFAULT_RATE_SETTINGS) };
 });
 
+vi.mock("@/lib/site-settings.server", () => ({
+  getBookingMode: vi.fn(async () => "online" as const),
+}));
+
 import { POST } from "@/app/api/reservations/transfer/route";
 
 function form(fields: Record<string, string>, file?: File) {

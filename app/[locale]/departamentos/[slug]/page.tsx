@@ -6,8 +6,10 @@ import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { UnitDetail } from "@/components/departamento/UnitDetail";
 import { UNITS, getUnit } from "@/lib/units";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
+import { getBookingMode } from "@/lib/site-settings.server";
 import { methodRates } from "@/lib/reservation/method-pricing";
 import { routing } from "@/lib/i18n/routing";
+import { accommodationJsonLd, breadcrumbJsonLd } from "@/lib/jsonld";
 
 export function generateStaticParams() {
   return routing.locales.flatMap((locale) =>
@@ -48,15 +50,30 @@ export default async function DepartamentoPage({
   const unit = getUnit(slug);
   if (!unit) notFound();
 
-  const settings = await getRateSettings();
+  const [settings, bookingMode] = await Promise.all([
+    getRateSettings(),
+    getBookingMode(),
+  ]);
   // "Desde $" público = precio de lista (método tarjeta, ver method-pricing.ts)
   const listPrices = methodRates(settings, "card").nightly;
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            accommodationJsonLd({ unit, locale, nightlyPrice: listPrices[unit.slug] }),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd({ locale, unit })) }}
+      />
       <SiteNav />
       <main>
-        <UnitDetail unit={unit} locale={locale} prices={listPrices} />
+        <UnitDetail unit={unit} locale={locale} prices={listPrices} bookingMode={bookingMode} />
       </main>
       <SiteFooter />
       <WhatsAppFab />

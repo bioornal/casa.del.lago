@@ -16,10 +16,29 @@ export const PETS_ALLOWED = false;
 export type ServiceKey = "wifi" | "ac" | "kitchen" | "reception" | "parking" | "linens";
 export const SERVICES: ServiceKey[] = ["wifi", "ac", "kitchen", "reception", "parking", "linens"];
 
-// Datos bancarios para pago por transferencia. NEXT_PUBLIC_ porque se leen client-side
-// (son datos públicos para que el huésped transfiera).
+const PLACEHOLDER_CBU = "0000000000000000000000";
+
+function envPresent(raw: string | undefined): boolean {
+  return (raw ?? "").trim() !== "";
+}
+
+function envOrDefault(raw: string | undefined, fallback: string): string {
+  return envPresent(raw) ? (raw as string).trim() : fallback;
+}
+
 export const BANK_DETAILS = {
-  alias: process.env.NEXT_PUBLIC_CDL_BANK_ALIAS ?? "CASA.LAGO.URUGUAI", // TODO: alias real
-  cbu: process.env.NEXT_PUBLIC_CDL_BANK_CBU ?? "0000000000000000000000", // TODO: CBU real
-  holder: process.env.NEXT_PUBLIC_CDL_BANK_HOLDER ?? "La Casa del Lago Urugua-í", // TODO: titular real
+  alias: envOrDefault(process.env.NEXT_PUBLIC_CDL_BANK_ALIAS, "CASA.LAGO.URUGUAI"),
+  cbu: envOrDefault(process.env.NEXT_PUBLIC_CDL_BANK_CBU, PLACEHOLDER_CBU),
+  holder: envOrDefault(process.env.NEXT_PUBLIC_CDL_BANK_HOLDER, "La Casa del Lago Urugua-í"),
 };
+
+/**
+ * true solo si las tres env vars de datos bancarios fueron seteadas (no vacías).
+ */
+export function bankDetailsConfigured(): boolean {
+  return (
+    envPresent(process.env.NEXT_PUBLIC_CDL_BANK_ALIAS) &&
+    envPresent(process.env.NEXT_PUBLIC_CDL_BANK_CBU) &&
+    envPresent(process.env.NEXT_PUBLIC_CDL_BANK_HOLDER)
+  );
+}

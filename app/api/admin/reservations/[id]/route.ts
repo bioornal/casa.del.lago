@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/admin/auth";
 import { getReservationById, setReservationStatus } from "@/lib/reservation/reservations.server";
-import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
+import { sendConfirmationEmailOnce, sendReleaseEmail } from "@/lib/reservation/email.server";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   // Defensa en profundidad (el middleware ya bloquea, pero re-verificamos).
@@ -35,6 +35,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       catch (err) { console.error("[admin] email fallo:", err instanceof Error ? err.message : err); }
     } else {
       await setReservationStatus(id, "released");
+      try { await sendReleaseEmail(r); }
+      catch (err) { console.error("[admin] release email fallo:", err instanceof Error ? err.message : err); }
     }
   } catch (err) {
     console.error("[admin] acción fallo:", err instanceof Error ? err.message : err);

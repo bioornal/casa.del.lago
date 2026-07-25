@@ -105,7 +105,9 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
   // Desktop (sm+): popover anclado que abre hacia arriba, como antes.
   const popoverClass =
     "fixed left-1/2 top-1/2 z-[70] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[#E7E0D4] bg-white p-3 shadow-[0_30px_70px_-45px_rgba(29,29,29,.5)] " +
-    "sm:absolute sm:left-0 sm:top-auto sm:bottom-[calc(100%+8px)] sm:translate-x-0 sm:translate-y-0 sm:p-[18px]";
+    (variant === "bar"
+      ? "sm:absolute sm:left-0 sm:top-[calc(100%+8px)] sm:bottom-auto sm:translate-x-0 sm:translate-y-0 sm:p-[18px]"
+      : "sm:absolute sm:left-0 sm:top-auto sm:bottom-[calc(100%+8px)] sm:translate-x-0 sm:translate-y-0 sm:p-[18px]");
 
   const backdrop = (
     <div
