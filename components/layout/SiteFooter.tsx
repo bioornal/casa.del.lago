@@ -7,6 +7,7 @@ export function SiteFooter() {
   const tf = useTranslations("footer");
   const tn = useTranslations("nav");
   const tc = useTranslations("contacto");
+  const tll = useTranslations("comoLlegar");
 
   return (
     <footer className="bg-lago-hover text-arena pt-16 md:pt-[90px] pb-9">
@@ -36,7 +37,7 @@ export function SiteFooter() {
             </div>
             <div className="flex flex-col gap-[13px] text-[14px]">
               <a
-                href="#cabanas"
+                href="#casa"
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("brand")}
@@ -52,6 +53,12 @@ export function SiteFooter() {
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("experiences")}
+              </a>
+              <a
+                href="#llegar"
+                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
+              >
+                {tll("kicker")}
               </a>
               <a
                 href="#galeria"

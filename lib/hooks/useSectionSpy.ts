@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 
+// "llegar" no tiene link en la nav, pero va igual: si no está, el scrollspy deja
+// "El lugar" marcado mientras el usuario ya pasó a Cómo llegar.
 export const HOME_SECTION_IDS = [
   "casa",
   "cabanas",
   "lugar",
+  "llegar",
   "galeria",
   "contacto",
 ] as const;

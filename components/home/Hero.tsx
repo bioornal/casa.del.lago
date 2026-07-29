@@ -13,10 +13,12 @@ const HERO_IMAGE =
 export function Hero({ children }: { children?: React.ReactNode }) {
   const t = useTranslations("hero");
 
+  // El contenido va anclado abajo; sin piso arriba, en teléfonos bajos crece
+  // hacia arriba y se mete debajo de la nav fija (72px mobile / 96px desktop).
   return (
     <header
       id="top"
-      className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden px-[clamp(20px,4vw,56px)] pb-[clamp(48px,6vh,76px)]"
+      className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden px-[clamp(20px,4vw,56px)] pt-[96px] pb-[clamp(48px,6vh,76px)] md:pt-[120px]"
       style={{
         background:
           "linear-gradient(180deg,#3B2340 0%,#6B3552 26%,#B4552F 48%,#8A3A2C 60%,#2A1E22 78%,#161318 100%)",

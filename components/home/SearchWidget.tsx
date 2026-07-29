@@ -89,18 +89,26 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
   // Separadores verticales entre campos, según fondo (glass oscuro vs claro)
   const sep = variant === "hero" ? "rgba(255,255,255,.16)" : "#E7E0D4";
 
+  const isHero = variant === "hero";
+
   const label: React.CSSProperties = {
-    fontSize: 11,
+    fontSize: isHero ? 10.5 : 11,
+    fontWeight: isHero ? 600 : undefined,
     letterSpacing: ".2em",
     textTransform: "uppercase",
-    color: variant === "bar" ? "#155e75" : "rgba(245,238,225,.75)",
+    color: isHero ? "rgba(248,243,232,.62)" : "#155e75",
   };
   const valueStyle: React.CSSProperties = {
     fontFamily: "var(--font-display)",
-    fontSize: 21,
-    color: variant === "bar" ? "#1D1D1D" : "#f5eee1",
-    marginTop: 5,
+    fontSize: isHero ? 19 : 21,
+    color: isHero ? "#F8F3E8" : "#1D1D1D",
+    marginTop: isHero ? 8 : 5,
   };
+  const cellPadding = isHero ? "20px 24px" : "18px 24px";
+  // Apilado en mobile el separador tiene que ser horizontal; recién en sm+, con
+  // las cuatro celdas en fila, pasa a ser vertical.
+  const cellDivider = `border-t sm:border-t-0 sm:border-l`;
+  const dividerStyle: React.CSSProperties = { borderColor: sep };
   // Mobile: modal centrado con backdrop (el popover quedaba cortado por la nav fija).
   // Desktop (sm+): popover anclado que abre hacia arriba, como antes.
   const popoverClass =
@@ -122,31 +130,23 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
       <div className={wrapperClass}>
         <div
           className={
-            variant === "hero"
-              ? "flex flex-wrap items-stretch rounded-[16px] border"
+            isHero
+              ? "grid grid-cols-1 items-stretch rounded-[16px] border sm:grid-cols-[1.05fr_1.05fr_1.25fr_auto]"
               : "flex flex-wrap items-stretch rounded-[4px] border border-[#E7E0D4] bg-marfil"
           }
-          style={variant === "hero" ? glassPanel : { boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)" }}
+          style={isHero ? glassPanel : { boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)" }}
         >
-          {/* Grupo Llegada + Salida — popovers separados que abren hacia arriba */}
-          <div className="relative flex flex-1 min-w-[220px]" style={{ flexBasis: "320px" }}>
+          {/* Llegada — cada fecha es su propia celda, así el calendario se ancla
+              a su campo y no al par. */}
+          <div className={isHero ? "relative" : "relative flex-1 min-w-[160px]"}>
             <button
               type="button"
               onClick={clickArrival}
-              className="flex-1 text-left bg-transparent border-none cursor-pointer"
-              style={{ padding: "18px 24px", borderRight: `1px solid ${sep}` }}
+              className="h-full w-full text-left bg-transparent border-none cursor-pointer"
+              style={{ padding: cellPadding }}
             >
               <div style={label}>{t("arrival")}</div>
               <div style={valueStyle}>{fmtDate(checkIn)}</div>
-            </button>
-            <button
-              type="button"
-              onClick={clickDeparture}
-              className="flex-1 text-left bg-transparent border-none cursor-pointer"
-              style={{ padding: "18px 24px" }}
-            >
-              <div style={label}>{t("departure")}</div>
-              <div style={valueStyle}>{fmtDate(checkOut)}</div>
             </button>
 
             {open === "arrival" && (
@@ -165,6 +165,24 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
                 </div>
               </>
             )}
+          </div>
+
+          {/* Salida */}
+          <div
+            className={
+              (isHero ? "relative " : "relative flex-1 min-w-[160px] ") + cellDivider
+            }
+            style={dividerStyle}
+          >
+            <button
+              type="button"
+              onClick={clickDeparture}
+              className="h-full w-full text-left bg-transparent border-none cursor-pointer"
+              style={{ padding: cellPadding }}
+            >
+              <div style={label}>{t("departure")}</div>
+              <div style={valueStyle}>{fmtDate(checkOut)}</div>
+            </button>
 
             {open === "departure" && checkIn && (
               <>
@@ -184,21 +202,24 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
             )}
           </div>
 
-          {/* Separador vertical para guests */}
-          <div className="hidden sm:block w-px self-stretch" style={{ background: sep }} />
-
           {/* Huéspedes */}
           <div
-            className="relative flex-1 min-w-[180px]"
-            style={{ padding: "18px 24px" }}
+            className={
+              (isHero ? "relative " : "relative flex-1 min-w-[180px] ") + cellDivider
+            }
+            style={{ ...dividerStyle, padding: cellPadding }}
           >
             <div style={label}>{t("guests")}</div>
-            <div className="flex items-center justify-between" style={{ marginTop: 5 }}>
+            <div
+              className="flex items-center justify-between gap-4"
+              style={{ marginTop: valueStyle.marginTop }}
+            >
               <span
                 style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: 21,
-                  color: variant === "bar" ? "#1D1D1D" : "#f5eee1",
+                  fontFamily: valueStyle.fontFamily,
+                  fontSize: valueStyle.fontSize,
+                  color: valueStyle.color,
+                  whiteSpace: "nowrap",
                 }}
               >
                 {guests} {guests === 1 ? t("guest") : t("guestsPlural")}
@@ -230,12 +251,12 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
             onClick={submit}
             disabled={!valid}
             className={
-              "group/btn flex items-center justify-center gap-[10px] w-full sm:w-auto border-none py-4 text-[12.5px] uppercase tracking-[.16em] transition-[background] duration-300 " +
+              "group/btn flex items-center justify-center gap-[10px] w-full sm:w-auto border-none text-[12.5px] font-bold uppercase tracking-[.16em] transition-[background] duration-300 " +
               // El contenedor no puede llevar overflow-hidden (recortaría el
               // calendario), así que el CTA redondea sus propias esquinas.
-              (variant === "hero"
-                ? "px-9 md:px-14 rounded-bl-[15px] rounded-br-[15px] sm:rounded-bl-none sm:rounded-tr-[15px]"
-                : "px-9")
+              (isHero
+                ? "py-5 px-[clamp(30px,3.4vw,52px)] rounded-bl-[15px] rounded-br-[15px] sm:rounded-bl-none sm:rounded-tr-[15px]"
+                : "py-4 px-9")
             }
             style={{
               flex: "0 0 auto",
