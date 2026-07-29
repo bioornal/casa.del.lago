@@ -44,7 +44,7 @@ body { margin: 0; background: var(--color-marfil); color: var(--color-carbon); f
 ::selection { background: var(--color-terracota); color: var(--color-marfil); }
 
 /* Animaciones (las reactivamos con JS; el contenido es visible sin ellas) */
-@keyframes lago-kb { from { transform: scale(1.09); } to { transform: scale(1.01); } }
+@keyframes lago-kb { from { transform: scale(1.08); } to { transform: scale(1); } }
 @keyframes lago-cue { 0%,100% { transform: translateY(0); opacity: .5; } 50% { transform: translateY(7px); opacity: 1; } }
 
 /* Reduced motion: estado final visible, sin animación */
@@ -62,6 +62,104 @@ html[data-fx]:not([data-fx~="css"]) *::after {
   transition: none !important;
 }
 html[data-fx]:not([data-fx~="grano"]) [data-grain] { display: none !important; }
+
+/* ==================== Nav: shrink + solidificado por scroll ====================
+   Dos propiedades registradas —y por lo tanto interpolables— gobiernan toda la
+   barra:
+     --nav-p    progreso del encogido (96→68px en desktop, 72→60 en mobile)
+     --nav-ink  cuánto de "barra sólida" (fondo marfil, tinta oscura, isotipo carbón)
+
+   Van separadas porque son estados distintos: abrir el drawer arriba de todo
+   necesita barra ALTA pero SÓLIDA (si no, el menú queda ilegible sobre la foto).
+
+   El valor base lo pone React por data-attribute; la animación de scroll lo
+   pisa (origen animación > declaración normal). Si no hay scroll-timeline, si
+   el usuario pide reduced-motion o si ?sinfx=1 mata las animaciones, sobrevive
+   el valor por data-attribute y la nav vuelve al salto en dos estados. Se
+   degrada sola, sin detección por JS ni riesgo de hydration mismatch. */
+@property --nav-p { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --nav-ink { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+@keyframes nav-scrub {
+  from { --nav-p: 0; --nav-ink: 0; }
+  to   { --nav-p: 1; --nav-ink: 1; }
+}
+
+[data-nav] {
+  --nav-p: 0;
+  --nav-ink: 0;
+  /* El salto de respaldo. Alcanza con animar las dos variables: todo lo que
+     deriva de ellas interpola solo. */
+  transition: --nav-p 300ms ease, --nav-ink 300ms ease;
+}
+[data-nav][data-nav-compact="true"] { --nav-p: 1; --nav-ink: 1; }
+/* !important a propósito: con el drawer abierto la barra tiene que estar
+   sólida sí o sí, y esto debe ganarle también a la animación de scroll. */
+[data-nav][data-nav-open="true"] { --nav-ink: 1 !important; }
+
+/* El scrub continuo sólo existe en Home: en las internas la barra ya nace
+   compacta y no hay hero contra el cual destacarse. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-nav][data-nav-scrub="true"] {
+      animation: nav-scrub linear both;
+      animation-timeline: scroll(root);
+      animation-range: 40px 200px;
+    }
+  }
+}
+
+/* --- Superficie de la barra --- */
+[data-nav] {
+  background-color: rgb(245 238 225 / calc(var(--nav-ink) * 0.94));
+  border-bottom-color: rgb(31 29 25 / calc(var(--nav-ink) * 0.08));
+  box-shadow: 0 12px 34px rgb(31 29 25 / calc(var(--nav-ink) * 0.07));
+  -webkit-backdrop-filter: blur(calc(var(--nav-ink) * 14px));
+  backdrop-filter: blur(calc(var(--nav-ink) * 14px));
+}
+
+/* --- Alto de la fila (el shrink propiamente dicho) --- */
+[data-nav-row] {
+  --h-alta: 72px;
+  --h-baja: 60px;
+  height: calc(var(--h-alta) + (var(--h-baja) - var(--h-alta)) * var(--nav-p));
+}
+[data-nav-iso] {
+  --h-alta: 42px;
+  --h-baja: 34px;
+  height: calc(var(--h-alta) + (var(--h-baja) - var(--h-alta)) * var(--nav-p));
+}
+[data-nav-word] { font-size: calc(20px + (18px - 20px) * var(--nav-p)); }
+[data-nav-sub] {
+  font-size: calc(9.5px + (9px - 9.5px) * var(--nav-p));
+  margin-top: calc(5px + (3px - 5px) * var(--nav-p));
+}
+@media (min-width: 768px) {
+  [data-nav-row] { --h-alta: 96px; --h-baja: 68px; }
+  [data-nav-iso] { --h-alta: 52px; --h-baja: 40px; }
+  [data-nav-word] { font-size: calc(23px + (20px - 23px) * var(--nav-p)); }
+  [data-nav-sub] { font-size: calc(11px + (10px - 11px) * var(--nav-p)); }
+}
+
+/* --- Tinta: marfil sobre la foto → paleta normal sobre el marfil --- */
+[data-nav-word],
+[data-nav-link][data-active="true"] {
+  color: color-mix(in oklab, var(--color-marfil), var(--color-lago) calc(var(--nav-ink) * 100%));
+}
+[data-nav-sub] {
+  color: color-mix(in oklab, rgb(245 238 225 / .72), var(--color-muted) calc(var(--nav-ink) * 100%));
+}
+[data-nav-link][data-active="false"] {
+  color: color-mix(in oklab, rgb(245 238 225 / .9), rgb(31 29 25 / .82) calc(var(--nav-ink) * 100%));
+}
+[data-nav-link]:hover { color: var(--color-atardecer); }
+[data-nav-burger] span {
+  background-color: color-mix(in oklab, var(--color-marfil), var(--color-carbon) calc(var(--nav-ink) * 100%));
+}
+/* Crossfade del isotipo: dos PNG cruzados por opacidad para que no parpadee
+   al cambiar el src (ver el comentario en SiteNav.tsx). */
+[data-nav-iso-carbon] { opacity: var(--nav-ink); }
+[data-nav-iso-marfil] { opacity: calc(1 - var(--nav-ink)); }
 
 /* ======================== react-day-picker overrides (v10) ======================== */
 /* Month caption label: display font, carbon, prominent */

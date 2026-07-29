@@ -13,8 +13,12 @@ export function SiteNav() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const sectionHref = (id: string) => (isHome ? `#${id}` : `/#${id}`);
-  // Transparente solo en Home, arriba de todo y con el drawer cerrado
-  const dark = isHome && !solid && !open;
+  // Alto y color viven en CSS, gobernados por --nav-p y --nav-ink (ver
+  // globals.css). Acá sólo se publica el estado de respaldo por data-attribute:
+  // donde hay scroll-timeline la animación lo pisa y el cambio es continuo.
+  // `compact` es el alto; la solidez además la fuerza el drawer abierto, porque
+  // el menú necesita fondo marfil aunque la barra siga alta sobre el hero.
+  const compact = !isHome || solid;
 
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 60);
@@ -35,39 +39,30 @@ export function SiteNav() {
   // marfil) cruzadas por opacidad: evita el parpadeo que daría cambiar el src
   // al pasar el nav de transparente a sólido. El wordmark sigue siendo texto
   // porque el lockup completo, apilado, es ilegible a la altura del nav.
+  // Los tamaños y colores los pone globals.css a partir de --nav-p/--nav-ink.
   const brandLockup = (
     <span className="flex items-center gap-[11px] md:gap-[15px]">
-      <span className="relative block h-[42px] md:h-[52px] aspect-[320/253] shrink-0">
+      <span data-nav-iso className="relative block aspect-[320/253] shrink-0">
         <img
+          data-nav-iso-carbon
           src="/isotipo-lago.png"
           alt=""
           aria-hidden
-          className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
-          style={{ opacity: dark ? 0 : 1 }}
+          className="absolute inset-0 h-full w-full object-contain"
         />
         <img
+          data-nav-iso-marfil
           src="/isotipo-lago-marfil.png"
           alt=""
           aria-hidden
-          className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
-          style={{ opacity: dark ? 1 : 0 }}
+          className="absolute inset-0 h-full w-full object-contain"
         />
       </span>
       <span className="flex flex-col items-start leading-none">
-        <span
-          className={[
-            "font-display font-medium text-[20px] md:text-[23px] tracking-[0.01em] transition-colors duration-300",
-            dark ? "text-marfil" : "text-lago",
-          ].join(" ")}
-        >
+        <span data-nav-word className="font-display font-medium tracking-[0.01em]">
           La Casa del Lago
         </span>
-        <span
-          className={[
-            "text-[9.5px] md:text-[11px] uppercase tracking-[0.38em] mt-[5px] transition-colors duration-300",
-            dark ? "text-marfil/72" : "text-muted",
-          ].join(" ")}
-        >
+        <span data-nav-sub className="uppercase tracking-[0.38em]">
           Urugua-í
         </span>
       </span>
@@ -90,8 +85,10 @@ export function SiteNav() {
             key={id}
             href={`#${id}`}
             data-section={id}
+            data-nav-link
+            data-active={id === active}
             onClick={() => setOpen(false)}
-            className={linkClass(id, active, dark)}
+            className={linkClass(id, active)}
           >
             {label}
           </a>
@@ -99,8 +96,10 @@ export function SiteNav() {
           <Link
             key={id}
             href={sectionHref(id)}
+            data-nav-link
+            data-active={id === active}
             onClick={() => setOpen(false)}
-            className={linkClass(id, active, dark)}
+            className={linkClass(id, active)}
           >
             {label}
           </Link>
@@ -119,47 +118,38 @@ export function SiteNav() {
         aria-hidden="true"
       />
     <nav
-      className={[
-        "fixed top-0 left-0 right-0 z-50 border-b transition-[background-color,border-color] duration-300",
-        dark
-          ? "bg-transparent border-transparent"
-          : "bg-[rgba(245,238,225,.92)] backdrop-blur-[14px] border-borde-medio",
-      ].join(" ")}
+      data-nav
+      data-nav-compact={compact}
+      data-nav-open={open}
+      data-nav-scrub={isHome}
+      className="fixed top-0 left-0 right-0 z-50 border-b border-solid"
     >
       {/* Ancho completo a propósito (el resto del sitio usa max-w-[1320px]): un nav
           fijo que respira lee mejor que uno "casi alineado" con el contenido. */}
-      <div className="w-full px-5 md:px-10 lg:px-16 py-[10px] md:py-3 flex items-center justify-between gap-5">
+      <div
+        data-nav-row
+        className="w-full px-5 md:px-10 lg:px-16 flex items-center justify-between gap-5"
+      >
         {/* LEFT — desktop nav links / mobile: hamburger */}
         <div className="flex items-center gap-[30px]">
           <button
             type="button"
+            data-nav-burger
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className={[
-              "lg:hidden flex flex-col items-center justify-center w-8 h-8 -ml-1",
-              dark ? "text-marfil" : "text-carbon",
-            ].join(" ")}
+            className="lg:hidden flex flex-col items-center justify-center w-8 h-8 -ml-1"
           >
             <span
-              className={[
-                "block w-6 h-px transition-[transform,background-color] duration-300",
-                dark ? "bg-marfil" : "bg-carbon",
-              ].join(" ")}
+              className="block w-6 h-px transition-transform duration-300"
               style={{ transform: open ? "translateY(4px) rotate(45deg)" : "none" }}
             />
             <span
-              className={[
-                "block w-6 h-px transition-[opacity,background-color] duration-300 my-[5px]",
-                dark ? "bg-marfil" : "bg-carbon",
-              ].join(" ")}
+              className="block w-6 h-px transition-opacity duration-300 my-[5px]"
               style={{ opacity: open ? 0 : 1 }}
             />
             <span
-              className={[
-                "block w-6 h-px transition-[transform,background-color] duration-300",
-                dark ? "bg-marfil" : "bg-carbon",
-              ].join(" ")}
+              className="block w-6 h-px transition-transform duration-300"
               style={{ transform: open ? "translateY(-4px) rotate(-45deg)" : "none" }}
             />
           </button>
@@ -219,16 +209,11 @@ export function SiteNav() {
   );
 }
 
-function linkClass(section: string, active: string, dark: boolean) {
-  const isActive = section === active;
+// El color ya no se decide acá: lo resuelve globals.css interpolando sobre
+// --nav-ink según data-active. Sólo queda el peso tipográfico del activo.
+function linkClass(section: string, active: string) {
   return [
     "text-[15px] md:text-[13px] tracking-[.04em] no-underline transition-colors duration-[250ms] py-3 md:py-0 md:whitespace-nowrap",
-    isActive
-      ? dark
-        ? "text-marfil opacity-100 md:font-medium"
-        : "text-lago opacity-100 md:font-medium"
-      : dark
-        ? "text-marfil/90 opacity-100 hover:text-atardecer"
-        : "text-carbon opacity-[.82] hover:text-atardecer",
+    section === active ? "md:font-medium" : "",
   ].join(" ");
 }

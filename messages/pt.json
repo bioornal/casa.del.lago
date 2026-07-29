@@ -9,8 +9,10 @@
   },
   "hero": {
     "kicker": "Puerto Libertad · Misiones",
-    "title": "Às margens do lago Urugua-í",
-    "subtitle": "Cabanas de madeira e tijolo, piscina de frente para o lago e fogo para o churrasco."
+    "title": "Dormir tão perto da água",
+    "subtitle": "Cabanas de frente para o lago Urugua-í, cada uma com sua piscina e seu fogo para o churrasco. Você só traz vontade de não fazer nada.",
+    "titleAccent": "que dá para ouvir",
+    "trust": "Reserve direto com os anfitriões · sem comissões · respondemos pelo WhatsApp"
   },
   "bookingBar": {
     "arrival": "Chegada",
@@ -24,8 +26,8 @@
     "arrival": "Check-in",
     "departure": "Check-out",
     "guests": "Hóspedes",
-    "select": "Selecionar",
-    "cta": "Reservar",
+    "select": "Escolha a data",
+    "cta": "Ver disponibilidade",
     "guest": "hóspede",
     "guestsPlural": "hóspedes"
   },
@@ -79,7 +81,7 @@
   "manifiesto": {
     "kicker": "A casa",
     "title": "O dia termina olhando o pôr do sol sobre a água.",
-    "body": "A Casa del Lago são cabanas de madeira e tijolo junto ao espelho de água do Urugua-í. Dias de píer, caiaque e piscina; noites de fogo, churrasco e céu aberto. Nós cuidamos da calma.",
+    "body": "Dias de píer, caiaque e água; noites de céu aberto e silêncio. A calma é por nossa conta.",
     "link": "Conheça o lugar →"
   },
   "units": {
@@ -100,7 +102,7 @@
   "experiencias": {
     "kicker": "O lugar",
     "title": "O lago, sem pressa.",
-    "body": "Píer próprio, caiaques e pores do sol refletidos na água. E quando o sol se põe, fogo: lareira a lenha por dentro, churrasco por fora.",
+    "body": "Píer próprio, caiaques e uma piscina em cada cabana, à beira da água. Quando o sol baixa a tarde se muda para o fogo: churrasqueira fora, salamandra dentro.",
     "caption": "Lago Urugua-í · Misiones",
     "items": {
       "nature": {
@@ -118,6 +120,31 @@
       "activities": {
         "title": "Selva de Misiones",
         "desc": "Palmeiras, trilhas e tapetes de folhas de outono."
+      }
+    }
+  },
+  "comoLlegar": {
+    "kicker": "Como chegar",
+    "title": "Está mais perto do que parece.",
+    "body": "Puerto Libertad fica na rodovia RN12, entre Puerto Esperanza e Wanda, a caminho de Iguazú. Você estaciona na porta e não usa mais o carro.",
+    "checkin": "Check-in 15 h · Check-out 11 h",
+    "mapLink": "Abrir no Maps →",
+    "rows": {
+      "igr": {
+        "place": "Aeroporto de Iguazú (IGR)",
+        "distance": "55 km · 45 min"
+      },
+      "cataratas": {
+        "place": "Cataratas do Iguaçu",
+        "distance": "70 km · 1 h"
+      },
+      "wanda": {
+        "place": "Minas de Wanda",
+        "distance": "25 km · 20 min"
+      },
+      "posadas": {
+        "place": "Posadas",
+        "distance": "270 km · 3 h 30"
       }
     }
   },
@@ -173,8 +200,8 @@
   },
   "cta": {
     "kicker": "Reservar",
-    "title": "Seu lugar à beira da água está te esperando.",
-    "body": "Escreva para a gente e combinamos sua estadia. Anfitriões presentes, resposta direta e sem complicação.",
+    "title": "Conte para nós quando você vem.",
+    "body": "Escreva para nós e combinamos a estadia. Somos os anfitriões: respondemos nós mesmos, sem intermediários nem comissões.",
     "bookNow": "Reservar agora",
     "whatsapp": "WhatsApp",
     "handwritten": "Esperamos por você!"

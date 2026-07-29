@@ -9,8 +9,10 @@
   },
   "hero": {
     "kicker": "Puerto Libertad · Misiones",
-    "title": "A orillas del lago Urugua-í",
-    "subtitle": "Cabañas de madera y ladrillo, pileta frente al lago y fuego para el asado."
+    "title": "Dormir tan cerca del agua",
+    "subtitle": "Cabañas frente al lago Urugua-í, cada una con su pileta y su fuego para el asado. Vos traé ganas de no hacer nada.",
+    "titleAccent": "que se escucha",
+    "trust": "Reservá directo con los anfitriones · sin comisiones · respondemos por WhatsApp"
   },
   "bookingBar": {
     "arrival": "Llegada",
@@ -24,8 +26,8 @@
     "arrival": "Llegada",
     "departure": "Salida",
     "guests": "Huéspedes",
-    "select": "Seleccionar",
-    "cta": "Reservar",
+    "select": "Elegí la fecha",
+    "cta": "Ver disponibilidad",
     "guest": "huésped",
     "guestsPlural": "huéspedes"
   },
@@ -79,7 +81,7 @@
   "manifiesto": {
     "kicker": "La casa",
     "title": "El día termina mirando el atardecer sobre el agua.",
-    "body": "La Casa del Lago son cabañas de madera y ladrillo junto al espejo de agua del Urugua-í. Días de muelle, kayak y pileta; noches de fuego, asado y cielo abierto. Nosotros ponemos la calma.",
+    "body": "Días de muelle, kayak y agua; noches de cielo abierto y silencio. Nosotros ponemos la calma.",
     "link": "Conocé el lugar →"
   },
   "units": {
@@ -100,7 +102,7 @@
   "experiencias": {
     "kicker": "El lugar",
     "title": "El lago, sin apuro.",
-    "body": "Muelle propio, kayaks y atardeceres que se reflejan en el agua. Y cuando baja el sol, fuego: salamandra adentro, asado afuera.",
+    "body": "Muelle propio, kayaks y una pileta en cada cabaña, al borde del agua. Cuando baja el sol la tarde se muda al fuego: parrilla afuera, salamandra adentro.",
     "caption": "Lago Urugua-í · Misiones",
     "items": {
       "nature": {
@@ -118,6 +120,31 @@
       "activities": {
         "title": "Selva misionera",
         "desc": "Palmeras, senderos y alfombras de hojas de otoño."
+      }
+    }
+  },
+  "comoLlegar": {
+    "kicker": "Cómo llegar",
+    "title": "Está más cerca de lo que parece.",
+    "body": "Puerto Libertad está sobre la RN12, entre Puerto Esperanza y Wanda, camino a Iguazú. Estacionás en la puerta y no volvés a usar el auto.",
+    "checkin": "Check-in 15 h · Check-out 11 h",
+    "mapLink": "Abrir en Maps →",
+    "rows": {
+      "igr": {
+        "place": "Aeropuerto de Iguazú (IGR)",
+        "distance": "55 km · 45 min"
+      },
+      "cataratas": {
+        "place": "Cataratas del Iguazú",
+        "distance": "70 km · 1 h"
+      },
+      "wanda": {
+        "place": "Minas de Wanda",
+        "distance": "25 km · 20 min"
+      },
+      "posadas": {
+        "place": "Posadas",
+        "distance": "270 km · 3 h 30"
       }
     }
   },
@@ -173,8 +200,8 @@
   },
   "cta": {
     "kicker": "Reservá",
-    "title": "Tu lugar junto al agua te espera.",
-    "body": "Escribinos y coordinamos tu estadía. Anfitriones presentes, respuesta directa y sin vueltas.",
+    "title": "Contanos cuándo venís.",
+    "body": "Escribinos y coordinamos la estadía. Somos los anfitriones: contestamos nosotros, sin intermediarios ni comisiones.",
     "bookNow": "Reservar ahora",
     "whatsapp": "WhatsApp",
     "handwritten": "¡Te esperamos!"

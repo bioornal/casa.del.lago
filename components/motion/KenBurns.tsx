@@ -3,7 +3,7 @@ export function KenBurns({ children, className = "" }:
   return (
     <div
       className={className}
-      style={{ animation: "lago-kb 9s ease-out forwards" }}
+      style={{ animation: "lago-kb 18s ease-out forwards" }}
     >
       {children}
     </div>

@@ -7,6 +7,7 @@ import { UnitsGrid } from "@/components/home/UnitsGrid";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { methodRates } from "@/lib/reservation/method-pricing";
 import { Experiencias } from "@/components/home/Experiencias";
+import { ComoLlegar } from "@/components/home/ComoLlegar";
 import { RelatoImagenes } from "@/components/home/RelatoImagenes";
 import { CtaReserva } from "@/components/home/CtaReserva";
 import { Contacto } from "@/components/home/Contacto";
@@ -101,17 +102,15 @@ export default async function HomePage({
       />
       <SiteNav />
       <main className="relative">
-        {/* El buscador se dockea al borde inferior del hero en desktop;
-            en mobile queda en flujo, solapado apenas como barra flotante. */}
-        <div className="relative">
-          <Hero />
-          <div className="md:absolute md:inset-x-0 md:bottom-0 md:z-20">
-            <SearchWidget variant="hero" />
-          </div>
-        </div>
+        {/* El buscador vive dentro de la columna de texto del hero, debajo del
+            subtítulo — ya no dockeado por fuera al borde inferior. */}
+        <Hero>
+          <SearchWidget variant="hero" />
+        </Hero>
         <Manifiesto />
         <UnitsGrid prices={listPrices} />
         <Experiencias />
+        <ComoLlegar />
         <RelatoImagenes />
         <CtaReserva bookingMode={bookingMode} />
         <Contacto />

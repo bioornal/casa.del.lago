@@ -79,15 +79,15 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
     );
   }
 
-  // Hero: barra dockeada al borde inferior del hero, ancho completo (estilo
-  // buscador de hotel). En mobile vuelve a ser una barra flotante compacta.
+  // Hero: el buscador ya vive dentro de la columna de texto del hero, así que no
+  // lleva ancho ni padding propios — los hereda de esa columna.
   const wrapperClass =
     variant === "hero"
-      ? "relative z-20 w-full max-w-[1020px] md:max-w-none mx-auto px-5 md:px-0 -mt-[52px] md:mt-0"
+      ? "relative z-20 w-full"
       : "relative z-20 max-w-[1020px] mx-auto px-5 md:px-6";
 
   // Separadores verticales entre campos, según fondo (glass oscuro vs claro)
-  const sep = variant === "hero" ? "rgba(245,238,225,.22)" : "#E7E0D4";
+  const sep = variant === "hero" ? "rgba(255,255,255,.16)" : "#E7E0D4";
 
   const label: React.CSSProperties = {
     fontSize: 11,
@@ -123,18 +123,10 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
         <div
           className={
             variant === "hero"
-              ? "flex flex-wrap items-stretch rounded-[10px] md:rounded-none border md:border-x-0 md:border-b-0 backdrop-blur-md"
+              ? "flex flex-wrap items-stretch rounded-[16px] border"
               : "flex flex-wrap items-stretch rounded-[4px] border border-[#E7E0D4] bg-marfil"
           }
-          style={
-            variant === "hero"
-              ? {
-                  boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)",
-                  background: "rgba(16,30,36,.55)",
-                  borderColor: "rgba(245,238,225,.28)",
-                }
-              : { boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)" }
-          }
+          style={variant === "hero" ? glassPanel : { boxShadow: "0 40px 80px -50px rgba(29,29,29,.6)" }}
         >
           {/* Grupo Llegada + Salida — popovers separados que abren hacia arriba */}
           <div className="relative flex flex-1 min-w-[220px]" style={{ flexBasis: "320px" }}>
@@ -216,7 +208,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
                   type="button"
                   aria-label="−"
                   onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                  style={roundBtn}
+                  style={variant === "hero" ? roundBtnGlass : roundBtnLight}
                 >
                   −
                 </button>
@@ -224,7 +216,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
                   type="button"
                   aria-label="+"
                   onClick={() => setGuests((g) => Math.min(6, g + 1))}
-                  style={roundBtn}
+                  style={variant === "hero" ? roundBtnGlass : roundBtnLight}
                 >
                   +
                 </button>
@@ -239,7 +231,11 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
             disabled={!valid}
             className={
               "group/btn flex items-center justify-center gap-[10px] w-full sm:w-auto border-none py-4 text-[12.5px] uppercase tracking-[.16em] transition-[background] duration-300 " +
-              (variant === "hero" ? "px-9 md:px-16" : "px-9")
+              // El contenedor no puede llevar overflow-hidden (recortaría el
+              // calendario), así que el CTA redondea sus propias esquinas.
+              (variant === "hero"
+                ? "px-9 md:px-14 rounded-bl-[15px] rounded-br-[15px] sm:rounded-bl-none sm:rounded-tr-[15px]"
+                : "px-9")
             }
             style={{
               flex: "0 0 auto",
@@ -262,14 +258,39 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
   );
 }
 
-const roundBtn: React.CSSProperties = {
+// Glass del buscador sobre el hero: el degradé claro encima del tinte oscuro es
+// lo que da el reflejo; el `inset` de arriba simula el canto iluminado del vidrio.
+const glassPanel: React.CSSProperties = {
+  background:
+    "linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 46%,rgba(255,255,255,.02) 100%),rgba(12,24,29,.34)",
+  backdropFilter: "blur(22px) saturate(165%)",
+  WebkitBackdropFilter: "blur(22px) saturate(165%)",
+  borderColor: "rgba(255,255,255,.20)",
+  boxShadow:
+    "0 34px 70px -34px rgba(6,14,18,.72),0 2px 10px -4px rgba(6,14,18,.45),inset 0 1px 0 rgba(255,255,255,.30)",
+};
+
+const roundBtnBase: React.CSSProperties = {
   width: 30,
   height: 30,
   borderRadius: "50%",
-  border: "1px solid #c9bfae",
-  background: "#fff",
   cursor: "pointer",
   fontSize: 17,
-  color: "#1D1D1D",
   lineHeight: 1,
+  transition: "background .2s,border-color .2s",
+};
+
+const roundBtnLight: React.CSSProperties = {
+  ...roundBtnBase,
+  border: "1px solid #c9bfae",
+  background: "#fff",
+  color: "#1D1D1D",
+};
+
+// Sobre el glass, los círculos blancos sólidos se veían como parches pegados.
+const roundBtnGlass: React.CSSProperties = {
+  ...roundBtnBase,
+  border: "1px solid rgba(255,255,255,.34)",
+  background: "rgba(255,255,255,.12)",
+  color: "#f5eee1",
 };

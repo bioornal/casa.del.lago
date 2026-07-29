@@ -9,8 +9,10 @@
   },
   "hero": {
     "kicker": "Puerto Libertad · Misiones",
-    "title": "On the shores of Lake Urugua-í",
-    "subtitle": "Wood and brick cabins, a pool facing the lake and fire for the asado."
+    "title": "Sleep close enough to hear",
+    "subtitle": "Cabins facing Lake Urugua-í, each with its own pool and its own fire for the asado. Just bring the will to do nothing.",
+    "titleAccent": "the water",
+    "trust": "Book direct with your hosts · no booking fees · we reply on WhatsApp"
   },
   "bookingBar": {
     "arrival": "Check-in",
@@ -24,8 +26,8 @@
     "arrival": "Check-in",
     "departure": "Check-out",
     "guests": "Guests",
-    "select": "Select",
-    "cta": "Book",
+    "select": "Pick a date",
+    "cta": "Check availability",
     "guest": "guest",
     "guestsPlural": "guests"
   },
@@ -79,7 +81,7 @@
   "manifiesto": {
     "kicker": "The house",
     "title": "The day ends watching the sunset over the water.",
-    "body": "La Casa del Lago is wood and brick cabins by the still water of the Urugua-í. Days of the dock, kayaking and the pool; nights of fire, asado and open sky. We bring the calm.",
+    "body": "Days of dock, kayak and water; nights of open sky and silence. We supply the calm.",
     "link": "Discover the place →"
   },
   "units": {
@@ -100,7 +102,7 @@
   "experiencias": {
     "kicker": "The place",
     "title": "The lake, unhurried.",
-    "body": "A private dock, kayaks and sunsets reflected on the water. And once the sun goes down, fire: a wood stove inside, an asado outside.",
+    "body": "Our own dock, kayaks and a pool at every cabin, right at the water's edge. When the sun drops the evening moves to the fire: grill outside, wood stove inside.",
     "caption": "Lake Urugua-í · Misiones",
     "items": {
       "nature": {
@@ -118,6 +120,31 @@
       "activities": {
         "title": "Misiones jungle",
         "desc": "Palm trees, trails and carpets of autumn leaves."
+      }
+    }
+  },
+  "comoLlegar": {
+    "kicker": "Getting here",
+    "title": "It's closer than it looks.",
+    "body": "Puerto Libertad sits on national route 12, between Puerto Esperanza and Wanda, on the way to Iguazú. You park at the door and never touch the car again.",
+    "checkin": "Check-in 3 pm · Check-out 11 am",
+    "mapLink": "Open in Maps →",
+    "rows": {
+      "igr": {
+        "place": "Iguazú Airport (IGR)",
+        "distance": "55 km · 45 min"
+      },
+      "cataratas": {
+        "place": "Iguazú Falls",
+        "distance": "70 km · 1 h"
+      },
+      "wanda": {
+        "place": "Wanda Mines",
+        "distance": "25 km · 20 min"
+      },
+      "posadas": {
+        "place": "Posadas",
+        "distance": "270 km · 3 h 30"
       }
     }
   },
@@ -173,8 +200,8 @@
   },
   "cta": {
     "kicker": "Book",
-    "title": "Your place by the water is waiting.",
-    "body": "Write to us and we'll set up your stay. Hosts who are actually there, direct answers, no runaround.",
+    "title": "Tell us when you're coming.",
+    "body": "Write to us and we'll arrange the stay. We're the hosts: we answer ourselves, with no middlemen and no commissions.",
     "bookNow": "Book now",
     "whatsapp": "WhatsApp",
     "handwritten": "See you soon!"
