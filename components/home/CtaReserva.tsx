@@ -1,78 +1,58 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { Link } from "@/lib/i18n/navigation";
-import { Reveal } from "@/components/motion/Reveal";
-import { FiguraAgua } from "@/components/motion/FiguraAgua";
-import { RevealTitle } from "@/components/motion/RevealTitle";
 import { isWhatsAppBookingMode, type BookingMode } from "@/lib/booking-mode";
 import { waLink } from "@/lib/contact";
+
+// Columna angosta (660px) y centrada, como el diseño. Antes eran 880px con un
+// h2 de hasta 80px: el título se comía el ancho y perdía el aire de alrededor.
+const BOTON =
+  "inline-flex items-center justify-center gap-2 rounded-[4px] px-[30px] py-4 text-[12px] font-bold uppercase tracking-[0.14em] transition-[background,transform,color,border-color] duration-300";
 
 export function CtaReserva({ bookingMode }: { bookingMode?: BookingMode } = {}) {
   const t = useTranslations("cta");
   const whatsappMode = isWhatsAppBookingMode(bookingMode ?? "whatsapp");
 
   return (
-    <section id="reservar" className="relative bg-marfil py-20 md:py-[150px]">
-      {/* Las gotas viven acá y no en la galería: es la sección del agua ("tu
-          lugar junto al agua"). El contenido va centrado en 880px, así que el
-          margen izquierdo es aire de sobra en cualquier viewport ancho. */}
-      <FiguraAgua kind="gotas" className="top-16 left-[7%]" size={92} />
-      <div className="relative z-[1] mx-auto text-center max-w-[880px] px-5 md:px-12">
-        <Reveal>
-          <Kicker>{t("kicker")}</Kicker>
-        </Reveal>
+    <section
+      id="reservar"
+      className="relative bg-marfil px-[clamp(20px,4vw,56px)] py-[clamp(88px,12vh,150px)] text-center"
+    >
+      <div className="relative z-[1] mx-auto max-w-[660px]">
+        <Kicker>{t("kicker")}</Kicker>
 
-        <RevealTitle delay={0.08}>
-          <h2
-            className="font-display font-normal leading-[1.15] tracking-[-0.015em]"
-            style={{
-              fontSize: "clamp(34px,6vw,80px)",
-              margin: "22px 0 0",
-            }}
+        <h2
+          className="font-display m-0 mt-[22px] text-balance font-normal leading-[1.08] tracking-[-0.024em] text-carbon"
+          style={{ fontSize: "clamp(32px,4vw,56px)" }}
+        >
+          {t("title")}
+        </h2>
+
+        <p className="mx-auto mt-[22px] max-w-[480px] text-pretty text-[16px] font-light leading-[1.72] text-cuerpo">
+          {t("body")}
+        </p>
+
+        <div className="mt-[34px] flex flex-wrap justify-center gap-3">
+          <Link
+            href={whatsappMode ? "/tarifas" : "/reservas"}
+            className={`${BOTON} bg-terracota text-marfil hover:-translate-y-0.5 hover:bg-terracota-hover`}
           >
-            {t("title")}
-          </h2>
-        </RevealTitle>
+            {t("bookNow")}
+          </Link>
 
-        <Reveal delay={0.16}>
-          <p
-            className="font-light text-cuerpo mx-auto"
-            style={{
-              fontSize: 16,
-              lineHeight: 1.7,
-              margin: "40px auto 42px",
-              maxWidth: "48ch",
-            }}
+          <a
+            href={waLink()}
+            target="_blank"
+            rel="noopener"
+            className={`${BOTON} border border-borde-medio text-carbon hover:border-lago hover:text-lago`}
           >
-            {t("body")}
-          </p>
+            {t("whatsapp")}
+          </a>
+        </div>
 
-          <div className="flex gap-4 justify-center flex-wrap">
-            {/* Locale-aware link styled as terracota button */}
-            <Link
-              href={whatsappMode ? "/tarifas" : "/reservas"}
-              className="inline-flex items-center justify-center gap-2 text-[12.5px] uppercase tracking-[0.1em] px-9 py-4 rounded-[2px] transition-[background,transform,color,border-color] duration-300 bg-terracota text-marfil hover:bg-terracota-hover hover:-translate-y-0.5"
-            >
-              {t("bookNow")}
-            </Link>
-
-            <a
-              href={waLink()}
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center justify-center gap-2 text-[12.5px] uppercase tracking-[0.1em] px-9 py-4 rounded-[2px] transition-[background,transform,color,border-color] duration-300 border border-[#c9bfae] text-carbon hover:border-carbon hover:bg-carbon hover:text-arena"
-            >
-              {t("whatsapp")}
-            </a>
-          </div>
-
-          <p
-            className="font-accent text-atardecer text-[27px] mt-8 inline-block"
-            style={{ transform: "rotate(-2deg)" }}
-          >
-            {t("handwritten")}
-          </p>
-        </Reveal>
+        <p className="font-accent mt-[26px] text-[24px] text-atardecer">
+          {t("handwritten")}
+        </p>
       </div>
     </section>
   );

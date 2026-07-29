@@ -86,18 +86,19 @@
   },
   "units": {
     "sectionKicker": "Cabins",
-    "sectionTitle": "Each cabin, another way to look at the lake.",
-    "viewAll": "View rates →",
+    "sectionTitle": "Each cabin looks at the lake its own way.",
+    "viewAll": "Check availability →",
     "fromPrice": "From {price}",
-    "perNight": "/ night",
+    "perNight": "a night",
     "aratiri": {
       "name": "Cabaña Aratirí",
-      "sub": "up to 6 guests · 2 bedrooms · covered deck with grill · lake view · wifi"
+      "sub": "Up to 6 guests · 2 bedrooms · porch with grill · lake view"
     },
     "aguaribay": {
       "name": "Cabaña Aguaribay",
-      "sub": "up to 4 guests · 1 bedroom · wood stove · deck on the water · wifi"
-    }
+      "sub": "Up to 4 guests · 1 bedroom · wood stove · deck on the water"
+    },
+    "note": "Every cabin has its own pool and its own grill. Both include linens, wifi, parking and dock access."
   },
   "experiencias": {
     "kicker": "The place",

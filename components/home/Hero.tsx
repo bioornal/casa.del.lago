@@ -1,6 +1,5 @@
 import { useTranslations } from "next-intl";
 import { KenBurns } from "@/components/motion/KenBurns";
-import { HeroReveal } from "@/components/motion/HeroReveal";
 
 // Fotografía real del lago servida desde el bucket de assets del cliente.
 const HERO_IMAGE =
@@ -59,7 +58,7 @@ export function Hero({ children }: { children?: React.ReactNode }) {
       />
 
       <div className="relative z-[3] mx-auto w-full max-w-[1240px]">
-        <HeroReveal>
+        <div>
           <div className="flex items-center gap-[14px]">
             <span className="h-px w-[38px] bg-[rgba(245,238,225,.55)]" />
             <span className="font-sans text-[11.5px] font-semibold uppercase tracking-[0.32em] text-[rgba(245,238,225,.86)]">
@@ -94,7 +93,7 @@ export function Hero({ children }: { children?: React.ReactNode }) {
               </p>
             </div>
           ) : null}
-        </HeroReveal>
+        </div>
       </div>
     </header>
   );

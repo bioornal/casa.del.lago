@@ -86,18 +86,19 @@
   },
   "units": {
     "sectionKicker": "Cabañas",
-    "sectionTitle": "Cada cabaña, una forma de mirar el lago.",
-    "viewAll": "Ver tarifas →",
+    "sectionTitle": "Cada cabaña mira el lago de otra manera.",
+    "viewAll": "Consultar disponibilidad →",
     "fromPrice": "Desde {price}",
-    "perNight": "/ noche",
+    "perNight": "la noche",
     "aratiri": {
       "name": "Cabaña Aratirí",
-      "sub": "hasta 6 huéspedes · 2 dormitorios · galería con parrilla · vista al lago · wifi"
+      "sub": "Hasta 6 huéspedes · 2 dormitorios · galería con parrilla · vista al lago"
     },
     "aguaribay": {
       "name": "Cabaña Aguaribay",
-      "sub": "hasta 4 huéspedes · 1 dormitorio · salamandra · deck al agua · wifi"
-    }
+      "sub": "Hasta 4 huéspedes · 1 dormitorio · salamandra · deck al agua"
+    },
+    "note": "Cada cabaña tiene su pileta y su parrilla. Las dos incluyen ropa blanca, wifi, estacionamiento y acceso al muelle."
   },
   "experiencias": {
     "kicker": "El lugar",

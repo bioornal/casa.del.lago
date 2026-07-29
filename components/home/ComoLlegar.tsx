@@ -1,7 +1,5 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
-import { Reveal } from "@/components/motion/Reveal";
-import { RevealTitle } from "@/components/motion/RevealTitle";
 
 const ROWS = ["igr", "cataratas", "wanda", "posadas"] as const;
 
@@ -15,28 +13,28 @@ export function ComoLlegar() {
     >
       <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-start gap-[clamp(36px,6vw,96px)] md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <div>
-          <Reveal>
+          <div>
             <Kicker>{t("kicker")}</Kicker>
-          </Reveal>
-          <RevealTitle delay={0.08}>
+          </div>
+          <div>
             <h2
               className="font-display mt-[22px] text-balance font-normal leading-[1.14] tracking-[-0.02em] text-carbon"
               style={{ fontSize: "clamp(28px,3.2vw,44px)" }}
             >
               {t("title")}
             </h2>
-          </RevealTitle>
-          <Reveal delay={0.16}>
+          </div>
+          <div>
             <p className="mt-[22px] max-w-[420px] text-pretty text-[16px] font-light leading-[1.72] text-cuerpo">
               {t("body")}
             </p>
             <p className="mt-[22px] text-[14.5px] font-medium tracking-[.01em] text-carbon">
               {t("checkin")}
             </p>
-          </Reveal>
+          </div>
         </div>
 
-        <Reveal delay={0.12}>
+        <div>
           <div className="grid">
             {ROWS.map((row, i) => (
               <div
@@ -60,7 +58,7 @@ export function ComoLlegar() {
           >
             {t("mapLink")}
           </a>
-        </Reveal>
+        </div>
       </div>
     </section>
   );

@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { ImageSlot } from "@/components/ui/ImageSlot";
-import { Reveal } from "@/components/motion/Reveal";
 import { Link } from "@/lib/i18n/navigation";
 import { StickyBookingCard } from "./StickyBookingCard";
 import { UNITS } from "@/lib/units";
@@ -208,7 +207,7 @@ export function UnitDetail({
       {/* ===== GALERÍA EDITORIAL ===== */}
       {gallery ? (
         /* Cuadrícula asimétrica con todas las fotos reales */
-        <Reveal>
+        <div>
           <section className="mx-auto max-w-[1320px] px-5 pt-8 md:px-12 md:pt-[42px]">
             <div className="grid grid-flow-dense grid-cols-2 auto-rows-[130px] gap-3 md:grid-cols-4 md:auto-rows-[210px] md:gap-4">
               {gallery.map(({ photo, alt, span }, i) => (
@@ -221,9 +220,9 @@ export function UnitDetail({
               ))}
             </div>
           </section>
-        </Reveal>
+        </div>
       ) : (
-      <Reveal>
+      <div>
         <section className="mx-auto max-w-[1320px] px-5 pt-8 md:px-12 md:pt-[42px]">
           {/* Top row: 2fr / 1fr */}
           <div className="grid grid-cols-1 gap-3 md:h-[560px] md:grid-cols-[2fr_1fr] md:gap-4">
@@ -280,7 +279,7 @@ export function UnitDetail({
             </div>
           </div>
         </section>
-      </Reveal>
+      </div>
       )}
 
       {/* ===== CONTENIDO + RESERVA ===== */}
@@ -290,7 +289,7 @@ export function UnitDetail({
           {/* LEFT — editorial + características + servicios */}
           <div>
             {/* El espacio */}
-            <Reveal>
+            <div>
               <Kicker>{t("spaceTitle")}</Kicker>
               <p
                 className="font-display m-0 mt-[22px] font-light leading-[1.45] text-[#3a3429]"
@@ -298,10 +297,10 @@ export function UnitDetail({
               >
                 {t(`spaceBody.${unit.slug}`)}
               </p>
-            </Reveal>
+            </div>
 
             {/* Características */}
-            <Reveal delay={0.08}>
+            <div>
               <div className="mt-16">
                 <Kicker className="mb-7 block">{t("featuresTitle")}</Kicker>
                 <div
@@ -323,10 +322,10 @@ export function UnitDetail({
                   ))}
                 </div>
               </div>
-            </Reveal>
+            </div>
 
             {/* Servicios */}
-            <Reveal delay={0.12}>
+            <div>
               <div className="mt-16">
                 <Kicker className="mb-7 block">{t("servicesTitle")}</Kicker>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-x-12">
@@ -341,7 +340,7 @@ export function UnitDetail({
                   ))}
                 </div>
               </div>
-            </Reveal>
+            </div>
           </div>
 
           {/* RIGHT — sticky booking card */}
@@ -352,7 +351,7 @@ export function UnitDetail({
       {/* ===== OTROS ALOJAMIENTOS ===== */}
       <section className="bg-arena-clara py-16 md:py-[110px]">
         <div className="mx-auto max-w-[1320px] px-5 md:px-12">
-          <Reveal>
+          <div>
             <div className="mb-[52px] flex flex-wrap items-end justify-between gap-5">
               <h2
                 className="font-display m-0 font-normal tracking-[-0.01em] text-carbon"
@@ -367,11 +366,11 @@ export function UnitDetail({
                 {tn("apartments")} →
               </Link>
             </div>
-          </Reveal>
+          </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-[30px]">
             {others.map((other, i) => (
-              <Reveal key={other.slug} delay={i * 0.1}>
+              <div>
                 <Link
                   href={`/departamentos/${other.slug}`}
                   className="block text-inherit no-underline transition-transform duration-500 ease-[cubic-bezier(.16,.84,.44,1)] hover:-translate-y-2"
@@ -388,7 +387,7 @@ export function UnitDetail({
                     </span>
                   </div>
                 </Link>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>

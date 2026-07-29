@@ -1,22 +1,18 @@
 import { useTranslations } from "next-intl";
-import { Kicker } from "@/components/ui/Kicker";
 import { ImageSlot } from "@/components/ui/ImageSlot";
-import { Reveal } from "@/components/motion/Reveal";
-import { RevealTitle } from "@/components/motion/RevealTitle";
 import { Parallax } from "@/components/motion/Parallax";
-import { FiguraAgua } from "@/components/motion/FiguraAgua";
 
 /**
- * Experiencias — banda cinematográfica full-bleed.
- * El agua del lago es la protagonista en formato panorámico, con parallax
- * sutil; los 4 ítems van en una tira editorial debajo, sin competir con la
- * imagen. Misma estructura que la versión "cataratas" de Aruma, reencuadrada
- * en la paleta del lago (lago-hover + turquesa).
+ * El lugar — banda cinematográfica full-bleed sobre el petróleo de la marca.
  *
- * FOTO: hoy sale del placeholder temático (label → POOL.lago de ImageSlot:
- * lago a la hora dorada). Cuando haya una foto real del lago en el bucket,
- * alcanza con pasar `photo="Complejo/XX.jpg"` (o mapear el seed en
- * REAL_PHOTOS de ImageSlot) y se usa sola.
+ * El fondo es `lago` (#155e75), no `lago-hover` (#0e4a5e): el oscuro queda
+ * reservado para la banda de la foto, y así los dos tonos se leen como capas.
+ * El kicker va en cyan claro (#7FD4E2) y no en turquesa: sobre este fondo el
+ * turquesa de `<Kicker>` casi no contrasta.
+ *
+ * FOTO: hoy sale del placeholder temático (label → POOL.lago de ImageSlot).
+ * Cuando haya una foto real del lago en el bucket, alcanza con pasar
+ * `photo="Complejo/XX.jpg"` y se usa sola.
  */
 const ITEMS = [
   { key: "nature", num: "01" },
@@ -29,45 +25,39 @@ export function Experiencias() {
   const t = useTranslations("experiencias");
 
   return (
-    <section
-      id="lugar"
-      className="bg-lago-hover text-[#E4EEF2] relative py-16 md:py-[110px] overflow-hidden"
-    >
-      <FiguraAgua kind="ola" color="#E4EEF2" className="top-16 right-[4%]" size={100} flip />
+    <section id="lugar" className="relative overflow-hidden bg-lago text-marfil">
 
       {/* Header editorial: kicker + título a la izquierda, bajada a la derecha */}
-      <div className="relative z-[1] mx-auto max-w-[1320px] px-5 md:px-12">
-        <Reveal>
-          <Kicker>{t("kicker")}</Kicker>
-        </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-[1.35fr_1fr] gap-8 md:gap-16 mt-6 md:mt-8 items-end">
-          <RevealTitle delay={0.08}>
+      <div className="relative z-[1] mx-auto grid max-w-[1240px] grid-cols-1 items-start gap-[clamp(32px,6vw,96px)] px-[clamp(20px,4vw,56px)] py-[clamp(72px,10vh,120px)] md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <div>
+          <div>
+            <span className="text-[11.5px] font-bold uppercase tracking-[0.2em] text-[#7FD4E2]">
+              {t("kicker")}
+            </span>
+          </div>
+          <div>
             <h2
-              className="font-display font-normal leading-[1.05] tracking-[-0.01em] text-marfil m-0"
-              style={{ fontSize: "clamp(30px,4.4vw,58px)" }}
+              className="font-display m-0 mt-[22px] font-normal leading-[1.1] tracking-[-0.022em] text-marfil"
+              style={{ fontSize: "clamp(30px,3.6vw,50px)" }}
             >
               {t("title")}
             </h2>
-          </RevealTitle>
-          <Reveal delay={0.16}>
-            <p
-              className="font-light m-0"
-              style={{ fontSize: 16, lineHeight: 1.8, color: "#B9CFD9", maxWidth: "44ch" }}
-            >
-              {t("body")}
-            </p>
-          </Reveal>
+          </div>
+        </div>
+        <div className="pt-[clamp(0px,1.2vw,14px)]">
+          <p className="m-0 text-pretty text-[16px] font-light leading-[1.72] text-[rgba(245,238,225,.86)]">
+            {t("body")}
+          </p>
         </div>
       </div>
 
       {/* Banda full-bleed: el lago en su formato panorámico natural.
           El wrapper lleva relative z-[1] para que la foto opaca quede por
-          encima de las figuras decorativas, que van en z-[1] detrás del
-          contenido. */}
-      <Reveal delay={0.1} className="relative z-[1] mt-10 md:mt-[64px]">
+          encima de las figuras decorativas. */}
+      <div className="relative z-[1]">
         <div
-          className="relative h-[300px] md:h-[56vh] md:min-h-[380px] md:max-h-[600px] overflow-hidden"
-          style={{ background: "#0d3f52" }}
+          className="relative h-[clamp(280px,46vh,520px)] overflow-hidden"
+          style={{ background: "#0E4A5E" }}
         >
           {/* Imagen 80px más alta que la banda: margen para el recorrido del parallax */}
           <Parallax speed={-40} className="absolute inset-x-0 top-0 h-[calc(100%+80px)]">
@@ -83,37 +73,35 @@ export function Experiencias() {
             className="pointer-events-none absolute inset-x-0 bottom-0 pt-20"
             style={{ background: "linear-gradient(to top, rgba(8,32,42,.6), rgba(8,32,42,0))" }}
           >
-            <div className="mx-auto max-w-[1320px] px-5 md:px-12 pb-4 md:pb-5">
-              <span className="text-[11px] uppercase tracking-[0.22em] text-marfil/90 [text-shadow:0_1px_8px_rgba(0,0,0,.5)]">
+            <div className="px-[clamp(20px,4vw,56px)] pb-[22px]">
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.24em] text-[rgba(245,238,225,.9)] [text-shadow:0_1px_12px_rgba(18,16,14,.6)]">
                 {t("caption")}
               </span>
             </div>
           </div>
         </div>
-      </Reveal>
+      </div>
 
-      {/* Tira de ítems: numeración + título + bajada, hover turquesa */}
-      <div className="relative z-[1] mx-auto max-w-[1320px] px-5 md:px-12 mt-10 md:mt-[56px]">
-        <Reveal delay={0.12}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-9">
+      {/* Tira de ítems: numeración + título + bajada */}
+      <div className="relative z-[1] mx-auto max-w-[1240px] px-[clamp(20px,4vw,56px)] pt-[clamp(48px,6vh,80px)] pb-[clamp(72px,10vh,120px)]">
+        <div>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-[clamp(24px,3vw,44px)]">
             {ITEMS.map(({ key, num }) => (
-              <div key={key} className="group border-t border-white/15 pt-5">
-                <span className="text-[12px] tracking-[0.2em] text-[#7FC9D6] transition-colors duration-300 group-hover:text-turquesa">
+              <div key={key} className="group">
+                <div className="h-px bg-[rgba(245,238,225,.28)]" />
+                <span className="mt-[14px] block text-[10.5px] font-semibold tracking-[0.2em] text-[rgba(245,238,225,.55)]">
                   {num}
                 </span>
-                <span className="font-display block text-[21px] text-[#F8F5F0] mt-3 transition-colors duration-300 group-hover:text-[#A8E0EA]">
+                <h3 className="font-display mt-[10px] mb-2 text-[20px] font-normal tracking-[-0.01em] text-marfil transition-colors duration-300 group-hover:text-[#A8E0EA]">
                   {t(`items.${key}.title`)}
-                </span>
-                <span
-                  className="font-light block mt-2"
-                  style={{ fontSize: 13.5, lineHeight: 1.6, color: "#9FBCC9" }}
-                >
+                </h3>
+                <p className="m-0 text-[14.5px] font-light leading-[1.6] text-[rgba(245,238,225,.74)]">
                   {t(`items.${key}.desc`)}
-                </span>
+                </p>
               </div>
             ))}
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );

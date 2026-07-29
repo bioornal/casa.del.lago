@@ -1,6 +1,5 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
-import { Reveal } from "@/components/motion/Reveal";
 import { ContactForm } from "./ContactForm";
 import { waLink, CONTACT_EMAIL, CONTACT_PHONE_HREF } from "@/lib/contact";
 
@@ -20,7 +19,7 @@ export function Contacto() {
     >
       <div className="relative z-[1] mx-auto max-w-[1320px] px-5 md:px-12">
         {/* Header */}
-        <Reveal className="text-center mb-12 md:mb-[64px]">
+        <div className="text-center mb-12 md:mb-[64px]">
           <Kicker>{t("kicker")}</Kicker>
           <h2
             className="font-display font-normal leading-[1.04] tracking-[-0.01em] text-carbon"
@@ -31,12 +30,12 @@ export function Contacto() {
           >
             {t("title")}
           </h2>
-        </Reveal>
+        </div>
 
         {/* Two-column grid */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 md:gap-16 items-start">
           {/* LEFT column */}
-          <Reveal>
+          <div>
             {/* WhatsApp card */}
             <a
               href={WA_HREF}
@@ -198,10 +197,10 @@ export function Contacto() {
 
             {/* Contact form (client component) */}
             <ContactForm />
-          </Reveal>
+          </div>
 
           {/* RIGHT column: Map */}
-          <Reveal>
+          <div>
             <div
               className="relative rounded-[4px] overflow-hidden h-[420px] lg:h-[560px]"
               style={{
@@ -272,7 +271,7 @@ export function Contacto() {
                 {t("mapCta")}
               </a>
             </div>
-          </Reveal>
+          </div>
         </div>
       </div>
     </section>

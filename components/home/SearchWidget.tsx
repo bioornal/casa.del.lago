@@ -9,7 +9,6 @@ import "react-day-picker/style.css";
 import { useRouter } from "@/lib/i18n/navigation";
 import { formatDateOnly, parseDateOnly } from "@/lib/reservation/booking";
 import { buildTarifasUrl } from "@/lib/reservation/search";
-import { Reveal } from "@/components/motion/Reveal";
 
 interface SearchWidgetProps {
   variant: "hero" | "bar";
@@ -69,7 +68,13 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
   }
 
   function submit() {
-    if (!valid) return;
+    // Sin fechas igual se navega a /tarifas, que ya resuelve ese caso mostrando
+    // "elegí las fechas". Antes el botón quedaba deshabilitado y en gris, que es
+    // por qué el hero no coincidía con el diseño (ahí el CTA va siempre activo).
+    if (!valid) {
+      router.push("/tarifas");
+      return;
+    }
     router.push(
       buildTarifasUrl({
         checkIn: formatDateOnly(checkIn!),
@@ -87,7 +92,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
       : "relative z-20 max-w-[1020px] mx-auto px-5 md:px-6";
 
   // Separadores verticales entre campos, según fondo (glass oscuro vs claro)
-  const sep = variant === "hero" ? "rgba(255,255,255,.16)" : "#E7E0D4";
+  const sep = variant === "hero" ? "rgba(245,238,225,.16)" : "#E7E0D4";
 
   const isHero = variant === "hero";
 
@@ -126,7 +131,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
   );
 
   return (
-    <Reveal delay={0.05}>
+    <div>
       <div className={wrapperClass}>
         <div
           className={
@@ -249,7 +254,6 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
           <button
             type="button"
             onClick={submit}
-            disabled={!valid}
             className={
               "group/btn flex items-center justify-center gap-[10px] w-full sm:w-auto border-none text-[12.5px] font-bold uppercase tracking-[.16em] transition-[background] duration-300 " +
               // El contenedor no puede llevar overflow-hidden (recortaría el
@@ -260,35 +264,34 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
             }
             style={{
               flex: "0 0 auto",
-              cursor: valid ? "pointer" : "not-allowed",
-              background: valid ? "#a24b2a" : "#bdb4a4",
-              color: "#f5eee1",
+              cursor: "pointer",
+              background: "#a24b2a",
+              color: "#f8f3e8",
             }}
             onMouseEnter={(e) => {
-              if (valid) e.currentTarget.style.background = "#85391f";
+              e.currentTarget.style.background = "#85391f";
             }}
             onMouseLeave={(e) => {
-              if (valid) e.currentTarget.style.background = "#a24b2a";
+              e.currentTarget.style.background = "#a24b2a";
             }}
           >
             {t("cta")}
           </button>
         </div>
       </div>
-    </Reveal>
+    </div>
   );
 }
 
-// Glass del buscador sobre el hero: el degradé claro encima del tinte oscuro es
-// lo que da el reflejo; el `inset` de arriba simula el canto iluminado del vidrio.
+// Glass del buscador sobre el hero, con los valores del diseño. Antes llevaba un
+// degradé blanco encima de un tinte al 34%: quedaba lechoso y se leía la foto
+// atrás. El diseño va más opaco (66%) y sin brillo, así los labels leen limpios.
 const glassPanel: React.CSSProperties = {
-  background:
-    "linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 46%,rgba(255,255,255,.02) 100%),rgba(12,24,29,.34)",
-  backdropFilter: "blur(22px) saturate(165%)",
-  WebkitBackdropFilter: "blur(22px) saturate(165%)",
-  borderColor: "rgba(255,255,255,.20)",
-  boxShadow:
-    "0 34px 70px -34px rgba(6,14,18,.72),0 2px 10px -4px rgba(6,14,18,.45),inset 0 1px 0 rgba(255,255,255,.30)",
+  background: "rgba(22,19,17,.66)",
+  backdropFilter: "blur(18px)",
+  WebkitBackdropFilter: "blur(18px)",
+  borderColor: "rgba(245,238,225,.20)",
+  boxShadow: "0 26px 70px rgba(18,16,14,.40)",
 };
 
 const roundBtnBase: React.CSSProperties = {
@@ -311,7 +314,7 @@ const roundBtnLight: React.CSSProperties = {
 // Sobre el glass, los círculos blancos sólidos se veían como parches pegados.
 const roundBtnGlass: React.CSSProperties = {
   ...roundBtnBase,
-  border: "1px solid rgba(255,255,255,.34)",
-  background: "rgba(255,255,255,.12)",
-  color: "#f5eee1",
+  border: "1px solid rgba(245,238,225,.34)",
+  background: "transparent",
+  color: "#f8f3e8",
 };

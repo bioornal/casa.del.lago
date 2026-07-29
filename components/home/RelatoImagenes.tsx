@@ -3,10 +3,6 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { ImageSlot } from "@/components/ui/ImageSlot";
-import { Reveal } from "@/components/motion/Reveal";
-import { Asentar } from "@/components/motion/Asentar";
-import { RevealTitle } from "@/components/motion/RevealTitle";
-import { FiguraAgua } from "@/components/motion/FiguraAgua";
 import { GalleryLightbox, type GalleryItem } from "./GalleryLightbox";
 
 /**
@@ -59,29 +55,25 @@ export function RelatoImagenes() {
         {/* Header */}
         <div className="flex flex-wrap items-end justify-between gap-5 mb-9 md:mb-[48px]">
           <div className="max-w-[560px]">
-            <Reveal>
+            <div>
               <Kicker>{t("kicker")}</Kicker>
-            </Reveal>
-            <RevealTitle delay={0.08}>
+            </div>
+            <div>
               <h2
                 className="font-display font-normal tracking-[-0.01em]"
                 style={{ fontSize: "clamp(30px,4.4vw,52px)", margin: "14px 0 0" }}
               >
                 {t("title")}
               </h2>
-            </RevealTitle>
+            </div>
           </div>
           {/* La fogata se ancla AL BOTÓN, no a la sección: centrada con
               left-1/2 queda alineada con él sea cual sea su ancho —"Ver
               completa" / "View full" / "Ver completa" miden distinto— y en
               cualquier viewport, sin porcentajes a ojo. Sube al aire del
               padding superior con bottom-full. */}
-          <Reveal delay={0.14} className="relative">
-            <FiguraAgua
-              kind="fuego"
-              className="bottom-full left-1/2 -translate-x-1/2 mb-5"
-              size={88}
-            />
+          <div className="relative">
+
             <button
               type="button"
               onClick={() => openAt(0)}
@@ -90,15 +82,14 @@ export function RelatoImagenes() {
               {t("viewFull")}
               <span aria-hidden>→</span>
             </button>
-          </Reveal>
+          </div>
         </div>
 
         {/* Grilla bento: 2 col mobile, 4 col desktop — las 10 fotos visibles */}
-        <Asentar className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-[14px] [grid-auto-rows:150px] md:[grid-auto-rows:208px]">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-[14px] [grid-auto-rows:150px] md:[grid-auto-rows:208px]">
           {TILES.map((tile) => (
             // El <div> intermedio no es redundante: lleva las clases de span de
-            // la grilla y es el hijo directo que Asentar anima. Rotar el
-            // <button> (que tiene overflow-hidden) haría asomar su borde.
+            // la grilla.
             <div key={tile.key} className={`${tile.span} h-full`}>
               <button
                 type="button"
@@ -136,7 +127,7 @@ export function RelatoImagenes() {
               </button>
             </div>
           ))}
-        </Asentar>
+        </div>
       </div>
 
       <GalleryLightbox
