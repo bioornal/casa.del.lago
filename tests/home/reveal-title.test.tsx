@@ -1,21 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { RevealTitle } from "@/components/motion/RevealTitle";
 
-beforeEach(() => {
-  // reduced motion → sin animación; el contenido debe estar visible igual
-  vi.stubGlobal(
-    "matchMedia",
-    vi.fn().mockReturnValue({
-      matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }),
-  );
-});
-
+// Las animaciones de aparición se quitaron: el componente es un wrapper
+// transparente. Ya no hay matchMedia que stubear porque no corre JS.
 describe("RevealTitle", () => {
-  it("renderiza el contenido dentro de un wrapper overflow-hidden", () => {
+  it("renderiza el contenido visible y sin recorte", () => {
     const { container } = render(
       <RevealTitle>
         <h2>Un título</h2>
@@ -23,7 +13,9 @@ describe("RevealTitle", () => {
     );
     expect(screen.getByText("Un título")).toBeInTheDocument();
     const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.className).toContain("overflow-hidden");
+    // El overflow-hidden existía sólo para enmascarar el deslizamiento; sin
+    // animación, clipear el título le decapitaría las descendentes.
+    expect(wrapper.className).not.toContain("overflow-hidden");
   });
 
   it("acepta className adicional", () => {

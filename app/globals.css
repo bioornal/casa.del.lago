@@ -156,6 +156,22 @@ html[data-fx]:not([data-fx~="grano"]) [data-grain] { display: none !important; }
 [data-nav-burger] span {
   background-color: color-mix(in oklab, var(--color-marfil), var(--color-carbon) calc(var(--nav-ink) * 100%));
 }
+/* Píldoras de idioma del nav: mismo criterio que los links — el color sale de
+   interpolar sobre --nav-ink, no de una clase por estado. */
+[data-nav-pills] {
+  border-color: color-mix(in oklab, rgb(245 238 225 / .26), rgb(31 29 25 / .16) calc(var(--nav-ink) * 100%));
+}
+[data-nav-pill][data-active="true"] {
+  color: color-mix(in oklab, var(--color-marfil), var(--color-carbon) calc(var(--nav-ink) * 100%));
+  background-color: color-mix(in oklab, rgb(245 238 225 / .16), rgb(31 29 25 / .09) calc(var(--nav-ink) * 100%));
+}
+[data-nav-pill][data-active="false"] {
+  color: color-mix(in oklab, rgb(245 238 225 / .62), var(--color-muted) calc(var(--nav-ink) * 100%));
+}
+[data-nav-pill][data-active="false"]:hover {
+  color: color-mix(in oklab, var(--color-marfil), var(--color-carbon) calc(var(--nav-ink) * 100%));
+}
+
 /* Crossfade del isotipo: dos PNG cruzados por opacidad para que no parpadee
    al cambiar el src (ver el comentario en SiteNav.tsx). */
 [data-nav-iso-carbon] { opacity: var(--nav-ink); }

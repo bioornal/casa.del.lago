@@ -1,12 +1,3 @@
-"use client";
-import { useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import { fxAllowed } from "@/lib/fx";
-
-gsap.registerPlugin(ScrollTrigger);
-
 export type FiguraKind = "ola" | "gota" | "gotas" | "bambu" | "fuego";
 
 // Estela de agua — dos cintas encadenadas, el mismo gesto que las olas del
@@ -93,9 +84,11 @@ function Figura({ kind }: { kind: FiguraKind }) {
 // Igual hay que colocarla en una zona de aire: quedar detrás evita que oculte
 // el texto, pero una figura opaca bajo un kicker igual arruina el contraste.
 //
-// El llenado corre SIEMPRE, también con prefers-reduced-motion: no es
-// animación autónoma — lo conduce el scroll del usuario, y sin scroll es
-// estático. Sin JS queda el contorno, que ya es un estado válido.
+// La figura se llenaba con un clip-path conducido por el scroll (inset 100%→0%),
+// o sea que "se iba pintando". Eso se quitó por pedido explícito junto al resto
+// de las animaciones de aparición, y con él la capa de relleno: queda sólo el
+// contorno, que ya era el estado válido sin JS. Ahora es un componente de
+// servidor — no necesita "use client" ni GSAP.
 export function FiguraAgua({
   kind,
   className = "",
@@ -109,41 +102,10 @@ export function FiguraAgua({
   size?: number;
   flip?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const fillRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      if (!fxAllowed("figuras")) return;
-      const el = fillRef.current;
-      if (!el) return;
-      // Oculta en mobile (display:none) o sin layout (jsdom): sin trigger,
-      // el relleno queda en su estado SSR (vacío)
-      if (!ref.current || ref.current.getBoundingClientRect().height === 0) return;
-
-      gsap.fromTo(
-        el,
-        { clipPath: "inset(100% 0 0 0)" },
-        {
-          clipPath: "inset(0% 0 0 0)",
-          ease: "none",
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 92%",
-            end: "top 28%",
-            scrub: 0.6,
-          },
-        },
-      );
-    },
-    { scope: ref },
-  );
-
   const svgStyle = flip ? { transform: "scaleX(-1)" } : undefined;
 
   return (
     <div
-      ref={ref}
       aria-hidden="true"
       data-figura-agua
       className={`pointer-events-none absolute z-0 hidden md:block ${className}`}
@@ -160,18 +122,6 @@ export function FiguraAgua({
           <Figura kind={kind} />
         </g>
       </svg>
-      <div
-        ref={fillRef}
-        data-figura-fill
-        className="absolute inset-0"
-        style={{ clipPath: "inset(100% 0 0 0)" }}
-      >
-        <svg viewBox="0 0 100 100" width={size} height={size} style={svgStyle} focusable="false">
-          <g fill="currentColor" fillOpacity={0.88} stroke="none">
-            <Figura kind={kind} />
-          </g>
-        </svg>
-      </div>
     </div>
   );
 }

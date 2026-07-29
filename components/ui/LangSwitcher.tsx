@@ -4,10 +4,39 @@ import { usePathname, useRouter } from "@/lib/i18n/navigation";
 
 const LOCALES = ["es", "en", "pt"] as const;
 
-export function LangSwitcher({ variant = "light" }: { variant?: "light" | "dark" }) {
+export function LangSwitcher({
+  variant = "light",
+}: {
+  variant?: "light" | "dark" | "pills";
+}) {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+
+  // "pills": grupo de píldoras del nav. Los colores no se deciden acá — los
+  // interpola globals.css sobre --nav-ink, igual que los links del nav.
+  if (variant === "pills") {
+    return (
+      <div
+        data-nav-pills
+        className="flex items-center gap-[2px] rounded-full border border-solid p-[4px]"
+      >
+        {LOCALES.map((l) => (
+          <button
+            key={l}
+            type="button"
+            data-nav-pill
+            data-active={l === locale}
+            onClick={() => router.replace(pathname, { locale: l })}
+            className="cursor-pointer rounded-full px-[11px] py-[6px] text-[11.5px] uppercase tracking-[0.1em] transition-[background-color,color] duration-200 data-[active=false]:font-semibold data-[active=true]:font-bold"
+          >
+            {l}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   const sep = variant === "dark" ? "text-white/30" : "text-bronce";
   const text = variant === "dark" ? "text-marfil" : "text-carbon";
   // Sobre fondo oscuro (footer lago) el activo va en marfil; sobre claro, en lago.

@@ -58,7 +58,10 @@ export function SiteNav() {
           className="absolute inset-0 h-full w-full object-contain"
         />
       </span>
-      <span className="flex flex-col items-start leading-none">
+      {/* Debajo de sm no caben hamburguesa + isotipo + wordmark + RESERVAR en
+          360px: el wordmark se oculta y queda el isotipo, que ya identifica la
+          marca. Con el logo completo el CTA se le montaba encima. */}
+      <span className="hidden flex-col items-start leading-none sm:flex">
         <span data-nav-word className="font-display font-medium tracking-[0.01em]">
           La Casa del Lago
         </span>
@@ -125,13 +128,20 @@ export function SiteNav() {
       className="fixed top-0 left-0 right-0 z-50 border-b border-solid"
     >
       {/* Ancho completo a propósito (el resto del sitio usa max-w-[1320px]): un nav
-          fijo que respira lee mejor que uno "casi alineado" con el contenido. */}
+          fijo que respira lee mejor que uno "casi alineado" con el contenido.
+          Grid de tres pistas como el diseño: el logo va a la IZQUIERDA y los links
+          al centro. Con flex+justify-between el logo "centrado" quedaba 76px
+          corrido, porque los grupos laterales nunca miden lo mismo. */}
+      {/* flex abajo de lg y grid recién en lg+: los links van display:none en
+          mobile, así que el grid los saca del flujo y el grupo derecho caía en la
+          columna del medio, quedando 14px corrido del borde. Con flex son dos
+          hijos y justify-between los apoya exacto en los dos paddings. */}
       <div
         data-nav-row
-        className="w-full px-5 md:px-10 lg:px-16 flex items-center justify-between gap-5"
+        className="flex w-full items-center justify-between gap-[clamp(14px,2vw,32px)] px-5 md:px-10 lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:px-16"
       >
-        {/* LEFT — desktop nav links / mobile: hamburger */}
-        <div className="flex items-center gap-[30px]">
+        {/* IZQUIERDA — hamburguesa (mobile) + logo */}
+        <div className="flex min-w-0 items-center gap-[14px]">
           <button
             type="button"
             data-nav-burger
@@ -153,36 +163,38 @@ export function SiteNav() {
               style={{ transform: open ? "translateY(-4px) rotate(-45deg)" : "none" }}
             />
           </button>
-          <div className="hidden lg:flex items-center gap-[30px]">{navLinks}</div>
+          {isHome ? (
+            <a
+              href="#top"
+              aria-label="La Casa del Lago Urugua-í"
+              className="flex items-center no-underline"
+            >
+              {brandLockup}
+            </a>
+          ) : (
+            <Link
+              href="/"
+              aria-label="La Casa del Lago Urugua-í"
+              className="flex items-center no-underline"
+            >
+              {brandLockup}
+            </Link>
+          )}
         </div>
 
-        {/* CENTER — logo */}
-        {isHome ? (
-          <a
-            href="#top"
-            aria-label="La Casa del Lago Urugua-í"
-            className="flex items-center no-underline"
-          >
-            {brandLockup}
-          </a>
-        ) : (
-          <Link
-            href="/"
-            aria-label="La Casa del Lago Urugua-í"
-            className="flex items-center no-underline"
-          >
-            {brandLockup}
-          </Link>
-        )}
+        {/* CENTRO — links */}
+        <div className="hidden min-w-0 items-center justify-center gap-[clamp(12px,1.9vw,36px)] overflow-hidden lg:flex">
+          {navLinks}
+        </div>
 
-        {/* RIGHT — lang switcher + book button */}
+        {/* DERECHA — idioma + reservar */}
         <div className="flex items-center justify-end gap-[14px] md:gap-[22px]">
           <span className="hidden sm:block">
-            <LangSwitcher variant="light" />
+            <LangSwitcher variant="pills" />
           </span>
           <Link
             href="/reservas"
-            className="inline-flex items-center justify-center bg-terracota text-marfil text-[12.5px] uppercase tracking-[.1em] px-[18px] md:px-[22px] py-[10px] md:py-[11px] rounded-[2px] transition-[background,transform] duration-300 hover:bg-terracota-hover hover:-translate-y-px whitespace-nowrap no-underline"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-terracota px-[18px] py-[11px] text-[12px] font-bold uppercase tracking-[.14em] text-marfil no-underline shadow-[0_8px_24px_rgba(31,29,25,.22)] transition-[background,transform] duration-300 hover:-translate-y-px hover:bg-terracota-hover md:px-[clamp(18px,1.8vw,26px)] md:py-[13px]"
           >
             {t("book")}
           </Link>
