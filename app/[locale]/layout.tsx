@@ -34,7 +34,14 @@ export default async function LocaleLayout({
         {/* Kill-switch de efectos (ver lib/fx.ts): el server ya manda
             data-fx=FX_DEFAULT; este script aplica los overrides por URL
             (?sinfx=1 / ?fx=on / ?fx=lista) y el flag del FxWatchdog antes
-            de hidratar. La URL siempre le gana al flag. */}
+            de hidratar. La URL siempre le gana al flag.
+
+            Sólo tiene que correr en cargas reales. Lo único que re-renderizaba
+            este layout en cliente era el cambio de idioma, y ahí React avisaba
+            que no puede ejecutar scripts en cliente; se resolvió haciendo que
+            ese cambio sea una navegación completa (ver LangSwitcher), no
+            envolviéndolo en next/script — con beforeInteractive el aviso
+            aparecía igual. */}
         <script dangerouslySetInnerHTML={{ __html: FX_BOOT_SCRIPT }} />
         <NextIntlClientProvider>
           <FilmGrain />

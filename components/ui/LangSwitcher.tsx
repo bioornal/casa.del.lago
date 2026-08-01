@@ -1,6 +1,6 @@
 "use client";
 import { useLocale } from "next-intl";
-import { usePathname, useRouter } from "@/lib/i18n/navigation";
+import { usePathname } from "@/lib/i18n/navigation";
 
 const LOCALES = ["es", "en", "pt"] as const;
 
@@ -11,7 +11,22 @@ export function LangSwitcher({
 }) {
   const locale = useLocale();
   const pathname = usePathname();
-  const router = useRouter();
+
+  // Navegación completa a propósito, no router.replace(): cambiar de locale es
+  // lo ÚNICO que vuelve a renderizar LocaleLayout en el cliente (navegar entre
+  // páginas del mismo idioma no lo toca, porque el segmento no cambia). En ese
+  // re-render React se topaba con el <script> de arranque de FX y avisaba por
+  // consola que no puede ejecutar scripts en cliente. Con una carga real el
+  // script corre cuando corresponde y el aviso desaparece.
+  //
+  // De paso conserva query y hash, que router.replace() descartaba: eso importa
+  // para el kill-switch de diagnóstico (?sinfx=1 sobrevive al cambio de idioma).
+  function switchTo(next: string) {
+    const base = pathname === "/" ? "" : pathname;
+    window.location.assign(
+      `/${next}${base}${window.location.search}${window.location.hash}`,
+    );
+  }
 
   // "pills": grupo de píldoras del nav. Los colores no se deciden acá — los
   // interpola globals.css sobre --nav-ink, igual que los links del nav.
@@ -27,7 +42,7 @@ export function LangSwitcher({
             type="button"
             data-nav-pill
             data-active={l === locale}
-            onClick={() => router.replace(pathname, { locale: l })}
+            onClick={() => switchTo(l)}
             className="cursor-pointer rounded-full px-[11px] py-[6px] text-[11.5px] uppercase tracking-[0.1em] transition-[background-color,color] duration-200 data-[active=false]:font-semibold data-[active=true]:font-bold"
           >
             {l}
@@ -50,7 +65,7 @@ export function LangSwitcher({
         <span key={l} className="flex items-center gap-[9px]">
           <button
             type="button"
-            onClick={() => router.replace(pathname, { locale: l })}
+            onClick={() => switchTo(l)}
             className={`cursor-pointer uppercase transition-[opacity,color] duration-200 ${
               l === locale ? active : `${text} opacity-45 hover:opacity-100`
             }`}
