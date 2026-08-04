@@ -4,10 +4,14 @@ import { ContactForm } from "./ContactForm";
 import { waLink, CONTACT_EMAIL, CONTACT_PHONE_HREF } from "@/lib/contact";
 
 const WA_HREF = waLink();
+// Ficha de Google Maps del lodge. La anterior era la de Aruma (Obispo Angelelli
+// 95, Puerto Iguazú) y se arrastraba desde la adaptación del sitio.
 const MAPS_EMBED =
-  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d660.1445607832369!2d-54.57444015912828!3d-25.61587341498988!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f692504f45817b%3A0xd868aa283d79c377!2sObispo%20Angelelli%2095%2C%20N3378%20Puerto%20Iguaz%C3%BA%2C%20Misiones!5e1!3m2!1ses-419!2sar!4v1781475283983!5m2!1ses-419!2sar";
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3609.511968696764!2d-54.53896758901789!3d-25.842810877206297!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f6e519c69a41f5%3A0xb53bf86f8901ef7a!2sLA%20CASA%20DEL%20LAGO%20URUGUA-I!5e1!3m2!1ses-419!2sar!4v1785873431498!5m2!1ses-419!2sar";
+// Por coordenadas y no por nombre: el lodge está sobre la costa del lago, fuera
+// del casco urbano, y una búsqueda por texto puede resolver a otro punto.
 const MAPS_DIRECTIONS =
-  "https://www.google.com/maps/search/?api=1&query=Santa+Mar%C3%ADa+del+Iguaz%C3%BA+esq+Obispo+Angelelli+Puerto+Iguaz%C3%BA";
+  "https://www.google.com/maps/dir/?api=1&destination=-25.842811%2C-54.538968";
 
 export function Contacto() {
   const t = useTranslations("contacto");
@@ -96,9 +100,10 @@ export function Contacto() {
                   className="font-display"
                   style={{ fontSize: 21, color: "#1D1D1D", lineHeight: 1.35 }}
                 >
-                  Puerto Iguazú
-                  <br />
-                  Misiones, Argentina
+                  {/* Venía hardcodeado con la ciudad de Aruma ("Puerto Iguazú"),
+                      ignorando la clave `address` del i18n, que existía pero no
+                      la usaba nadie. Ahora sale de ahí y se traduce con el resto. */}
+                  {t("address")}
                 </div>
                 <div
                   className="text-muted"
@@ -250,7 +255,7 @@ export function Contacto() {
                 <div
                   style={{ fontSize: 12, color: "#a39d92", marginTop: 3 }}
                 >
-                  Puerto Iguazú · Misiones
+                  Puerto Bossetti, Puerto Libertad · Misiones
                 </div>
               </div>
 

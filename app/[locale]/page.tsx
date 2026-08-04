@@ -23,12 +23,16 @@ const LODGING_JSONLD = {
     "Cabañas a orillas del lago Urugua-í, entre Puerto Iguazú y Puerto Libertad, Misiones. Reserva directa, confirmación automática.",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Costa del lago Urugua-í", // TODO: dirección/acceso real
+    // El paraje va en streetAddress: schema.org no tiene campo de barrio, y
+    // addressLocality tiene que seguir siendo la localidad —Puerto Libertad— que
+    // es la que figura en las fichas de Google, Airbnb y Facebook del lodge.
+    streetAddress: "Puerto Bossetti, costa del lago Urugua-í",
     addressLocality: "Puerto Libertad",
     addressRegion: "Misiones",
     addressCountry: "AR",
   },
-  geo: { "@type": "GeoCoordinates", latitude: -25.90, longitude: -54.58 }, // TODO: coordenadas reales del lago
+  // Coordenadas reales, tomadas de la ficha de Google Maps del lodge.
+  geo: { "@type": "GeoCoordinates", latitude: -25.842811, longitude: -54.538968 },
   telephone: "+54 9 XXX XXXXXX", // TODO: teléfono real
   email: "info@lacasadellago.com.ar", // TODO: email real
   priceRange: "$$",
