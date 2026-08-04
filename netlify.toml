@@ -9,6 +9,11 @@
 [build.environment]
   NODE_VERSION = "22"
 
+  # El remitente de email (CDL_EMAIL_FROM) no es sensible: viaja en claro en cada
+  # mail que llega al huésped. Lo excluimos del scanner de secretos para que no
+  # marque el fallback de `client.ts` ni el ejemplo de `.env.example`.
+  SECRETS_SCAN_OMIT_KEYS = "CDL_EMAIL_FROM"
+
   # Fotos del lodge. Las dos van acá y no en el panel de Netlify porque ninguna
   # es un secreto: la URL del proyecto Supabase viaja igual en el bundle público
   # de cualquier deploy, y el flag es un booleano. Al vivir en el repo, un deploy
