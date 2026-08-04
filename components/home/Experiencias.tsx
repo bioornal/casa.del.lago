@@ -10,9 +10,9 @@ import { Parallax } from "@/components/motion/Parallax";
  * El kicker va en cyan claro (#7FD4E2) y no en turquesa: sobre este fondo el
  * turquesa de `<Kicker>` casi no contrasta.
  *
- * FOTO: hoy sale del placeholder temático (label → POOL.lago de ImageSlot).
- * Cuando haya una foto real del lago en el bucket, alcanza con pasar
- * `photo="Complejo/XX.jpg"` y se usa sola.
+ * FOTO: el atardecer sobre el lago en su versión 16:9 (ChatGPT1.jpg), extendida
+ * a partir de la 7.jpeg original —que es vertical— para que entre en la banda.
+ * Con 1.78 de ratio el recorte a ~3:1 es leve y el horizonte queda centrado.
  */
 const ITEMS = [
   { key: "nature", num: "01" },
@@ -63,7 +63,7 @@ export function Experiencias() {
           <Parallax speed={-40} className="absolute inset-x-0 top-0 h-[calc(100%+80px)]">
             <ImageSlot
               label="El lago Urugua-í al atardecer"
-              position="50% 62%"
+              photo="ChatGPT1.jpg"
               className="h-full w-full"
             />
           </Parallax>

@@ -156,45 +156,45 @@
     "relato": {
       "intro": "Un recorrido en fotos por La Casa del Lago: del primer reflejo del agua al último rincón pensado para que te quedes.",
       "frames": {
-        "llegada": {
-          "t": "La llegada",
-          "c": "Cruzás el jardín y el agua turquesa ya te está esperando."
-        },
-        "descenso": {
-          "t": "El descenso",
-          "c": "Unos escalones entre arces de otoño y estás al borde de la pileta."
-        },
         "agua": {
           "t": "El agua",
-          "c": "Reflejos de sol sobre el borde cálido: la pausa del mediodía."
+          "c": "La pileta termina donde empieza el lago."
         },
-        "refugio": {
-          "t": "El refugio",
-          "c": "La cabaña asoma entre palmeras, al ras del agua."
+        "pileta": {
+          "t": "La pileta",
+          "c": "Turquesa a la sombra de los árboles grandes."
         },
-        "selva": {
-          "t": "La selva alrededor",
-          "c": "Orquídeas sobre el tronco y cielo abierto entre las hojas."
+        "noche": {
+          "t": "La noche",
+          "c": "Se encienden las guirnaldas y el lugar cambia de tono."
         },
-        "iris": {
-          "t": "Iris de la selva",
-          "c": "Flores que se abren con el rocío de la mañana."
+        "quincho": {
+          "t": "El quincho",
+          "c": "El mate en la mesa larga y el lago del otro lado del vidrio."
         },
-        "heliconia": {
-          "t": "Heliconia",
-          "c": "El rojo tropical que crece entre la humedad."
+        "atardecer": {
+          "t": "El atardecer",
+          "c": "Se rema hasta que el sol toca el agua."
         },
-        "adentro": {
-          "t": "Adentro",
-          "c": "Objetos elegidos con calma para cada ambiente."
+        "remada": {
+          "t": "La remada",
+          "c": "Salís de la orilla y el monte se cierra alrededor."
+        },
+        "fuego": {
+          "t": "El fuego",
+          "c": "Todo empieza con la leña prendida y la tabla llena."
+        },
+        "lago": {
+          "t": "Desde el agua",
+          "c": "Así se ve la casa cuando volvés remando."
         },
         "descanso": {
           "t": "El descanso",
-          "c": "Baños en suite con materiales nobles y luz suave."
+          "c": "La bruma del lago entra por la ventana al despertar."
         },
-        "rincon": {
-          "t": "Cada rincón",
-          "c": "Nada quedó librado al azar, hasta el último cuadro."
+        "adentro": {
+          "t": "Adentro",
+          "c": "El living mira al lago por tres ventanas."
         }
       }
     }

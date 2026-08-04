@@ -156,45 +156,45 @@
     "relato": {
       "intro": "A walk through La Casa del Lago in photos: from the first reflection on the water to the last thoughtfully chosen corner.",
       "frames": {
-        "llegada": {
-          "t": "Arrival",
-          "c": "Cross the garden and the turquoise water is already waiting."
-        },
-        "descenso": {
-          "t": "The descent",
-          "c": "A few steps among autumn maples and you're at the pool's edge."
-        },
         "agua": {
           "t": "The water",
-          "c": "Sunlight scattered over the warm coping: the midday pause."
+          "c": "The pool ends where the lake begins."
         },
-        "refugio": {
-          "t": "The retreat",
-          "c": "The cabin peeks out among the palms, level with the water."
+        "pileta": {
+          "t": "The pool",
+          "c": "Turquoise in the shade of the old trees."
         },
-        "selva": {
-          "t": "The jungle around",
-          "c": "Orchids on the trunk and open sky between the leaves."
+        "noche": {
+          "t": "Nightfall",
+          "c": "The string lights come on and the place changes key."
         },
-        "iris": {
-          "t": "Wild iris",
-          "c": "Flowers that open with the morning dew."
+        "quincho": {
+          "t": "The quincho",
+          "c": "Mate on the long table, the lake on the other side of the glass."
         },
-        "heliconia": {
-          "t": "Heliconia",
-          "c": "The tropical red that grows in the damp."
+        "atardecer": {
+          "t": "Sundown",
+          "c": "You paddle until the sun touches the water."
         },
-        "adentro": {
-          "t": "Inside",
-          "c": "Objects chosen with care for every room."
+        "remada": {
+          "t": "The paddle",
+          "c": "You leave the shore and the forest closes in around you."
+        },
+        "fuego": {
+          "t": "The fire",
+          "c": "It all starts with the wood lit and the board full."
+        },
+        "lago": {
+          "t": "From the water",
+          "c": "This is the house as you paddle back."
         },
         "descanso": {
           "t": "The rest",
-          "c": "En-suite bathrooms with fine materials and soft light."
+          "c": "The lake mist comes through the window at dawn."
         },
-        "rincon": {
-          "t": "Every corner",
-          "c": "Nothing left to chance, down to the last artwork."
+        "adentro": {
+          "t": "Inside",
+          "c": "The living room looks at the lake through three windows."
         }
       }
     }

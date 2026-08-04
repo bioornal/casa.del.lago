@@ -1,47 +1,109 @@
 const UNSPLASH = "https://images.unsplash.com";
 
-// Fotos reales del lodge — bucket público "casa-lago-fotos" en Supabase Storage.
+// Fotos reales del lodge — bucket público "imagenes" en Supabase Storage.
 // Tienen prioridad sobre PHOTO_MAP/placeholders cuando el seed coincide.
-const SUPABASE_FOTOS = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/casa-lago-fotos`;
+const SUPABASE_FOTOS = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/imagenes`;
 
-// ¿Bucket propio cargado? Opt-in explícito: hasta que el bucket público
-// "casa-lago-fotos" exista Y tenga las fotos subidas, todo cae a placeholders
-// temáticos (lago/cabañas/selva). Antes esto se deducía de que
-// NEXT_PUBLIC_SUPABASE_URL siguiera siendo la plantilla ("TU-PROYECTO"), pero
-// configurar el proyecto Supabase y subir las fotos son dos pasos distintos:
-// la heurística rompía todas las imágenes en el medio. Poner en "1" recién
-// cuando las fotos estén arriba.
+// ¿Bucket propio cargado? Opt-in explícito: hasta que el bucket tenga las fotos
+// subidas, todo cae a placeholders temáticos (lago/cabañas/selva). Antes esto se
+// deducía de que NEXT_PUBLIC_SUPABASE_URL siguiera siendo la plantilla
+// ("TU-PROYECTO"), pero configurar el proyecto Supabase y subir las fotos son dos
+// pasos distintos: la heurística rompía todas las imágenes en el medio.
 const BUCKET_READY =
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
   process.env.NEXT_PUBLIC_PHOTOS_BUCKET_READY === "1";
 
-/** URL pública de una foto dentro del bucket casa-lago-fotos (p. ej. "Complejo/5.jpg"). */
+// Las fotos que HOY están en el bucket, con su contenido. El bucket es plano:
+// archivos "N.jpeg" sueltos, sin carpetas por alojamiento.
+//
+// Sirve además de guarda: BUCKET_READY vale para todo el sitio, pero las galerías
+// de Aratirí/Aguaribay (ver UnitDetail) siguen apuntando a rutas "Dpto1/…"/"Dpto2/…"
+// heredadas de otro proyecto que nunca existieron acá. Sin esta lista quedarían
+// 42 <img> rotos en vez de caer al placeholder. Cuando se suban las fotos de cada
+// cabaña, agregarlas acá y actualizar UnitDetail.
+const BUCKET_FILES = new Set([
+  "1.jpeg", // living con sofá esquinero, ventanas al lago
+  "3.jpeg", // kayak familiar al atardecer
+  "4.jpeg", // remada POV hacia el monte
+  "5.jpeg", // el complejo de noche, guirnaldas y pileta
+  "6.jpeg", // verduras cortadas y fuego a leña
+  "7.jpeg", // atardecer sobre el lago, reflejo rosado
+  "9.jpeg", // pileta turquesa con la cabaña entre los árboles
+  "10.jpeg", // dormitorio con ventanal al lago (bruma)
+  "11.jpeg", // el complejo visto desde el agua, luz dorada
+  "12.jpeg", // dormitorio, cabecera gris
+  "13.jpeg", // dormitorio, toma frontal
+  "14.jpeg", // pileta + lago + arboleda (la única apaisada del set)
+  "16.jpeg", // galería con taza de café y vista al lago
+  "17.jpeg", // el quincho: mesa larga, mate y termo frente al lago
+  "18.jpeg", // kayak apoyado sobre las raíces
+  "19.jpeg", // deck con macetas de copetes naranjas
+  "20.jpeg", // dormitorio con ventanal, encuadre cuadrado
+  "21.jpeg", // pileta y cabaña, día abierto
+  "22.jpeg", // vegetación en primer plano, pileta y lago al fondo
+  // Versión 16:9 del atardecer de la 7, extendida con IA. Es la única del bucket
+  // con formato apaisado real, por eso va en la banda panorámica de "El lugar".
+  // (Su hermana ChatGPT2.jpg es la misma vista pasada a día, hoy sin usar.)
+  "ChatGPT1.jpg",
+  // Fuera del set a propósito: la 2, porque el Smart TV está encendido con un
+  // noticiero y la placa se lee a tamaño real. La 8 queda afuera por repetida:
+  // es la misma escena que la 17, que sí entra.
+  // La 15 nunca se subió al bucket.
+]);
+
+/** URL pública de una foto dentro del bucket imagenes (p. ej. "14.jpeg"). */
 export function bucketSrc(path: string) {
   return `${SUPABASE_FOTOS}/${encodeURI(path)}`;
 }
+
+/** ¿Esta ruta se puede servir del bucket, o hay que caer al placeholder? */
+function inBucket(path: string | undefined): path is string {
+  return BUCKET_READY && !!path && BUCKET_FILES.has(path);
+}
+
 const REAL_PHOTOS: Record<string, string> = {
-  // Cabaña Aratirí — la galería del detalle usa la prop `photo` (ver UnitDetail);
-  // este seed solo cubre las cards (home, tarifas, otros alojamientos).
-  "cabana-aratiri": "Dpto2/4.jpg", // living con sofá esquinero
-  // Cabaña Aguaribay — la galería del detalle usa la prop `photo` (ver UnitDetail);
-  // este seed solo cubre las cards (home, tarifas, otros alojamientos).
-  "cabana-aguaribay": "Dpto1/20.jpg", // living con sofá y Smart TV (portada)
+  // Cabañas: portadas de las cards (home, tarifas, otros alojamientos). Hasta que
+  // haya fotos de cada cabaña por separado, las dos van con interiores genéricos.
+  // Elegidas para NO repetir ninguna de las diez de la galería del home: las
+  // cards y la grilla conviven en la misma página y la repetición se nota.
+  "cabana-aratiri": "10.jpeg", // dormitorio con ventanal al lago
+  "cabana-aguaribay": "12.jpeg", // dormitorio con cabecera gris
   // Galería del home
-  "piscina": "Casa/22.jpg",
+  "piscina": "21.jpeg",
 };
 
 // Ajustes finos por foto: filtro para tomas oscuras y objectPosition para reencuadrar
 // el recorte de object-cover (x% <50 muestra más del lado izquierdo de la foto).
 const PHOTO_TWEAKS: Record<string, { filter?: string; position?: string }> = {
-  "Dpto2/4.jpg": {
-    filter: "brightness(1.18) contrast(1.05) saturate(1.08)",
-    position: "38% 58%",
+  // Tomada al amanecer con bruma: sale plana y fría de cámara.
+  "1.jpeg": {
+    filter: "brightness(1.12) contrast(1.06) saturate(1.06)",
+    position: "50% 55%",
   },
-  // Foto vertical del balcón: la pileta y el follaje están en el tercio superior,
-  // así que sesgamos el recorte hacia arriba para no mostrar solo el piso de rejilla.
-  "Dpto1/22.jpg": {
-    position: "50% 25%",
+  // Nocturna: las cabañas iluminadas están en la mitad superior, la pileta en
+  // sombra ocupa el tercio de abajo. Sesgamos el recorte hacia arriba.
+  "5.jpeg": {
+    filter: "brightness(1.1) contrast(1.04)",
+    position: "50% 32%",
   },
+  // Remada en primera persona. El recorte va bien arriba a propósito: manda el
+  // monte cerrándose sobre el agua y quien rema baja al tercio inferior, con el
+  // tatuaje y el logo de la remera fuera de cuadro. Probado contra 20% y 35%,
+  // que dejaban la espalda dominando la foto — no bajar de 10%.
+  "4.jpeg": { position: "50% 10%" },
+  // El horizonte está a media altura: centrado, cualquier recorte panorámico
+  // conserva el cielo rosado y su reflejo. (Hoy sin usar: la banda de "El lugar"
+  // pasó a ChatGPT1.jpg, que es esta misma toma ya en 16:9.)
+  "7.jpeg": { position: "50% 50%" },
+  // El quincho: la franja que importa es la mesa larga con el lago detrás del
+  // vidrio. Centrado, el recorte se queda con eso y deja fuera el techo.
+  "17.jpeg": { position: "50% 52%" },
+  // Banda de "El lugar". En 16:9 dentro de una caja ~2.6 se ve el 69% del alto,
+  // así que el encuadre elige qué se pierde. Bajado a 65% para dar más espejo de
+  // agua; a 80% el horizonte sube demasiado y se come la nube del atardecer.
+  "ChatGPT1.jpg": { position: "50% 65%" },
+  // Vertical con mucho cielo: las cabañas y el reflejo viven en la banda central.
+  "11.jpeg": { position: "50% 48%" },
 };
 
 const PHOTO_MAP: Record<string, { id: string; w?: number; h?: number; q?: string }> = {
@@ -124,7 +186,7 @@ function buildSrc(seed: string, w: number, h: number) {
 export function slotSrc(label: string, photo?: string, w = 1600, h = 1100) {
   const seed = toSeed(label);
   const real = photo ?? REAL_PHOTOS[seed];
-  if (real && BUCKET_READY) return `${SUPABASE_FOTOS}/${encodeURI(real)}`;
+  if (inBucket(real)) return bucketSrc(real);
   const entry = PHOTO_MAP[seed];
   return buildSrc(entry?.id ?? themedId(seed), w, h);
 }
@@ -141,7 +203,7 @@ export function ImageSlot({
   className?: string;
   priority?: boolean;
   fit?: "cover" | "contain";
-  /** Ruta directa dentro del bucket casa-lago-fotos; tiene prioridad sobre el seed del label. */
+  /** Ruta directa dentro del bucket imagenes; tiene prioridad sobre el seed del label. */
   photo?: string;
   /** object-position del recorte (p. ej. "50% 20%"); pisa el tweak por foto. */
   position?: string;
@@ -151,13 +213,11 @@ export function ImageSlot({
   const entry = PHOTO_MAP[seed];
   const w = entry?.w ?? 1200;
   const h = entry?.h ?? 900;
-  const src =
-    real && BUCKET_READY
-      ? `${SUPABASE_FOTOS}/${encodeURI(real)}`
-      : buildSrc(entry?.id ?? themedId(seed), w, h);
+  const fromBucket = inBucket(real);
+  const src = fromBucket ? bucketSrc(real) : buildSrc(entry?.id ?? themedId(seed), w, h);
 
   const objectClass = fit === "contain" ? "object-contain bg-stone-100" : "object-cover";
-  const tweak = real && BUCKET_READY ? PHOTO_TWEAKS[real] : undefined;
+  const tweak = fromBucket ? PHOTO_TWEAKS[real] : undefined;
 
   return (
     <div className={`relative overflow-hidden bg-stone-100 ${className}`} aria-label={label}>
