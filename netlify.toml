@@ -9,6 +9,17 @@
 [build.environment]
   NODE_VERSION = "22"
 
+  # Fotos del lodge. Las dos van acá y no en el panel de Netlify porque ninguna
+  # es un secreto: la URL del proyecto Supabase viaja igual en el bundle público
+  # de cualquier deploy, y el flag es un booleano. Al vivir en el repo, un deploy
+  # limpio ya sale con las fotos, sin configurar nada a mano.
+  #
+  # Las credenciales (SUPABASE_SERVICE_ROLE_KEY, las de Mercado Pago, RESEND_API_KEY)
+  # NO van acá: esas se cargan en el panel de Netlify y nunca en el repositorio.
+  NEXT_PUBLIC_SUPABASE_URL = "https://aqknzqtxhgsrhfaskoeo.supabase.co"
+  # En "1" desde que el bucket público `imagenes` tiene las fotos arriba.
+  NEXT_PUBLIC_PHOTOS_BUCKET_READY = "1"
+
 # Runtime oficial de Next.js en Netlify (SSR, API routes, ISR).
 [[plugins]]
   package = "@netlify/plugin-nextjs"
