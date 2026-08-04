@@ -41,10 +41,10 @@ const BUCKET_FILES = new Set([
   "20.jpeg", // dormitorio con ventanal, encuadre cuadrado
   "21.jpeg", // pileta y cabaña, día abierto
   "22.jpeg", // vegetación en primer plano, pileta y lago al fondo
-  // Versión 16:9 del atardecer de la 7, extendida con IA. Es la única del bucket
-  // con formato apaisado real, por eso va en la banda panorámica de "El lugar".
-  // (Su hermana ChatGPT2.jpg es la misma vista pasada a día, hoy sin usar.)
-  "ChatGPT1.jpg",
+  // Las dos únicas apaisadas reales del bucket (1672×941), generadas a partir de
+  // la 7: la banda panorámica de "El lugar" sale de acá.
+  "ChatGPT1.jpg", // el atardecer, extendido a 16:9
+  "ChatGPT2.jpg", // la misma vista pasada a día, con sol y cielo azul
   // Fuera del set a propósito: la 2, porque el Smart TV está encendido con un
   // noticiero y la placa se lee a tamaño real. La 8 queda afuera por repetida:
   // es la misma escena que la 17, que sí entra.
@@ -102,6 +102,11 @@ const PHOTO_TWEAKS: Record<string, { filter?: string; position?: string }> = {
   // así que el encuadre elige qué se pierde. Bajado a 65% para dar más espejo de
   // agua; a 80% el horizonte sube demasiado y se come la nube del atardecer.
   "ChatGPT1.jpg": { position: "50% 65%" },
+  // La de día va bien abajo: el protagonista es el lago, no el cielo. Con este
+  // encuadre la costa cae en el tercio superior y el espejo de agua se queda con
+  // los dos tercios restantes. Se pierde el sol, que está en el borde de arriba
+  // de la foto, y es a propósito.
+  "ChatGPT2.jpg": { position: "50% 74%" },
   // Vertical con mucho cielo: las cabañas y el reflejo viven en la banda central.
   "11.jpeg": { position: "50% 48%" },
 };

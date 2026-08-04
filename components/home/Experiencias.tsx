@@ -10,9 +10,10 @@ import { Parallax } from "@/components/motion/Parallax";
  * El kicker va en cyan claro (#7FD4E2) y no en turquesa: sobre este fondo el
  * turquesa de `<Kicker>` casi no contrasta.
  *
- * FOTO: el atardecer sobre el lago en su versión 16:9 (ChatGPT1.jpg), extendida
- * a partir de la 7.jpeg original —que es vertical— para que entre en la banda.
- * Con 1.78 de ratio el recorte a ~3:1 es leve y el horizonte queda centrado.
+ * FOTO: el lago de día (ChatGPT2.jpg), en 16:9 para que entre en la banda. Con
+ * 1.78 de ratio el recorte a ~3:1 es leve. Su alternativa es ChatGPT1.jpg, la
+ * misma vista al atardecer; si se cambia, ojo que cada una lleva su propio
+ * encuadre en PHOTO_TWEAKS y no son intercambiables.
  */
 const ITEMS = [
   { key: "nature", num: "01" },
@@ -53,17 +54,23 @@ export function Experiencias() {
 
       {/* Banda full-bleed: el lago en su formato panorámico natural.
           El wrapper lleva relative z-[1] para que la foto opaca quede por
-          encima de las figuras decorativas. */}
+          encima de las figuras decorativas.
+
+          El alto va en `vw` y no en `vh`: como el ancho es full-bleed, atarlo a
+          la altura del viewport hacía que el ratio de la banda se disparara en
+          pantallas anchas (3.9 en un monitor de 1900, contra 2.5 en uno de 1280)
+          y el encuadre cambiaba solo según el alto de la ventana. Con 26vw el
+          ratio queda fijo en ~3.85 de 1280 para arriba. */}
       <div className="relative z-[1]">
         <div
-          className="relative h-[clamp(280px,46vh,520px)] overflow-hidden"
+          className="relative h-[clamp(280px,26vw,560px)] overflow-hidden"
           style={{ background: "#0E4A5E" }}
         >
           {/* Imagen 80px más alta que la banda: margen para el recorrido del parallax */}
           <Parallax speed={-40} className="absolute inset-x-0 top-0 h-[calc(100%+80px)]">
             <ImageSlot
-              label="El lago Urugua-í al atardecer"
-              photo="ChatGPT1.jpg"
+              label="El espejo de agua del lago Urugua-í en un día despejado"
+              photo="ChatGPT2.jpg"
               className="h-full w-full"
             />
           </Parallax>
