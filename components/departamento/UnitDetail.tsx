@@ -63,54 +63,69 @@ const UNIT_EXTRAS: Record<string, Record<UnitSlug, string[]>> = {
 // cuadrícula asimétrica. `span` marca el tamaño: hero 2x2, wide 2x1, tall 1x2.
 type GalleryPhoto = { photo: string; alt: string; span?: "hero" | "wide" | "tall" };
 
-// Cabaña Aratirí — carpeta Dpto2 del bucket.
+// Las cajas de la grilla, medidas en desktop: hero 2×2 576×436 (1.32), wide 2×1
+// 576×210 (2.74), tall 1×2 280×436 (0.64) y la celda simple 280×210 (1.33) —
+// que, igual que en la galería del home, NO es cuadrada sino apaisada. El set de
+// cada cabaña es casi todo vertical, así que las pocas apaisadas se reservan
+// para hero/wide/celda simple y el resto va a `tall`, donde el recorte es mínimo.
+//
+// El orden cuenta la cabaña: se entra por el estar, se recorren los dormitorios
+// y el baño, después la cocina y el fuego, y se sale al deck, la pileta y el lago.
+
+// Cabaña Aratirí — carpeta "cab arriba" del bucket (22 fotos).
 const ARATIRI_PHOTOS: GalleryPhoto[] = [
-  { photo: "Dpto2/4.jpg", alt: "Living con sofá esquinero y rack de TV", span: "hero" },
-  { photo: "Dpto2/11.jpg", alt: "Dormitorio principal con cama king" },
-  { photo: "Dpto2/3.jpg", alt: "Escalera de doble altura", span: "tall" },
-  { photo: "Dpto2/2.jpg", alt: "Comedor para ocho" },
-  { photo: "Dpto2/5.jpg", alt: "Living con cuadro de rosa", span: "wide" },
-  { photo: "Dpto2/8.jpg", alt: "Baño con espejo redondo", span: "tall" },
-  { photo: "Dpto2/13.jpg", alt: "Dormitorio principal con aire acondicionado" },
-  { photo: "Dpto2/15.jpg", alt: "Segundo dormitorio con camas individuales" },
-  { photo: "Dpto2/1.jpg", alt: "Cocina equipada", span: "wide" },
-  { photo: "Dpto2/14.jpg", alt: "Balcón con vista a la calle", span: "tall" },
-  { photo: "Dpto2/16.jpg", alt: "Segundo dormitorio con placard" },
-  { photo: "Dpto2/17.jpg", alt: "Dormitorio principal con baño en suite" },
-  { photo: "Dpto2/18.jpg", alt: "Vista a la pileta desde la ventana", span: "tall" },
-  { photo: "Dpto2/12.jpg", alt: "Dormitorio principal con cómoda", span: "wide" },
-  { photo: "Dpto2/7.jpg", alt: "Toilette con bidet" },
-  { photo: "Dpto2/9.jpg", alt: "Bacha del baño" },
-  { photo: "Dpto2/6.jpg", alt: "Ducha tipo lluvia", span: "tall" },
-  { photo: "Dpto2/1a.jpg", alt: "Ventana de la cocina al jardín" },
-  { photo: "Dpto2/2a.jpg", alt: "Toilette junto al comedor" },
-  { photo: "Dpto2/10.jpg", alt: "Baño completo con pared de mármol" },
-  { photo: "Dpto2/19 (1).jpg", alt: "Escalera desde la planta alta" },
+  { photo: "cab arriba/3.jpeg", alt: "Living comedor con mesa de madera maciza y ventanal al deck", span: "hero" },
+  { photo: "cab arriba/13.jpeg", alt: "La cabaña desde afuera, con el deck bajo los sauces" },
+  { photo: "cab arriba/1.jpeg", alt: "Living con sofá y el comedor al fondo", span: "tall" },
+  { photo: "cab arriba/5.jpeg", alt: "El comedor con los ventanales abiertos al lago", span: "wide" },
+  { photo: "cab arriba/8.jpeg", alt: "Dormitorio principal con dos mesas de luz", span: "tall" },
+  { photo: "cab arriba/9.jpeg", alt: "Segundo dormitorio con cabecera de madera", span: "tall" },
+  { photo: "cab arriba/4.jpeg", alt: "Comedor de mesa redonda con la parrilla al fondo" },
+  { photo: "cab arriba/2.jpeg", alt: "Cocina con mesada de granito negro", span: "tall" },
+  { photo: "cab arriba/16.jpeg", alt: "La parrilla de ladrillo con barra y banquetas", span: "tall" },
+  { photo: "cab arriba/17.jpeg", alt: "La parrilla encendida y las verduras sobre la mesada", span: "tall" },
+  { photo: "cab arriba/22.jpeg", alt: "El disco al fuego bajo el cartel de la parrilla", span: "tall" },
+  { photo: "cab arriba/14.jpeg", alt: "La galería con la salamandra y la pileta mirando al lago", span: "tall" },
+  { photo: "cab arriba/15.jpeg", alt: "La salamandra encendida, el mate y el termo sobre la mesa", span: "tall" },
+  { photo: "cab arriba/6.jpeg", alt: "Living con Smart TV y sofá con almohadones" },
+  { photo: "cab arriba/7.jpeg", alt: "Hall de entrada con banco de madera" },
+  { photo: "cab arriba/10.jpeg", alt: "La ventana que da a la pileta y al lago", span: "tall" },
+  { photo: "cab arriba/11.jpeg", alt: "El deck con sillones frente a la pileta", span: "tall" },
+  { photo: "cab arriba/12.jpeg", alt: "Mesa y sillas bajo los árboles, con el lago detrás", span: "tall" },
+  { photo: "cab arriba/19.jpeg", alt: "La pileta y la cabaña en un día abierto", span: "tall" },
+  { photo: "cab arriba/20.jpeg", alt: "La pileta vista desde el borde", span: "tall" },
+  { photo: "cab arriba/18.jpeg", alt: "Un ananá en la mano, la pileta y el lago de fondo", span: "tall" },
+  { photo: "cab arriba/21.jpeg", alt: "El kayak apoyado junto al árbol", span: "tall" },
 ];
 
-// Cabaña Aguaribay — carpeta Dpto1 del bucket (21 fotos: 1-9, 11-22).
+// Cabaña Aguaribay — carpeta "cab abajo" del bucket (26 fotos: 1-21 y 23-27).
 const AGUARIBAY_PHOTOS: GalleryPhoto[] = [
-  { photo: "Dpto1/20.jpg", alt: "Living con sofá y Smart TV", span: "hero" },
-  { photo: "Dpto1/9.jpg", alt: "Dormitorio principal con cama matrimonial", span: "wide" },
-  { photo: "Dpto1/1.jpg", alt: "Escalera de acceso a la planta alta", span: "tall" },
-  { photo: "Dpto1/7.jpg", alt: "Dormitorio con cama matrimonial y cómoda", span: "wide" },
-  { photo: "Dpto1/11.jpg", alt: "Baño con espejo redondo y bacha", span: "tall" },
-  { photo: "Dpto1/6.jpg", alt: "Dormitorio con dos camas individuales", span: "wide" },
-  { photo: "Dpto1/5.jpg", alt: "Dormitorio con espejo de cuerpo entero", span: "tall" },
-  { photo: "Dpto1/21.jpg", alt: "Living con sofá y cuadro" },
-  { photo: "Dpto1/14.jpg", alt: "Cocina equipada con mesada de granito", span: "tall" },
-  { photo: "Dpto1/15.jpg", alt: "Comedor integrado a la cocina" },
-  { photo: "Dpto1/19.jpg", alt: "Comedor para seis", span: "tall" },
-  { photo: "Dpto1/4.jpg", alt: "Escritorio junto a la ventana" },
-  { photo: "Dpto1/8.jpg", alt: "Dormitorio visto desde el pasillo" },
-  { photo: "Dpto1/12.jpg", alt: "Ducha con mampara de vidrio", span: "tall" },
-  { photo: "Dpto1/2.jpg", alt: "Ingreso con vista al comedor" },
-  { photo: "Dpto1/17.jpg", alt: "Ducha tipo lluvia", span: "tall" },
-  { photo: "Dpto1/16.jpg", alt: "Baño completo con inodoro y bidet" },
-  { photo: "Dpto1/18.jpg", alt: "Toilette con espejo redondo" },
-  { photo: "Dpto1/13.jpg", alt: "Inodoro y bidet" },
-  { photo: "Dpto1/3.jpg", alt: "Puerta de acceso y comedor", span: "tall" },
-  { photo: "Dpto1/22.jpg", alt: "Balcón con vista a la pileta", span: "tall" },
+  { photo: "cab abajo/11.jpeg", alt: "Living con sofá grande y ventanales al lago", span: "hero" },
+  { photo: "cab abajo/27.jpeg", alt: "La pileta turquesa con la cabaña entre los árboles", span: "tall" },
+  { photo: "cab abajo/10.jpeg", alt: "El living con la ventana al lago" },
+  { photo: "cab abajo/12.jpeg", alt: "Dormitorio principal con cabecera gris", span: "tall" },
+  { photo: "cab abajo/14.jpeg", alt: "Segundo dormitorio con ventanal al lago", span: "tall" },
+  { photo: "cab abajo/5.jpeg", alt: "El atardecer desde el deck, bajo el árbol grande", span: "wide" },
+  { photo: "cab abajo/13.jpeg", alt: "El dormitorio principal desde la puerta", span: "tall" },
+  { photo: "cab abajo/9.jpeg", alt: "Baño con ducha de mampara y paredes de cemento alisado", span: "tall" },
+  { photo: "cab abajo/1.jpeg", alt: "La cocina del quincho con el horno de ladrillo" },
+  { photo: "cab abajo/2.jpeg", alt: "La barra de la cocina y la parrilla" },
+  { photo: "cab abajo/16.jpeg", alt: "El quincho: la mesa larga frente al lago", span: "tall" },
+  { photo: "cab abajo/24.jpeg", alt: "La mesa del quincho con el termo y el mate", span: "tall" },
+  { photo: "cab abajo/3.jpeg", alt: "La tabla de asado sobre la mesa, con el lago detrás" },
+  { photo: "cab abajo/21.jpeg", alt: "Las verduras cortadas y el fuego a leña", span: "tall" },
+  { photo: "cab abajo/15.jpeg", alt: "La parrilla exterior de ladrillo", span: "tall" },
+  { photo: "cab abajo/17.jpeg", alt: "La galería con la taza sobre la mesa y el deck al frente", span: "tall" },
+  { photo: "cab abajo/20.jpeg", alt: "Los copetes naranjas del deck, con el lago al fondo" },
+  { photo: "cab abajo/19.jpeg", alt: "La noche, con las guirnaldas encendidas sobre la pileta", span: "tall" },
+  { photo: "cab abajo/18.jpeg", alt: "La pileta turquesa vista desde el jardín", span: "tall" },
+  { photo: "cab abajo/4.jpeg", alt: "La pileta a la sombra de los árboles grandes", span: "tall" },
+  { photo: "cab abajo/7.png", alt: "El lago desde el jardín, con la pileta a un costado", span: "tall" },
+  { photo: "cab abajo/6.jpeg", alt: "Mesa y sillas bajo el árbol, frente al agua", span: "tall" },
+  { photo: "cab abajo/25.jpeg", alt: "El kayak apoyado sobre las raíces" },
+  { photo: "cab abajo/26.jpeg", alt: "La costa, la vegetación en primer plano y el lago", span: "tall" },
+  { photo: "cab abajo/23.jpeg", alt: "El estar, con el sofá y las ventanas al lago", span: "tall" },
+  { photo: "cab abajo/8.jpeg", alt: "Living con Smart TV y mesa ratona", span: "tall" },
 ];
 
 const UNIT_GALLERY: Partial<Record<UnitSlug, GalleryPhoto[]>> = {

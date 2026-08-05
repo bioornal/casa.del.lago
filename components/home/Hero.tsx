@@ -1,9 +1,11 @@
 import { useTranslations } from "next-intl";
 import { KenBurns } from "@/components/motion/KenBurns";
+import { bucketSrc } from "@/components/ui/ImageSlot";
 
-// Fotografía real del lago servida desde el bucket de assets del cliente.
-const HERO_IMAGE =
-  "https://nbtnfdntsvjwkxmkbsfh.supabase.co/storage/v1/object/public/client-assets/Juanma/hero_banner/hero2.jpg";
+// El atardecer bajo el árbol grande, 16:9. Sale del bucket propio: antes esta
+// misma foto se servía de un proyecto Supabase ajeno (client-assets de otro
+// cliente), una dependencia que podía romper el hero sin aviso y sin fallback.
+const HERO_IMAGE = bucketSrc("hero/hero2.jpg");
 
 /**
  * El buscador entra como children y se renderiza dentro de la columna de texto:

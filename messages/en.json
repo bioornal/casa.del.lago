@@ -162,22 +162,6 @@
     "relato": {
       "intro": "A walk through La Casa del Lago in photos: from the first reflection on the water to the last thoughtfully chosen corner.",
       "frames": {
-        "agua": {
-          "t": "The water",
-          "c": "The pool ends where the lake begins."
-        },
-        "pileta": {
-          "t": "The pool",
-          "c": "Turquoise in the shade of the old trees."
-        },
-        "noche": {
-          "t": "Nightfall",
-          "c": "The string lights come on and the place changes key."
-        },
-        "quincho": {
-          "t": "The quincho",
-          "c": "Mate on the long table, the lake on the other side of the glass."
-        },
         "atardecer": {
           "t": "Sundown",
           "c": "You paddle until the sun touches the water."
@@ -186,21 +170,37 @@
           "t": "The paddle",
           "c": "You leave the shore and the forest closes in around you."
         },
+        "mirador": {
+          "t": "The lookout",
+          "c": "You walk down to the shore to look at the lake and lose track of time."
+        },
+        "mate": {
+          "t": "Mate",
+          "c": "The first one is early, with the water still glassy."
+        },
+        "fogata": {
+          "t": "The campfire",
+          "c": "When it cools down, the fire gets built by the water."
+        },
         "fuego": {
           "t": "The fire",
           "c": "It all starts with the wood lit and the board full."
         },
+        "disco": {
+          "t": "Over the coals",
+          "c": "Dinner cooks outside while the sky turns."
+        },
         "lago": {
-          "t": "From the water",
-          "c": "This is the house as you paddle back."
+          "t": "The lake",
+          "c": "Some evenings the water goes so still it doubles the sky."
         },
-        "descanso": {
-          "t": "The rest",
-          "c": "The lake mist comes through the window at dawn."
+        "kayak": {
+          "t": "The kayak",
+          "c": "Two paddles, and the house slowly falls behind."
         },
-        "adentro": {
-          "t": "Inside",
-          "c": "The living room looks at the lake through three windows."
+        "costa": {
+          "t": "The shore",
+          "c": "The whole grove fits inside the reflection."
         }
       }
     }

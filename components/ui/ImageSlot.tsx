@@ -13,42 +13,89 @@ const BUCKET_READY =
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
   process.env.NEXT_PUBLIC_PHOTOS_BUCKET_READY === "1";
 
-// Las fotos que HOY están en el bucket, con su contenido. El bucket es plano:
-// archivos "N.jpeg" sueltos, sin carpetas por alojamiento.
+// Las fotos que HOY están en el bucket, con su contenido. El bucket está
+// organizado en carpetas: una por cabaña, una de relato (lifestyle y paisaje) y
+// una de panorámicas 16:9. Ojo: los nombres de carpeta llevan espacio —
+// bucketSrc() los pasa por encodeURI, que los convierte en %20.
 //
-// Sirve además de guarda: BUCKET_READY vale para todo el sitio, pero las galerías
-// de Aratirí/Aguaribay (ver UnitDetail) siguen apuntando a rutas "Dpto1/…"/"Dpto2/…"
-// heredadas de otro proyecto que nunca existieron acá. Sin esta lista quedarían
-// 42 <img> rotos en vez de caer al placeholder. Cuando se suban las fotos de cada
-// cabaña, agregarlas acá y actualizar UnitDetail.
+// Sirve además de guarda: BUCKET_READY vale para todo el sitio, pero un número
+// mal tipeado acá deja un <img> roto en vez de caer al placeholder (fue lo que
+// pasó cuando el bucket se reorganizó y el código siguió pidiendo los "N.jpeg"
+// sueltos de la raíz: 400 en toda la galería). Regenerar esta lista cada vez que
+// se suban o borren fotos.
 const BUCKET_FILES = new Set([
-  "1.jpeg", // living con sofá esquinero, ventanas al lago
-  "3.jpeg", // kayak familiar al atardecer
-  "4.jpeg", // remada POV hacia el monte
-  "5.jpeg", // el complejo de noche, guirnaldas y pileta
-  "6.jpeg", // verduras cortadas y fuego a leña
-  "7.jpeg", // atardecer sobre el lago, reflejo rosado
-  "9.jpeg", // pileta turquesa con la cabaña entre los árboles
-  "10.jpeg", // dormitorio con ventanal al lago (bruma)
-  "11.jpeg", // el complejo visto desde el agua, luz dorada
-  "12.jpeg", // dormitorio, cabecera gris
-  "13.jpeg", // dormitorio, toma frontal
-  "14.jpeg", // pileta + lago + arboleda (la única apaisada del set)
-  "16.jpeg", // galería con taza de café y vista al lago
-  "17.jpeg", // el quincho: mesa larga, mate y termo frente al lago
-  "18.jpeg", // kayak apoyado sobre las raíces
-  "19.jpeg", // deck con macetas de copetes naranjas
-  "20.jpeg", // dormitorio con ventanal, encuadre cuadrado
-  "21.jpeg", // pileta y cabaña, día abierto
-  "22.jpeg", // vegetación en primer plano, pileta y lago al fondo
-  // Las dos únicas apaisadas reales del bucket (1672×941), generadas a partir de
-  // la 7: la banda panorámica de "El lugar" sale de acá.
-  "ChatGPT1.jpg", // el atardecer, extendido a 16:9
-  "ChatGPT2.jpg", // la misma vista pasada a día, con sol y cielo azul
-  // Fuera del set a propósito: la 2, porque el Smart TV está encendido con un
-  // noticiero y la placa se lee a tamaño real. La 8 queda afuera por repetida:
-  // es la misma escena que la 17, que sí entra.
-  // La 15 nunca se subió al bucket.
+  // ── Cabaña Aguaribay (26 fotos; no hay 22) ──────────────────────────────
+  "cab abajo/1.jpeg", // cocina-quincho con horno de ladrillo
+  "cab abajo/2.jpeg", // la misma cocina, la barra y la parrilla
+  "cab abajo/3.jpeg", // tabla de asado con el lago detrás (apaisada)
+  "cab abajo/4.jpeg", // la pileta entre los árboles grandes
+  "cab abajo/5.jpeg", // atardecer rosado desde el deck (apaisada)
+  "cab abajo/6.jpeg", // mesa y sillas bajo el árbol, frente al agua
+  "cab abajo/7.png", // el lago desde el jardín — 3 MB, recomprimir algún día
+  "cab abajo/8.jpeg", // living con Smart TV encendida
+  "cab abajo/9.jpeg", // baño, ducha con mampara y cemento alisado
+  "cab abajo/10.jpeg", // living con ventana al lago (apaisada)
+  "cab abajo/11.jpeg", // living con sofá grande y ventanales (apaisada)
+  "cab abajo/12.jpeg", // dormitorio principal, cabecera gris
+  "cab abajo/13.jpeg", // el mismo dormitorio, otro ángulo
+  "cab abajo/14.jpeg", // segundo dormitorio, ventanal al lago con bruma
+  "cab abajo/15.jpeg", // la parrilla exterior de ladrillo
+  "cab abajo/16.jpeg", // el quincho: mesa larga frente al lago
+  "cab abajo/17.jpeg", // la galería, la taza y el deck
+  "cab abajo/18.jpeg", // la pileta turquesa desde el jardín
+  "cab abajo/19.jpeg", // la noche: guirnaldas encendidas y pileta
+  "cab abajo/20.jpeg", // deck con macetas de copetes naranjas (cuadrada)
+  "cab abajo/21.jpeg", // verduras cortadas y fuego a leña
+  "cab abajo/23.jpeg", // el estar, sofá y ventanas al lago
+  "cab abajo/24.jpeg", // la mesa del quincho, termo y notebook
+  "cab abajo/25.jpeg", // el kayak sobre las raíces (cuadrada)
+  "cab abajo/26.jpeg", // la costa, la vegetación y el lago
+  "cab abajo/27.jpeg", // la pileta y la cabaña, día abierto
+  // ── Cabaña Aratirí (22 fotos) ───────────────────────────────────────────
+  "cab arriba/1.jpeg", // living con sofá gris y comedor al fondo
+  "cab arriba/2.jpeg", // cocina con mesada de granito negro
+  "cab arriba/3.jpeg", // living-comedor con mesa maciza (apaisada)
+  "cab arriba/4.jpeg", // comedor de mesa redonda, parrilla al fondo
+  "cab arriba/5.jpeg", // el comedor con los ventanales al lago (apaisada)
+  "cab arriba/6.jpeg", // living con Smart TV encendida
+  "cab arriba/7.jpeg", // hall de entrada, banco y caballos de metal
+  "cab arriba/8.jpeg", // dormitorio principal
+  "cab arriba/9.jpeg", // segundo dormitorio
+  "cab arriba/10.jpeg", // la ventana a la pileta y el lago
+  "cab arriba/11.jpeg", // el deck con sillones frente a la pileta
+  "cab arriba/12.jpeg", // mesa bajo los árboles con el lago detrás
+  "cab arriba/13.jpeg", // la cabaña desde afuera, deck y sauces
+  "cab arriba/14.jpeg", // la galería: salamandra, mate y pileta al lago
+  "cab arriba/15.jpeg", // la salamandra encendida, el mate y el termo
+  "cab arriba/16.jpeg", // la parrilla de ladrillo con barra y banquetas
+  "cab arriba/17.jpeg", // la parrilla encendida y las verduras
+  "cab arriba/18.jpeg", // el ananá en la mano, la pileta y el lago
+  "cab arriba/19.jpeg", // la pileta rectangular y la cabaña, de día
+  "cab arriba/20.jpeg", // la pileta desde el borde
+  "cab arriba/21.jpeg", // el kayak junto al árbol
+  "cab arriba/22.jpeg", // el disco al fuego bajo el cartel "Parrilla"
+  // ── Relato: lifestyle y paisaje, sin cabaña identificable (17) ──────────
+  "relato/3.jpeg", // kayak familiar al atardecer
+  "relato/4.jpeg", // remada POV hacia el monte cerrado
+  "relato/7.jpeg", // atardecer rosado, horizonte a media altura
+  "relato/11.jpeg", // arboleda reflejada en el agua, luz dorada
+  "relato/IMG_1265.jpeg", // mate y termo contra el lago
+  "relato/IMG_1269.jpeg", // cacerola de pollo al fuego
+  "relato/IMG_1270.jpeg", // fogata junto a la orilla
+  "relato/IMG_1272.jpeg", // kayak y cielo rosado (la única apaisada del set)
+  "relato/IMG_1275.jpeg", // calabaza a las brasas
+  "relato/IMG_1276.jpeg", // el disco al fuego contra el atardecer
+  "relato/IMG_1285.jpeg", // termo y mate sobre la mesa, el lago detrás
+  "relato/IMG_1290.jpeg", // la costa con vegetación y el lago azul
+  "relato/IMG_1291.jpeg", // kayak al atardecer, el sol bajo
+  "relato/IMG_1292.jpeg", // dos personas remando de espaldas (apaisada)
+  "relato/IMG_1316.jpeg", // la parrilla con la tabla de verduras
+  "relato/IMG_1318.jpeg", // la costa vista desde el agua
+  "relato/IMG_1319.jpeg", // dos personas mirando el lago (la más vertical)
+  // ── Panorámicas 16:9 (1672×941) ─────────────────────────────────────────
+  "hero/hero2.jpg", // el atardecer bajo el árbol grande — la del hero
+  "hero/ChatGPT1.jpg", // el mismo lago al atardecer, extendido a 16:9
+  "hero/ChatGPT2.jpg", // la misma vista pasada a día — la banda de "El lugar"
 ]);
 
 /** URL pública de una foto dentro del bucket imagenes (p. ej. "14.jpeg"). */
@@ -62,53 +109,33 @@ function inBucket(path: string | undefined): path is string {
 }
 
 const REAL_PHOTOS: Record<string, string> = {
-  // Cabañas: portadas de las cards (home, tarifas, otros alojamientos). Hasta que
-  // haya fotos de cada cabaña por separado, las dos van con interiores genéricos.
-  // Elegidas para NO repetir ninguna de las diez de la galería del home: las
-  // cards y la grilla conviven en la misma página y la repetición se nota.
-  "cabana-aratiri": "10.jpeg", // dormitorio con ventanal al lago
-  "cabana-aguaribay": "12.jpeg", // dormitorio con cabecera gris
-  // Galería del home
-  "piscina": "21.jpeg",
+  // Cabañas: portadas de las cards (home, tarifas, otros alojamientos). Ahora que
+  // cada cabaña tiene su carpeta, las dos van con un exterior propio: es lo que
+  // las distingue de un vistazo, porque los interiores se parecen entre sí. No
+  // compiten con la galería del home, que es toda de la carpeta relato/.
+  "cabana-aratiri": "cab arriba/13.jpeg", // la cabaña desde afuera, deck y sauces
+  "cabana-aguaribay": "cab abajo/27.jpeg", // la pileta turquesa y la cabaña
 };
 
 // Ajustes finos por foto: filtro para tomas oscuras y objectPosition para reencuadrar
 // el recorte de object-cover (x% <50 muestra más del lado izquierdo de la foto).
 const PHOTO_TWEAKS: Record<string, { filter?: string; position?: string }> = {
-  // Tomada al amanecer con bruma: sale plana y fría de cámara.
-  "1.jpeg": {
-    filter: "brightness(1.12) contrast(1.06) saturate(1.06)",
-    position: "50% 55%",
-  },
-  // Nocturna: las cabañas iluminadas están en la mitad superior, la pileta en
-  // sombra ocupa el tercio de abajo. Sesgamos el recorte hacia arriba.
-  "5.jpeg": {
-    filter: "brightness(1.1) contrast(1.04)",
-    position: "50% 32%",
-  },
-  // Remada en primera persona. El recorte va bien arriba a propósito: manda el
-  // monte cerrándose sobre el agua y quien rema baja al tercio inferior, con el
-  // tatuaje y el logo de la remera fuera de cuadro. Probado contra 20% y 35%,
-  // que dejaban la espalda dominando la foto — no bajar de 10%.
-  "4.jpeg": { position: "50% 10%" },
+  // Nocturna: sale subexpuesta de cámara y las guirnaldas pierden el naranja.
+  // El brillo va con la foto, no con la caja, así que sobrevive a cualquier tile.
+  "cab abajo/19.jpeg": { filter: "brightness(1.1) contrast(1.04)" },
   // El horizonte está a media altura: centrado, cualquier recorte panorámico
-  // conserva el cielo rosado y su reflejo. (Hoy sin usar: la banda de "El lugar"
-  // pasó a ChatGPT1.jpg, que es esta misma toma ya en 16:9.)
-  "7.jpeg": { position: "50% 50%" },
-  // El quincho: la franja que importa es la mesa larga con el lago detrás del
-  // vidrio. Centrado, el recorte se queda con eso y deja fuera el techo.
-  "17.jpeg": { position: "50% 52%" },
-  // Banda de "El lugar". En 16:9 dentro de una caja ~2.6 se ve el 69% del alto,
-  // así que el encuadre elige qué se pierde. Bajado a 65% para dar más espejo de
-  // agua; a 80% el horizonte sube demasiado y se come la nube del atardecer.
-  "ChatGPT1.jpg": { position: "50% 65%" },
+  // conserva el cielo rosado y su reflejo. Es la que aguanta el tile ancho (2.78)
+  // de la galería del home siendo un archivo vertical.
+  "relato/7.jpeg": { position: "50% 50%" },
   // La de día va bien abajo: el protagonista es el lago, no el cielo. Con este
   // encuadre la costa cae en el tercio superior y el espejo de agua se queda con
   // los dos tercios restantes. Se pierde el sol, que está en el borde de arriba
   // de la foto, y es a propósito.
-  "ChatGPT2.jpg": { position: "50% 74%" },
-  // Vertical con mucho cielo: las cabañas y el reflejo viven en la banda central.
-  "11.jpeg": { position: "50% 48%" },
+  "hero/ChatGPT2.jpg": { position: "50% 74%" },
+  // De reserva: mismo encuadre que la anterior pero al atardecer. Si alguna vez
+  // vuelve a la banda de "El lugar", 65% da más espejo de agua; a 80% el
+  // horizonte sube demasiado y se come la nube.
+  "hero/ChatGPT1.jpg": { position: "50% 65%" },
 };
 
 const PHOTO_MAP: Record<string, { id: string; w?: number; h?: number; q?: string }> = {

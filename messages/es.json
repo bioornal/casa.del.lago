@@ -162,22 +162,6 @@
     "relato": {
       "intro": "Un recorrido en fotos por La Casa del Lago: del primer reflejo del agua al último rincón pensado para que te quedes.",
       "frames": {
-        "agua": {
-          "t": "El agua",
-          "c": "La pileta termina donde empieza el lago."
-        },
-        "pileta": {
-          "t": "La pileta",
-          "c": "Turquesa a la sombra de los árboles grandes."
-        },
-        "noche": {
-          "t": "La noche",
-          "c": "Se encienden las guirnaldas y el lugar cambia de tono."
-        },
-        "quincho": {
-          "t": "El quincho",
-          "c": "El mate en la mesa larga y el lago del otro lado del vidrio."
-        },
         "atardecer": {
           "t": "El atardecer",
           "c": "Se rema hasta que el sol toca el agua."
@@ -186,21 +170,37 @@
           "t": "La remada",
           "c": "Salís de la orilla y el monte se cierra alrededor."
         },
+        "mirador": {
+          "t": "El mirador",
+          "c": "Se baja a la orilla a mirar el lago y se pierde la hora."
+        },
+        "mate": {
+          "t": "El mate",
+          "c": "El primero es temprano, con el agua todavía quieta."
+        },
+        "fogata": {
+          "t": "La fogata",
+          "c": "Cuando refresca, el fuego se arma junto al agua."
+        },
         "fuego": {
           "t": "El fuego",
           "c": "Todo empieza con la leña prendida y la tabla llena."
         },
+        "disco": {
+          "t": "El disco",
+          "c": "Se cocina afuera, mirando cómo cambia el cielo."
+        },
         "lago": {
-          "t": "Desde el agua",
-          "c": "Así se ve la casa cuando volvés remando."
+          "t": "El lago",
+          "c": "Algunas tardes el agua se queda tan quieta que duplica el cielo."
         },
-        "descanso": {
-          "t": "El descanso",
-          "c": "La bruma del lago entra por la ventana al despertar."
+        "kayak": {
+          "t": "El kayak",
+          "c": "Dos remos, y la casa se va quedando atrás."
         },
-        "adentro": {
-          "t": "Adentro",
-          "c": "El living mira al lago por tres ventanas."
+        "costa": {
+          "t": "La costa",
+          "c": "La arboleda entera entra en el reflejo."
         }
       }
     }

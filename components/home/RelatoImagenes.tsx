@@ -6,56 +6,71 @@ import { ImageSlot } from "@/components/ui/ImageSlot";
 import { GalleryLightbox, type GalleryItem } from "./GalleryLightbox";
 
 /**
- * Relato en imágenes — grilla bento compacta con diez fotos reales del bucket
- * "imagenes". Todas visibles; cada tile abre el lightbox en su índice. El orden
- * de PHOTOS sigue el orden visual de la grilla, así la numeración 01–10 es
- * correlativa en pantalla y coincide con el contador del lightbox (y la
- * navegación prev/next respeta ese mismo orden).
+ * Relato en imágenes — grilla bento compacta alimentada por la carpeta `relato/`
+ * del bucket: lifestyle y paisaje, sin cabaña identificable. Es a propósito —
+ * las dos cabañas tienen su propia galería en su página, y acá se cuenta el
+ * lugar, no el alojamiento.
  *
- * El set del lodge es casi todo vertical o cuadrado (son exports de Instagram),
- * así que la asignación va por forma. Medido en desktop, las cajas del grid son:
- * hero 578×430 (1.34), altos 282×430 (0.66), ancho 578×208 (2.78) y los "1×1"
- * 282×208 — que NO son cuadrados sino apaisados (1.35). De ahí el reparto:
+ * Los diez primeros items son los que se ven en la grilla; cada tile abre el
+ * lightbox en su índice. El orden de PHOTOS sigue el orden visual, así la
+ * numeración 01–10 es correlativa en pantalla y coincide con el contador del
+ * lightbox. Del 11 al 17 son las fotos restantes de la carpeta: no tienen tile
+ * y sólo se llega a ellas navegando con las flechas, que es lo que convierte
+ * "Ver completa" en algo más que abrir la misma grilla en grande.
  *
- *  - la 14, única apaisada del set, al tile hero;
- *  - la cuadrada 20 a un tile de 1.35, que es donde menos pierde;
- *  - las más verticales (9, 5) a los tiles altos de 0.66;
- *  - la 11 al tile ancho: es archivo vertical, pero su composición vive en una
- *    banda central horizontal y aguanta el 2.78 sin descuartizarse.
+ * El set es casi todo vertical (son exports de Instagram), así que la asignación
+ * va por forma. Medido en desktop, las cajas del grid son: hero 578×430 (1.34),
+ * altos 282×430 (0.66), ancho 578×208 (2.78) y los "1×1" 282×208 — que NO son
+ * cuadrados sino apaisados (1.35). De ahí el reparto:
  *
- * Las verticales que caen en tiles apaisados (17, 3, 4, 6, 1) llevan encuadre
- * propio —`pos` acá o PHOTO_TWEAKS en ImageSlot— para que el recorte conserve
- * el motivo y no el piso.
+ *  - IMG_1272, única apaisada de la carpeta, al tile hero: 1.34 contra 1.34;
+ *  - las más verticales (IMG_1319 a 0.63, la 4 a 0.75) a los tiles altos;
+ *  - la 7 al tile ancho: es archivo vertical, pero es puro horizonte a media
+ *    altura, así que aguanta el 2.78 sin descuartizarse (ver PHOTO_TWEAKS).
+ *
+ * Las verticales que caen en tiles apaisados llevan encuadre propio —`pos` acá
+ * o PHOTO_TWEAKS en ImageSlot— para que el recorte conserve el motivo.
  */
 const PHOTOS: GalleryItem[] = [
-  { label: "El agua", photo: "14.jpeg" },              // 0 · pileta + lago (la apaisada)
-  { label: "La pileta", photo: "9.jpeg" },             // 1 · turquesa entre los árboles
-  { label: "La noche", photo: "5.jpeg" },              // 2 · guirnaldas encendidas
-  { label: "El quincho", photo: "17.jpeg" },           // 3 · mesa larga, mate y termo
-  { label: "El atardecer", photo: "3.jpeg" },          // 4 · kayak familiar contra el sol
-  { label: "La remada", photo: "4.jpeg" },             // 5 · POV hacia el monte cerrado
-  { label: "El fuego", photo: "6.jpeg" },              // 6 · verduras y leña
-  { label: "Desde el agua", photo: "11.jpeg" },        // 7 · el complejo desde el lago (H)
-  { label: "El descanso", photo: "20.jpeg" },          // 8 · dormitorio al lago (1:1)
-  { label: "Adentro", photo: "1.jpeg" },               // 9 · living con vista al lago
+  // Visibles en la grilla (01–10). El `label` es el alt; el epígrafe sale de
+  // messages/*.json vía la `key` del TILE correspondiente.
+  { label: "El atardecer", photo: "relato/IMG_1272.jpeg" },   // 0 · kayak y cielo rosado (H)
+  { label: "La remada", photo: "relato/4.jpeg" },             // 1 · POV hacia el monte cerrado
+  { label: "El mirador", photo: "relato/IMG_1319.jpeg" },     // 2 · dos personas frente al lago
+  { label: "El mate", photo: "relato/IMG_1265.jpeg" },        // 3 · mate y termo contra el agua
+  { label: "La fogata", photo: "relato/IMG_1270.jpeg" },      // 4 · el fuego en la orilla
+  { label: "El fuego", photo: "relato/IMG_1316.jpeg" },       // 5 · parrilla y tabla de verduras
+  { label: "El disco", photo: "relato/IMG_1276.jpeg" },       // 6 · el disco contra el atardecer
+  { label: "El lago", photo: "relato/7.jpeg" },               // 7 · horizonte rosado (tile ancho)
+  { label: "El kayak", photo: "relato/IMG_1292.jpeg" },       // 8 · remando de espaldas (H)
+  { label: "La costa", photo: "relato/11.jpeg" },             // 9 · arboleda reflejada
+  // Sólo en el lightbox (11–17).
+  { label: "Kayak familiar al atardecer", photo: "relato/3.jpeg" },
+  { label: "La cacerola al fuego", photo: "relato/IMG_1269.jpeg" },
+  { label: "Calabaza a las brasas", photo: "relato/IMG_1275.jpeg" },
+  { label: "El termo y el mate sobre la mesa", photo: "relato/IMG_1285.jpeg" },
+  { label: "La costa con la vegetación en primer plano", photo: "relato/IMG_1290.jpeg" },
+  { label: "Kayak con el sol bajo", photo: "relato/IMG_1291.jpeg" },
+  { label: "La costa vista desde el agua", photo: "relato/IMG_1318.jpeg" },
 ];
 
 /** Tiles de la grilla (orden = colocación en el grid). `at` apunta a PHOTOS. */
 const TILES: { key: string; at: number; span: string; pos?: string }[] = [
-  { key: "agua", at: 0, span: "col-span-2 row-span-1 md:row-span-2" },        // 1.34
-  { key: "pileta", at: 1, span: "col-span-1 row-span-2" },                    // 0.66
-  { key: "noche", at: 2, span: "col-span-1 row-span-2" },                     // 0.66
-  // Las tres que siguen son verticales en cajas apaisadas: el recorte es fuerte
-  // y acá juega a favor —entran a la grilla sin robarle protagonismo al lago—,
-  // pero cada una necesita su encuadre (ver PHOTO_TWEAKS en ImageSlot).
-  { key: "quincho", at: 3, span: "col-span-1 row-span-1" },                   // 1.35
-  { key: "atardecer", at: 4, span: "col-span-1 row-span-1", pos: "50% 45%" },
-  { key: "remada", at: 5, span: "col-span-1 row-span-1" },
-  // La tabla y el fuego forman una franja a media altura.
-  { key: "fuego", at: 6, span: "col-span-1 row-span-1", pos: "50% 55%" },
+  { key: "atardecer", at: 0, span: "col-span-2 row-span-1 md:row-span-2" },   // 1.34
+  { key: "remada", at: 1, span: "col-span-1 row-span-2" },                    // 0.66
+  { key: "mirador", at: 2, span: "col-span-1 row-span-2" },                   // 0.66
+  // Las que siguen son verticales en cajas apaisadas: el recorte es fuerte y acá
+  // juega a favor —entran a la grilla sin robarle protagonismo al lago—, pero
+  // las que tienen el motivo fuera del centro necesitan su encuadre.
+  { key: "mate", at: 3, span: "col-span-1 row-span-1" },                      // 1.35
+  // La fogata está abajo en el cuadro, con copa de árbol arriba.
+  { key: "fogata", at: 4, span: "col-span-1 row-span-1", pos: "50% 62%" },
+  // La tabla y la parrilla forman una franja a media altura.
+  { key: "fuego", at: 5, span: "col-span-1 row-span-1", pos: "50% 55%" },
+  { key: "disco", at: 6, span: "col-span-1 row-span-1", pos: "50% 58%" },
   { key: "lago", at: 7, span: "col-span-2 row-span-1" },                      // 2.78
-  { key: "descanso", at: 8, span: "col-span-1 row-span-1" },                  // 1.35
-  { key: "adentro", at: 9, span: "col-span-1 row-span-1" },                   // 1.35
+  { key: "kayak", at: 8, span: "col-span-1 row-span-1" },                     // 1.35
+  { key: "costa", at: 9, span: "col-span-1 row-span-1" },                     // 1.35
 ];
 
 export function RelatoImagenes() {

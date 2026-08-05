@@ -14,6 +14,7 @@ import { Contacto } from "@/components/home/Contacto";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { getBookingMode } from "@/lib/site-settings.server";
+import { bucketSrc } from "@/components/ui/ImageSlot";
 
 const LODGING_JSONLD = {
   "@context": "https://schema.org",
@@ -68,9 +69,11 @@ export async function generateMetadata({
       siteName: "La Casa del Lago Urugua-í",
       images: [
         {
-          url: "https://res.cloudinary.com/djtvjkcu6/image/upload/c_fill,g_auto,w_1200,h_630,q_auto/v1781879164/ArumaLodge/Hero_bgsjtf.jpg",
-          width: 1200,
-          height: 630,
+          // La misma panorámica del hero, del bucket propio. Antes apuntaba a un
+          // Cloudinary de otro cliente (ArumaLodge), que además servía otra foto.
+          url: bucketSrc("hero/hero2.jpg"),
+          width: 1678,
+          height: 937,
           type: "image/jpeg",
           alt: "La Casa del Lago Urugua-í — Lago Urugua-í, Misiones",
         },

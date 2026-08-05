@@ -162,22 +162,6 @@
     "relato": {
       "intro": "Um passeio em fotos pela Casa del Lago: do primeiro reflexo na água ao último canto pensado para você ficar.",
       "frames": {
-        "agua": {
-          "t": "A água",
-          "c": "A piscina termina onde começa o lago."
-        },
-        "pileta": {
-          "t": "A piscina",
-          "c": "Turquesa à sombra das árvores grandes."
-        },
-        "noche": {
-          "t": "A noite",
-          "c": "As luzes se acendem e o lugar muda de tom."
-        },
-        "quincho": {
-          "t": "O quincho",
-          "c": "O chimarrão na mesa comprida e o lago do outro lado do vidro."
-        },
         "atardecer": {
           "t": "O entardecer",
           "c": "Rema-se até o sol tocar a água."
@@ -186,21 +170,37 @@
           "t": "A remada",
           "c": "Você sai da margem e a mata se fecha ao redor."
         },
+        "mirador": {
+          "t": "O mirante",
+          "c": "Desce-se até a margem para olhar o lago e perde-se a hora."
+        },
+        "mate": {
+          "t": "O chimarrão",
+          "c": "O primeiro é cedo, com a água ainda parada."
+        },
+        "fogata": {
+          "t": "A fogueira",
+          "c": "Quando refresca, o fogo se acende junto à água."
+        },
         "fuego": {
           "t": "O fogo",
           "c": "Tudo começa com a lenha acesa e a tábua cheia."
         },
+        "disco": {
+          "t": "Nas brasas",
+          "c": "Cozinha-se do lado de fora, vendo o céu mudar."
+        },
         "lago": {
-          "t": "Desde a água",
-          "c": "Assim se vê a casa quando você volta remando."
+          "t": "O lago",
+          "c": "Em algumas tardes a água fica tão parada que duplica o céu."
         },
-        "descanso": {
-          "t": "O descanso",
-          "c": "A bruma do lago entra pela janela ao amanhecer."
+        "kayak": {
+          "t": "O caiaque",
+          "c": "Dois remos, e a casa vai ficando para trás."
         },
-        "adentro": {
-          "t": "Por dentro",
-          "c": "A sala olha para o lago por três janelas."
+        "costa": {
+          "t": "A costa",
+          "c": "O bosque inteiro cabe no reflexo."
         }
       }
     }

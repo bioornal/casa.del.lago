@@ -10,10 +10,10 @@ import { Parallax } from "@/components/motion/Parallax";
  * El kicker va en cyan claro (#7FD4E2) y no en turquesa: sobre este fondo el
  * turquesa de `<Kicker>` casi no contrasta.
  *
- * FOTO: el lago de día (ChatGPT2.jpg), en 16:9 para que entre en la banda. Con
- * 1.78 de ratio el recorte a ~3:1 es leve. Su alternativa es ChatGPT1.jpg, la
- * misma vista al atardecer; si se cambia, ojo que cada una lleva su propio
- * encuadre en PHOTO_TWEAKS y no son intercambiables.
+ * FOTO: el lago de día (hero/ChatGPT2.jpg), en 16:9 para que entre en la banda.
+ * Con 1.78 de ratio el recorte a ~3:1 es leve. Su alternativa es
+ * hero/ChatGPT1.jpg, la misma vista al atardecer; si se cambia, ojo que cada una
+ * lleva su propio encuadre en PHOTO_TWEAKS y no son intercambiables.
  */
 const ITEMS = [
   { key: "nature", num: "01" },
@@ -70,7 +70,7 @@ export function Experiencias() {
           <Parallax speed={-40} className="absolute inset-x-0 top-0 h-[calc(100%+80px)]">
             <ImageSlot
               label="El espejo de agua del lago Urugua-í en un día despejado"
-              photo="ChatGPT2.jpg"
+              photo="hero/ChatGPT2.jpg"
               className="h-full w-full"
             />
           </Parallax>
