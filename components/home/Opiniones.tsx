@@ -131,31 +131,46 @@ export function Opiniones({
           </div>
 
           {/* Tarjetas: hairlines, no cajas — es el mismo recurso que Cómo llegar
-              y la tira de El lugar, y deja respirar el texto de cada reseña. */}
+              y la tira de El lugar, y deja respirar el texto de cada reseña.
+
+              El maquetado es multi-columna (masonry), NO grilla: las reseñas
+              tienen largos muy distintos y en una grilla cada fila se estira
+              hasta la más larga, dejando huecos enormes debajo de las cortas.
+              Con columnas cada reseña arranca donde termina la anterior y el
+              navegador balancea el alto de las dos columnas. `break-inside`
+              evita que una reseña se parta al medio entre columnas.
+              El precio es que las hairlines ya no se alinean entre columnas:
+              es el ritmo de una revista, y es a propósito. */}
           {hayTestimonios && (
             <div>
-              <div className="grid grid-cols-1 gap-x-[clamp(24px,3vw,48px)] gap-y-[clamp(26px,3vw,40px)] sm:grid-cols-2">
+              <ul className="m-0 list-none p-0 [column-gap:clamp(24px,3vw,48px)] sm:columns-2">
                 {testimonios.map((r) => (
-                  <figure key={r.id} className="m-0 border-t border-borde-medio pt-[18px]">
-                    <Estrellas value={r.rating} size={13} />
-                    {/* `lang` propio: las reseñas quedan en el idioma en que
-                        fueron escritas, que no siempre es el del sitio. */}
-                    <blockquote
-                      lang={r.lang}
-                      className="m-0 mt-[14px] text-pretty text-[15px] font-light leading-[1.72] text-cuerpo"
-                    >
-                      “{r.body}”
-                    </blockquote>
-                    <figcaption className="mt-[15px]">
-                      <span className="font-display block text-[16px] font-normal text-carbon">
-                        {r.author}
-                      </span>
-                      <span className="mt-[2px] block text-[12.5px] text-muted">{r.dateLabel}</span>
-                    </figcaption>
-                  </figure>
+                  <li key={r.id} className="mb-[clamp(26px,3vw,38px)] break-inside-avoid">
+                    <figure className="m-0 border-t border-borde-medio pt-[18px]">
+                      <Estrellas value={r.rating} size={13} />
+                      {/* `lang` propio: las reseñas quedan en el idioma en que
+                          fueron escritas, que no siempre es el del sitio. */}
+                      <blockquote
+                        lang={r.lang}
+                        className="m-0 mt-[14px] text-pretty text-[15px] font-light leading-[1.72] text-cuerpo"
+                      >
+                        “{r.body}”
+                      </blockquote>
+                      <figcaption className="mt-[15px]">
+                        <span className="font-display block text-[16px] font-normal text-carbon">
+                          {r.author}
+                        </span>
+                        <span className="mt-[2px] block text-[12.5px] text-muted">
+                          {r.dateLabel}
+                        </span>
+                      </figcaption>
+                    </figure>
+                  </li>
                 ))}
-              </div>
-              <p className="mt-[clamp(26px,3vw,36px)] text-[12.5px] leading-relaxed text-muted">
+              </ul>
+              {/* Margen chico: al alto de la lista ya lo infla el mb de la
+                  última reseña de cada columna. */}
+              <p className="mt-[6px] border-t border-borde-medio pt-[16px] text-[12.5px] leading-relaxed text-muted">
                 {t("attribution")}
               </p>
             </div>

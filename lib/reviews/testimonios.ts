@@ -78,7 +78,11 @@ export type TestimonioInput = {
 
 export type TestimonioValues = Omit<Testimonio, "id" | "position" | "published">;
 
-/** Tope del textarea: más largo que esto desbalancea la grilla de dos columnas. */
+/**
+ * Tope del textarea. La sección maqueta las reseñas en dos columnas masonry, así
+ * que un texto largo ya no deja huecos; pero pasado este largo una sola reseña
+ * ocupa media columna y se come la atención del resto.
+ */
 export const BODY_MAX = 700;
 
 export function parseTestimonioInput(
