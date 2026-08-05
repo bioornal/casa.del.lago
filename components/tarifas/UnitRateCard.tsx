@@ -15,13 +15,13 @@ function fmtDay(iso: string, locale: string): string {
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
 
 const ctaActiveClass =
-  "inline-flex items-center justify-center whitespace-nowrap rounded-[3px] bg-terracota px-[26px] py-[13px] text-[12.5px] uppercase tracking-[.1em] text-marfil no-underline transition-[background,transform] duration-300 hover:bg-terracota-hover hover:-translate-y-px";
+  "inline-flex min-h-[48px] items-center justify-center whitespace-nowrap rounded-[2px] bg-terracota px-[22px] py-[13px] text-[11.5px] font-medium uppercase tracking-[.1em] text-marfil no-underline transition-[background,transform,box-shadow] duration-300 hover:-translate-y-px hover:bg-terracota-hover hover:shadow-[0_12px_24px_-14px_rgba(162,75,42,.8)]";
 
 const ctaDisabledClass =
-  "inline-flex items-center justify-center whitespace-nowrap rounded-[3px] border border-borde-medio px-[26px] py-[13px] text-[12.5px] uppercase tracking-[.1em] text-muted";
+  "inline-flex min-h-[48px] items-center justify-center whitespace-nowrap rounded-[2px] border border-borde-medio bg-arena-clara px-[22px] py-[13px] text-[11.5px] font-medium uppercase tracking-[.1em] text-muted";
 
 const chipClass =
-  "inline-flex items-center rounded-full border border-[#CFE2E7] bg-[#EAF2F4] px-3 py-[5px] text-[11px] uppercase tracking-[.08em] text-lago";
+  "inline-flex items-center border-b border-[#c8dfe1] pb-1 text-[11px] tracking-[.03em] text-lago";
 
 interface UnitRateCardProps {
   unit: Unit;
@@ -46,17 +46,24 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
   }).split(" · ");
 
   return (
-    <div className="group grid grid-cols-1 overflow-hidden rounded-[6px] border border-borde-medio bg-white transition-[transform,box-shadow] duration-400 ease-[cubic-bezier(.16,.84,.44,1)] hover:-translate-y-1 hover:shadow-card md:grid-cols-[300px_1fr]">
-      <div className="h-[210px] md:h-auto md:min-h-[220px]">
-        <ImageSlot label={unit.name} className="h-full w-full" />
+    <article className="group overflow-hidden rounded-[8px] border border-borde-medio bg-white transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(.16,.84,.44,1)] hover:-translate-y-1 hover:shadow-card">
+      <div className="relative h-[270px] overflow-hidden bg-slot sm:h-[310px]">
+        <ImageSlot label={unit.name} className="h-full w-full transition-transform duration-700 group-hover:scale-[1.035]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-carbon/55 via-transparent to-transparent" />
+        <div className="absolute bottom-5 left-6 text-[10px] font-medium uppercase tracking-[.26em] text-marfil/80">
+          {t("unitLabel")}
+        </div>
       </div>
 
-      <div className="flex flex-col p-5 md:py-6 md:pl-0 md:pr-7">
-        <h3 className="font-display m-0 font-medium text-[27px] text-carbon transition-colors duration-300 group-hover:text-lago">
-          {unit.name}
-        </h3>
+      <div className="flex min-h-[270px] flex-col p-6 md:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="m-0 font-display text-[30px] font-medium leading-none text-carbon transition-colors duration-300 group-hover:text-lago">
+            {unit.name}
+          </h3>
+          <span className="mt-1 shrink-0 text-[10px] uppercase tracking-[.18em] text-bronce">{unit.slug === "aratiri" ? "01" : "02"}</span>
+        </div>
 
-        <div className="mt-[10px] flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
           {chips.map((chip) => (
             <span key={chip} className={chipClass}>
               {chip}
@@ -64,23 +71,26 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
           ))}
         </div>
 
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-4 pt-[18px]">
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-5 border-t border-borde-claro pt-5">
           <div>
             {rate && rate.available && rate.nights > 0 ? (
               <>
-                <div className="font-display text-[30px] text-carbon">{money(rate.total)}</div>
-                <div className="mt-[2px] text-[12px] text-muted">
+                <div className="font-display text-[32px] leading-none text-carbon">{money(rate.total)}</div>
+                <div className="mt-2 text-[11.5px] text-muted">
                   {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} · {money(nightly)} {t("perNight")}
                 </div>
                 {!whatsappMode && rate.savings > 0 && (
-                  <div className="mt-[6px] text-[12.5px] font-medium text-[#2f6b46]">
+                  <div className="mt-2 text-[11.5px] font-medium text-[#2f6b46]">
                     {t("transferNote", { total: money(rate.transferTotal), savings: money(rate.savings) })}
                   </div>
                 )}
               </>
             ) : (
-              <div className="font-display text-[24px] text-muted">
-                {t("from")} {money(prices[unit.slug])} <span className="text-[14px]">{t("perNight")}</span>
+              <div>
+                <div className="mb-1 text-[10px] uppercase tracking-[.18em] text-muted">{t("from")}</div>
+                <div className="font-display text-[28px] leading-none text-carbon">
+                  {money(prices[unit.slug])} <span className="font-sans text-[12px] text-muted">{t("perNight")}</span>
+                </div>
               </div>
             )}
           </div>
@@ -115,9 +125,9 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
         </div>
 
         {whatsappMode && bookable && (
-          <p className="m-0 mt-[10px] text-right text-[12.5px] text-muted">{t("waNote")}</p>
+          <p className="m-0 mt-3 text-right text-[11.5px] text-muted">{t("waNote")}</p>
         )}
       </div>
-    </div>
+    </article>
   );
 }
