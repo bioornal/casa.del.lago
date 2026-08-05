@@ -9,11 +9,13 @@ import { methodRates } from "@/lib/reservation/method-pricing";
 import { Experiencias } from "@/components/home/Experiencias";
 import { ComoLlegar } from "@/components/home/ComoLlegar";
 import { RelatoImagenes } from "@/components/home/RelatoImagenes";
+import { Opiniones } from "@/components/home/Opiniones";
 import { CtaReserva } from "@/components/home/CtaReserva";
 import { Contacto } from "@/components/home/Contacto";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { getBookingMode } from "@/lib/site-settings.server";
+import { getPublishedTestimonios, getReviewsAggregate } from "@/lib/reviews/testimonios.server";
 import { bucketSrc } from "@/components/ui/ImageSlot";
 
 const LODGING_JSONLD = {
@@ -96,9 +98,11 @@ export default async function HomePage({
   setRequestLocale(locale);
   // Mismo precio de lista que /tarifas (tarjeta, con el costo del canal incluido):
   // si el home mostrara el neto, no coincidiría con lo que ve el huésped al reservar.
-  const [rateSettings, bookingMode] = await Promise.all([
+  const [rateSettings, bookingMode, testimonios, agregado] = await Promise.all([
     getRateSettings(),
     getBookingMode(),
+    getPublishedTestimonios(),
+    getReviewsAggregate(),
   ]);
   const listPrices = methodRates(rateSettings, "card").nightly;
   return (
@@ -119,6 +123,9 @@ export default async function HomePage({
         <Experiencias />
         <ComoLlegar />
         <RelatoImagenes />
+        {/* Antes del CTA a propósito: la prueba social es lo último que se lee
+            antes de "Reservar ahora". */}
+        <Opiniones testimonios={testimonios} agregado={agregado} />
         <CtaReserva bookingMode={bookingMode} />
         <Contacto />
       </main>

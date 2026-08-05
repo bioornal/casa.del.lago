@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings.server";
 import { hasBookingModeOverride } from "@/lib/booking-mode";
 import { signOut } from "../login/actions";
@@ -18,8 +19,9 @@ export default async function AdminConfiguracionPage() {
           Configuración
         </h1>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <a href="/admin/reservas" style={navLink}>Reservas</a>
-          <a href="/admin/tarifas" style={navLink}>Tarifas</a>
+          <Link href="/admin/reservas" style={navLink}>Reservas</Link>
+          <Link href="/admin/tarifas" style={navLink}>Tarifas</Link>
+          <Link href="/admin/opiniones" style={navLink}>Opiniones</Link>
           <form action={signOut}>
             <button type="submit" style={{ background: "transparent", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: "#6b665d" }}>
               Cerrar sesión

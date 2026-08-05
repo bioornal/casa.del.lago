@@ -205,6 +205,15 @@
       }
     }
   },
+  "opiniones": {
+    "kicker": "Reviews",
+    "title": "What the people who've stayed here say.",
+    "body": "There's no front desk and no call centre: you write to us and we answer ourselves. These are some of the reviews guests have left on our Google listing.",
+    "bodyShort": "There's no front desk and no call centre: you write to us and we answer ourselves. What guests think is on our Google listing, open for anyone to read.",
+    "reviews": "{n} reviews on Google",
+    "googleCta": "Read them on Google",
+    "attribution": "Reviews published by guests on our Google listing. We show a selection; all of them are behind the link above."
+  },
   "cta": {
     "kicker": "Book",
     "title": "Tell us when you're coming.",

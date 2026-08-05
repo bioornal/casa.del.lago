@@ -9,6 +9,7 @@ export const HOME_SECTION_IDS = [
   "lugar",
   "llegar",
   "galeria",
+  "opiniones",
   "contacto",
 ] as const;
 

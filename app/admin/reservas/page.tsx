@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { listReservations, type ReservationStatus } from "@/lib/reservation/reservations.server";
 import { signComprobanteUrl } from "@/lib/reservation/comprobante.server";
 import { getAvailabilityServer } from "@/lib/reservation/availability.server";
@@ -49,15 +50,18 @@ export default async function AdminReservasPage({
           Reservas
         </h1>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <a href="/admin/tarifas" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
+          <Link href="/admin/tarifas" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
             Tarifas
-          </a>
-          <a href="/admin/configuracion" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
+          </Link>
+          <Link href="/admin/opiniones" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
+            Opiniones
+          </Link>
+          <Link href="/admin/configuracion" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
             Configuración
-          </a>
-          <a href="/admin/pago-prueba" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
+          </Link>
+          <Link href="/admin/pago-prueba" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
             Pago de prueba
-          </a>
+          </Link>
           <form action={signOut}>
             <button type="submit" style={{ background: "transparent", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: "#6b665d" }}>
               Cerrar sesión

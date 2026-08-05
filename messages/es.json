@@ -205,6 +205,15 @@
       }
     }
   },
+  "opiniones": {
+    "kicker": "Opiniones",
+    "title": "Lo que cuentan los que ya estuvieron.",
+    "body": "No hay recepción ni call center: nos escribís y contestamos nosotros. Estas son algunas de las reseñas que dejaron los huéspedes en nuestra ficha de Google.",
+    "bodyShort": "No hay recepción ni call center: nos escribís y contestamos nosotros. Lo que opinan los huéspedes está en nuestra ficha de Google, abierta para cualquiera que quiera leerla.",
+    "reviews": "{n} reseñas en Google",
+    "googleCta": "Leerlas en Google",
+    "attribution": "Reseñas publicadas por huéspedes en nuestra ficha de Google. Mostramos una selección; están todas en el enlace de arriba."
+  },
   "cta": {
     "kicker": "Reservá",
     "title": "Contanos cuándo venís.",

@@ -147,3 +147,55 @@ create trigger site_settings_set_updated_at
   before update on public.site_settings
   for each row execute function public.set_updated_at();
 
+-- =============================================================
+-- 2026-08-05 — Testimonios de la home, editables desde /admin/opiniones.
+-- La sección Opiniones muestra los publicados, en el orden de `position`.
+-- Sin filas publicadas la sección degrada al puntaje agregado (ver
+-- components/home/Opiniones.tsx): nunca se rellena con textos inventados.
+--
+-- ⚠ DEPENDE del bloque de site_settings de acá arriba (2026-07-23): el ALTER
+-- del final le agrega columnas. Correr sólo este bloque sobre una base donde
+-- site_settings no existe falla con 42P01. Ante la duda, correr el archivo
+-- entero, que es idempotente.
+-- =============================================================
+create table if not exists public.testimonials (
+  id          uuid primary key default gen_random_uuid(),
+  -- El nombre como figura en Google.
+  author      text not null check (length(trim(author)) > 0),
+  -- El texto tal cual lo escribió el huésped, sin comillas: las pone el
+  -- componente. Copiado a mano de la ficha, no se corrige la ortografía.
+  body        text not null check (length(trim(body)) > 0),
+  -- Idioma del texto, para el `lang` del <blockquote>. Las reseñas no se
+  -- traducen: se guardan una vez en el idioma original.
+  lang        text not null default 'es' check (lang in ('es', 'pt', 'en')),
+  rating      smallint not null default 5 check (rating between 1 and 5),
+  -- Fecha como la muestra Google: "hace 2 meses", "marzo de 2026".
+  date_label  text not null default '',
+  -- Orden en pantalla. Menor primero; se reordena desde el panel.
+  position    integer not null default 0,
+  -- Despublicar en vez de borrar: permite rotar sin perder el texto.
+  published   boolean not null default true,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+-- Índice del listado público (published + orden) y del panel.
+create index if not exists testimonials_order_idx
+  on public.testimonials (published, position, created_at);
+
+-- Mismo criterio que el resto: RLS sin policies, sólo la service role key.
+alter table public.testimonials enable row level security;
+
+drop trigger if exists testimonials_set_updated_at on public.testimonials;
+create trigger testimonials_set_updated_at
+  before update on public.testimonials
+  for each row execute function public.set_updated_at();
+
+-- Agregado de la ficha de Google — el "4,7 sobre 88" de la sección.
+-- ⚠ NO se puede derivar de testimonials: son las 88 reseñas que tiene la ficha,
+-- no las que cargamos acá. Se copia a mano de Google cuando cambia.
+alter table public.site_settings
+  add column if not exists reviews_rating numeric(2,1) not null default 4.7
+    check (reviews_rating >= 0 and reviews_rating <= 5),
+  add column if not exists reviews_count integer not null default 88
+    check (reviews_count >= 0);

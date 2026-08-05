@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { signOut } from "../login/actions";
 import { RateForm } from "./RateForm";
@@ -17,9 +18,12 @@ export default async function AdminTarifasPage() {
           Tarifas
         </h1>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <a href="/admin/reservas" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
+          <Link href="/admin/reservas" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
             Reservas
-          </a>
+          </Link>
+          <Link href="/admin/opiniones" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
+            Opiniones
+          </Link>
           <form action={signOut}>
             <button type="submit" style={{ background: "transparent", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: "#6b665d" }}>
               Cerrar sesión

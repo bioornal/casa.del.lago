@@ -205,6 +205,15 @@
       }
     }
   },
+  "opiniones": {
+    "kicker": "Avaliações",
+    "title": "O que dizem os que já estiveram.",
+    "body": "Não temos recepção nem call center: você escreve e nós mesmos respondemos. Estas são algumas das avaliações que os hóspedes deixaram na nossa ficha do Google.",
+    "bodyShort": "Não temos recepção nem call center: você escreve e nós mesmos respondemos. O que os hóspedes acham está na nossa ficha do Google, aberta para quem quiser ler.",
+    "reviews": "{n} avaliações no Google",
+    "googleCta": "Ler no Google",
+    "attribution": "Avaliações publicadas por hóspedes na nossa ficha do Google. Mostramos uma seleção; todas estão no link acima."
+  },
   "cta": {
     "kicker": "Reservar",
     "title": "Conte para nós quando você vem.",
