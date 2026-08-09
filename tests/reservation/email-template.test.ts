@@ -44,6 +44,35 @@ describe("robustez del mail rediseñado", () => {
     expect(html.toLowerCase()).toMatch(/calendario|agenda/);
     expect(text.toLowerCase()).toMatch(/calendario|agenda/);
   });
+
+  // Los tres casos de abajo vivían en email-template.ts (el duplicado muerto,
+  // retirado en 2C). Esa lógica -los 3 locales, el fallback de locale inválido
+  // y el escapado anti-inyección- también vive acá, en el template vigente, y
+  // se había quedado sin cobertura propia.
+  it("genera subject/html/text para los 3 locales", () => {
+    for (const locale of ["es", "en", "pt"] as const) {
+      const out = buildConfirmationEmail({ ...input, locale });
+      expect(out.subject).toContain("CDL-2026-AB12");
+      expect(out.html).toContain("CDL-2026-AB12");
+      expect(out.text).toContain("CDL-2026-AB12");
+    }
+  });
+
+  it("locale inválido cae a es", () => {
+    // @ts-expect-error probamos un locale fuera del union
+    const out = buildConfirmationEmail({ ...input, locale: "fr" });
+    const es = buildConfirmationEmail({ ...input, locale: "es" });
+    expect(out.subject).toBe(es.subject);
+  });
+
+  it("escapa HTML en campos del huésped (anti-inyección)", () => {
+    const out = buildConfirmationEmail({
+      ...input, firstName: "<script>x</script>", unitName: "<b>u</b>",
+    });
+    expect(out.html).not.toContain("<script>x</script>");
+    expect(out.html).not.toContain("<b>u</b>");
+    expect(out.html).toContain("&lt;script&gt;");
+  });
 });
 
 describe("buildReleaseEmail", () => {
