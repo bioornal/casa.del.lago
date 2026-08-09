@@ -46,3 +46,6 @@ next-env.d.ts
 
 # SDD scratch (subagent-driven-development)
 .superpowers/
+
+# salida de pnpm email:preview
+.preview-emails/
