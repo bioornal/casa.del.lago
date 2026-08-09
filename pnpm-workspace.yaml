@@ -1,17 +1,20 @@
-# Config de pnpm (v11 lee estos settings de acá, no del .npmrc).
+# Config de pnpm (v11 lee estos settings de acá, no del .npmrc ni del campo
+# "pnpm" de package.json, que quedó ignorado en silencio).
 # nodeLinker hoisted: node_modules plano sin symlinks → el plugin de Netlify
 # puede empaquetar en Windows sin el error EPERM.
 nodeLinker: hoisted
 verifyDepsBeforeRun: false
-onlyBuiltDependencies:
-  - sharp
-  - unrs-resolver
-  - "@parcel/watcher"
-  - "@swc/core"
-  - esbuild
+
+# Los cinco compilan o bajan un binario nativo en su postinstall. Van en true
+# porque sin eso pnpm los reporta como "ignored builds" en cada comando:
+#   sharp           optimización de imágenes de Next en el deploy
+#   @swc/core       transpilador de Next
+#   @parcel/watcher watcher de archivos en dev
+#   unrs-resolver   resolver de eslint-plugin-import
+#   esbuild         lo usa tsx para pnpm email:preview
 allowBuilds:
-  '@parcel/watcher': set this to true or false
-  '@swc/core': set this to true or false
-  esbuild: set this to true or false
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
+  '@parcel/watcher': true
+  '@swc/core': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

@@ -43,14 +43,5 @@
     "tsx": "^4.23.11",
     "typescript": "^5",
     "vitest": "^4.1.8"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "@swc/core",
-      "esbuild",
-      "sharp",
-      "unrs-resolver"
-    ]
   }
 }
