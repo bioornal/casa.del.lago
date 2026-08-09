@@ -4,6 +4,7 @@ import { buildConfirmationEmail, buildReleaseEmail, type EmailLocale } from "./g
 import { sendEmail } from "./client";
 import { buildBookingIcs } from "@/lib/reservation/ics-build";
 import { waLink } from "@/lib/contact";
+import { notifyAdminNewReservation } from "./admin";
 
 function normLocale(v: unknown): EmailLocale {
   return v === "en" || v === "pt" ? v : "es";
@@ -61,6 +62,24 @@ export async function sendConfirmationEmailOnce(code: string): Promise<void> {
           contentType: "text/calendar; charset=utf-8; method=PUBLISH",
         },
       ],
+    });
+
+    // El aviso al dueño va acá y no en las rutas: este bloque ya corre una sola
+    // vez por reserva (flip atómico de markConfirmationEmailSent) y la fila ya
+    // tiene todo. Cablearlo en el checkout y en el webhook mandaría dos.
+    await notifyAdminNewReservation({
+      code: row.code,
+      unitName: row.unit_name,
+      firstName: row.first_name,
+      lastName: row.last_name,
+      email: row.email,
+      phone: row.phone ?? "",
+      checkIn: row.check_in,
+      checkOut: row.check_out,
+      nights: row.nights,
+      guests: row.guests,
+      total: row.total,
+      paymentMethod: row.payment_method,
     });
   } catch (err) {
     console.error(

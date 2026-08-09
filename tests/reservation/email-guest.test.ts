@@ -10,10 +10,16 @@ vi.mock("@/lib/reservation/reservations.server", () => ({
   markConfirmationEmailSent: (...a: unknown[]) => markConfirmationEmailSent(...a),
 }));
 
+const notifyAdminNewReservation = vi.fn();
+vi.mock("@/lib/reservation/email/admin", () => ({
+  notifyAdminNewReservation: (...a: unknown[]) => notifyAdminNewReservation(...a),
+}));
+
 import { sendConfirmationEmailOnce, sendReleaseEmail } from "@/lib/reservation/email/guest";
 
 const ROW = {
   code: "CDL-2026-AB12", unit_name: "Cabaña Aratiri", first_name: "Juan",
+  last_name: "Pérez", phone: "+54 9 376 000000", payment_method: "card",
   email: "juan@test.com",
   check_in: "2026-07-02", check_out: "2026-07-05", nights: 3, guests: 4,
   total: 480000, locale: "es",
@@ -75,6 +81,33 @@ describe("sendConfirmationEmailOnce", () => {
     expect(att.filename).toBe("cdl-cdl-2026-ab12.ics");
     expect(att.contentType).toContain("text/calendar");
     expect(Buffer.from(att.content, "base64").toString("utf8")).toContain("BEGIN:VEVENT");
+  });
+
+  it("avisa al dueño con los datos de la fila", async () => {
+    markConfirmationEmailSent.mockResolvedValue(ROW);
+    await sendConfirmationEmailOnce("CDL-2026-AB12");
+    expect(notifyAdminNewReservation).toHaveBeenCalledOnce();
+    expect(notifyAdminNewReservation.mock.calls[0][0]).toMatchObject({
+      code: "CDL-2026-AB12",
+      lastName: "Pérez",
+      paymentMethod: "card",
+      total: 480000,
+    });
+  });
+
+  it("flip no ganado → tampoco avisa al dueño (dedup compartida)", async () => {
+    // El checkout y el webhook confirman la misma reserva: sin esta guarda
+    // llegan dos avisos.
+    markConfirmationEmailSent.mockResolvedValue(null);
+    await sendConfirmationEmailOnce("CDL-2026-AB12");
+    expect(notifyAdminNewReservation).not.toHaveBeenCalled();
+  });
+
+  it("si el mail al huésped falla, el dueño se entera igual", async () => {
+    markConfirmationEmailSent.mockResolvedValue(ROW);
+    send.mockResolvedValue({ data: null, error: { message: "nope" } });
+    await sendConfirmationEmailOnce("CDL-2026-AB12");
+    expect(notifyAdminNewReservation).toHaveBeenCalledOnce();
   });
 });
 
