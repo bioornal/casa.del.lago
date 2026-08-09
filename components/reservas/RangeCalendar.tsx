@@ -4,7 +4,12 @@ import { useLocale } from "next-intl";
 import { es as esLocale, enUS, ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
-import { pickDay, type RangeValue } from "@/lib/reservation/range";
+import {
+  pickDay,
+  rangeHasBlocked,
+  firstBlockedAfter,
+  type RangeValue,
+} from "@/lib/reservation/range";
 
 interface RangeCalendarProps {
   value: RangeValue;
@@ -29,15 +34,36 @@ export function RangeCalendar({ value, onChange, disabledDates = [] }: RangeCale
     rangeMiddle: "rdp-lago-middle",
   };
 
+  // Fase de salida: hay llegada elegida y falta el check-out. Ahí el rango se
+  // topea en la primera noche ocupada, para que no se pueda saltar el bloque
+  // eligiendo llegada antes y salida después (ambas puntas están libres, así
+  // que deshabilitar solo los días ocupados no alcanza).
+  const pickingDeparture = checkIn !== null && checkOut === null;
+  const maxCheckOut = pickingDeparture ? firstBlockedAfter(checkIn, disabledDates) : null;
+
+  // Esa noche tope sigue siendo elegible como salida: el check-out es exclusivo
+  // (turnover), y el servidor acepta ese rango.
+  const blocked = maxCheckOut
+    ? disabledDates.filter((d) => d.getTime() !== maxCheckOut.getTime())
+    : disabledDates;
+
   return (
     <DayPicker
       locale={dateFnsLocale}
       defaultMonth={checkIn ?? new Date()}
       weekStartsOn={1}
-      disabled={[{ before: new Date() }, ...disabledDates]}
+      disabled={[
+        { before: new Date() },
+        ...(maxCheckOut ? [{ after: maxCheckOut }] : []),
+        ...blocked,
+      ]}
       modifiers={modifiers}
       modifiersClassNames={modifiersClassNames}
-      onDayClick={(day) => onChange(pickDay(value, day))}
+      onDayClick={(day) => {
+        // Guarda de último recurso, por si la disponibilidad llegó tarde.
+        if (pickingDeparture && day > checkIn && rangeHasBlocked(checkIn, day, disabledDates)) return;
+        onChange(pickDay(value, day));
+      }}
     />
   );
 }
