@@ -71,6 +71,31 @@ Alcance incluye el panel de administración con el mismo criterio.
 - **No** portar valores de variables de entorno (ver "Variables de entorno").
 - **No** completar los datos reales del alojamiento (ver "Fuera de alcance").
 
+## Restricción de alcance: el front no se toca
+
+Decisión del 2026-08-09. El front de La Casa del Lago ya está como se quiere. El
+portado es de **funcionalidad y backend**.
+
+**No se toca:** layout, CSS, colores, tipografía, copy ni estructura visual.
+
+**Sí se toca:** comportamiento dentro de componentes cuando el fix lo exige, siempre que
+no cambie nada visual. El caso testigo es `RangeCalendar.tsx` en el dominio 1: cambia
+qué días son clickeables y agrega una guarda al `onDayClick`, sin mover un pixel ni
+tocar las clases `rdp-lago-*`.
+
+### Excepciones autorizadas
+
+Tres cambios de Aruma son visuales pero vienen pegados a funcionalidad que sí se quiere.
+Quedan **autorizados explícitamente**:
+
+| Dominio | Excepción | Por qué |
+|---|---|---|
+| 2 — Emails | Rediseño de `guest-templates.ts` (+202 líneas de HTML y estilos) | `f1ce901` mezcla el rediseño con tres arreglos funcionales en el mismo archivo. Además es un email transaccional, no el sitio |
+| 4 — Checkout | Rediseño del selector de comprobante en `StepTransferencia.tsx` | `ffe8dad` reemplaza el `<input type="file">` crudo por un label accesible. El input nativo queda fuera de vista pero en el tab order, no con `display:none` |
+| 5 — Admin | `TestUnitToggle.tsx`, componente nuevo | Sin él, el flag `test_unit_enabled` existe pero solo se puede activar tocando la base |
+
+Fuera de estas tres, cualquier otro cambio visual requiere aprobación previa.
+
 ## Clasificación del gap
 
 Los deltas de líneas separan atraso real de divergencia deliberada:
