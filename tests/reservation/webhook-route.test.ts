@@ -29,6 +29,11 @@ vi.mock("@/lib/reservation/email.server", () => ({
   sendConfirmationEmailOnce: (...a: unknown[]) => sendConfirmationEmailOnce(...a),
 }));
 
+const alertAdminPaymentWithoutSlot = vi.fn();
+vi.mock("@/lib/reservation/email/admin", () => ({
+  alertAdminPaymentWithoutSlot: (...a: unknown[]) => alertAdminPaymentWithoutSlot(...a),
+}));
+
 import { POST } from "@/app/api/webhooks/mercadopago/route";
 
 const SECRET = "test-secret";
@@ -72,6 +77,7 @@ beforeEach(() => {
   releasePendingByCode.mockReset();
   releasePendingByCode.mockResolvedValue(undefined);
   sendConfirmationEmailOnce.mockReset();
+  alertAdminPaymentWithoutSlot.mockReset();
   process.env.MERCADOPAGO_WEBHOOK_SECRET = SECRET;
 });
 afterEach(() => { delete process.env.MERCADOPAGO_WEBHOOK_SECRET; });
@@ -95,12 +101,19 @@ describe("POST /api/webhooks/mercadopago", () => {
     expect(sendConfirmationEmailOnce).toHaveBeenCalledWith("CDL-2026-AB12");
   });
 
-  it("fechas tomadas al confirmar: loguea y responde ok (sin error a MP)", async () => {
+  it("fechas tomadas al confirmar: alerta al dueño, loguea y responde ok a MP", async () => {
+    // Plata cobrada sin reserva. Hasta hoy el único registro era un
+    // console.error que nadie lee.
     const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     upsertConfirmedByCode.mockRejectedValueOnce(new OverlapError());
     const res = await POST(approvedReq());
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true });
+    expect(alertAdminPaymentWithoutSlot).toHaveBeenCalledOnce();
+    expect(alertAdminPaymentWithoutSlot.mock.calls[0][0]).toMatchObject({
+      code: "CDL-2026-AB12",
+      paymentId: "pay-1",
+    });
     errSpy.mockRestore();
   });
 
