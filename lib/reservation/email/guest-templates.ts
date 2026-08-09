@@ -126,20 +126,6 @@ function fmtDate(iso: string, locale: EmailLocale): string {
   }).format(new Date(y, m - 1, d));
 }
 
-/** Renderiza filas [label, value] como <tr> de la tabla de detalle. */
-function renderRows(rows: [string, string][]): string {
-  return rows
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:8px 0;color:#6b665d;font-size:14px">${k}</td>` +
-        `<td style="padding:8px 0;text-align:right;color:#23362B;font-size:14px;font-weight:600">${v}</td></tr>`,
-    )
-    .join("");
-}
-
-/**
- * Envoltorio HTML compartido: doctype/body, paleta, título "La Casa del Lago Urugua-í" y footer.
- */
 /**
  * Esqueleto del mail: tabla de ancho fijo, no un div con max-width. Outlook de
  * escritorio renderiza con el motor de Word, que ignora max-width, y el mail se
@@ -271,20 +257,6 @@ function renderGreeting(greeting: string, intro: string): string {
     <p style="font-family:${FONT_SANS};font-size:14px;color:${COLOR_INTRO};line-height:1.7;margin:0 0 24px">${intro}</p>`;
 }
 
-// Sobre viejo, todavía en uso por buildReleaseEmail. Se retira cuando ese mail
-// pase al shell (ver plan 2A, Task 2).
-function renderEnvelope(greeting: string, intro: string, body: string, footer: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#F8F5F0;font-family:Arial,Helvetica,sans-serif">
-<div style="max-width:520px;margin:0 auto;padding:32px 24px">
-  <h1 style="font-size:22px;color:#23362B;margin:0 0 4px">La Casa del Lago Urugua-í</h1>
-  <p style="font-size:15px;color:#23362B;margin:18px 0 4px">${greeting}</p>
-  <p style="font-size:15px;color:#5b5347;line-height:1.6;margin:0 0 22px">${intro}</p>
-  ${body}
-  <p style="font-size:12px;color:#9a9388;border-top:1px solid #ece5d8;padding-top:16px;margin:0">${footer}</p>
-</div>
-</body></html>`;
-}
-
 export function buildConfirmationEmail(input: ConfirmationEmailInput): BuiltEmail {
   const locale: EmailLocale = (["es", "en", "pt"] as const).includes(input.locale)
     ? input.locale
@@ -367,6 +339,8 @@ type ReleaseCopy = {
   subject: (code: string) => string;
   greeting: (name: string) => string;
   intro: string;
+  /** Franja de estado. Enuncia el hecho, sin adjetivar al huésped. */
+  badge: string;
   labels: { code: string; unit: string; checkIn: string; checkOut: string };
   cta: string;
   outro: string;
@@ -383,6 +357,7 @@ const RELEASE_COPY: Record<EmailLocale, ReleaseCopy> = {
     greeting: (n) => `Hola ${n},`,
     intro:
       "No logramos identificar el pago de tu reserva en La Casa del Lago Urugua-í, así que liberamos las fechas para no retenerlas sin confirmar.",
+    badge: "Reserva no confirmada",
     labels: { code: "Código", unit: "Alojamiento", checkIn: "Check-in", checkOut: "Check-out" },
     cta: "Escribinos por WhatsApp",
     outro:
@@ -394,6 +369,7 @@ const RELEASE_COPY: Record<EmailLocale, ReleaseCopy> = {
     greeting: (n) => `Hi ${n},`,
     intro:
       "We could not identify the payment for your booking at La Casa del Lago Urugua-í, so we released the dates rather than hold them unconfirmed.",
+    badge: "Booking not confirmed",
     labels: { code: "Code", unit: "Accommodation", checkIn: "Check-in", checkOut: "Check-out" },
     cta: "Message us on WhatsApp",
     outro:
@@ -405,6 +381,7 @@ const RELEASE_COPY: Record<EmailLocale, ReleaseCopy> = {
     greeting: (n) => `Olá ${n},`,
     intro:
       "Não conseguimos identificar o pagamento da sua reserva na La Casa del Lago Urugua-í, então liberamos as datas em vez de mantê-las sem confirmação.",
+    badge: "Reserva não confirmada",
     labels: { code: "Código", unit: "Acomodação", checkIn: "Check-in", checkOut: "Check-out" },
     cta: "Fale conosco pelo WhatsApp",
     outro:
@@ -426,20 +403,25 @@ export function buildReleaseEmail(input: ReleaseEmailInput): BuiltEmail {
     [t.labels.checkOut, fmtDate(input.checkOut, locale)],
   ];
 
-  const rowsHtml = renderRows(rows);
+  // El código sube a la franja, igual que en la confirmación; abajo queda qué
+  // fechas se liberaron. Sin `renderStay`: ese bloque anuncia una estadía, y acá
+  // justamente no la hay.
+  const body = `${renderGreeting(t.greeting(esc(input.firstName)), t.intro)}
+    ${renderDetailRows(rows.slice(1))}
+    ${renderCta(input.whatsappUrl, t.cta)}
+    <p style="font-family:${FONT_SANS};font-size:13px;color:${COLOR_MUTED};line-height:1.7;margin:0;border-top:1px solid ${COLOR_BORDER};padding-top:18px">${t.outro}</p>`;
 
-  const body = `<table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid #ece5d8;border-radius:8px;padding:8px 18px">
-    ${rowsHtml}
-  </table>
-  <p style="font-size:13px;color:#6b665d;line-height:1.6;margin:22px 0 18px">${t.outro}</p>
-  <div style="text-align:center;margin:26px 0">
-    <a href="${input.whatsappUrl}" style="display:inline-block;background:#A04B2A;color:#F8F5F0;text-decoration:none;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 28px;border-radius:4px">${t.cta}</a>
-  </div>`;
-
-  const html = renderEnvelope(t.greeting(esc(input.firstName)), t.intro, body, t.footer);
+  // Sin foto de portada: para una mala noticia es el tono equivocado.
+  const html = renderShell({
+    badge: t.badge,
+    badgeSub: esc(input.code),
+    hero: false,
+    body,
+    footer: t.footer,
+  });
 
   const textRows = rows.map(([k, v]) => `${k}: ${v}`).join("\n");
-  const text = `${t.greeting(input.firstName)}\n\n${t.intro}\n\n${textRows}\n\n${t.outro}\n\n${t.cta}: ${input.whatsappUrl}\n${t.footer}`;
+  const text = `${t.badge.toUpperCase()}\n\n${t.greeting(input.firstName)}\n\n${t.intro}\n\n${textRows}\n\n${t.outro}\n\n${t.cta}: ${input.whatsappUrl}\n${t.footer}`;
 
   return { subject: t.subject(input.code), html, text };
 }
