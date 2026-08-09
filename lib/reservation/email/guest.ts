@@ -39,6 +39,7 @@ export async function sendConfirmationEmailOnce(code: string): Promise<void> {
       total: row.total,
       locale,
       miReservaUrl,
+      whatsappUrl: waLink(`Hola, escribo por la reserva ${row.code}`),
     });
 
     const ics = buildBookingIcs({

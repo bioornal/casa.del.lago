@@ -57,6 +57,17 @@ describe("sendConfirmationEmailOnce", () => {
     expect(send).not.toHaveBeenCalled();
   });
 
+  it("incluye el link de WhatsApp prellenado con el código", async () => {
+    // El texto del mail invita a escribir por WhatsApp; sin link, el huésped
+    // se queda sin a dónde ir.
+    markConfirmationEmailSent.mockResolvedValue(ROW);
+    await sendConfirmationEmailOnce("CDL-2026-AB12");
+    const arg = send.mock.calls[0][0];
+    expect(arg.html).toContain("wa.me");
+    expect(arg.html).toContain("CDL-2026-AB12");
+    expect(arg.text).toContain("wa.me");
+  });
+
   it("adjunta el .ics de la reserva", async () => {
     markConfirmationEmailSent.mockResolvedValue(ROW);
     await sendConfirmationEmailOnce("CDL-2026-AB12");
@@ -82,5 +93,13 @@ describe("sendReleaseEmail", () => {
     // @ts-expect-error fila parcial
     await sendReleaseEmail(ROW_FULL);
     expect(markConfirmationEmailSent).not.toHaveBeenCalled();
+  });
+
+  it("fail-soft: si Resend rechaza, no lanza", async () => {
+    // Avisar es best-effort. Las fechas YA se liberaron en la base cuando se
+    // llama a esto: que Resend falle no puede tumbar la operación.
+    send.mockRejectedValue(new Error("resend down"));
+    // @ts-expect-error fila parcial
+    await expect(sendReleaseEmail(ROW_FULL)).resolves.toBeUndefined();
   });
 });

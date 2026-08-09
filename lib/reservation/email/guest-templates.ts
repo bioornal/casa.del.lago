@@ -13,6 +13,9 @@ export type ConfirmationEmailInput = {
   total: number;
   locale: EmailLocale;
   miReservaUrl: string;
+  /** Link de WhatsApp prellenado con el código. Opcional: sin él no se
+   *  renderiza el link, y el template sigue válido para inputs viejos. */
+  whatsappUrl?: string;
 };
 
 export type BuiltEmail = { subject: string; html: string; text: string };
@@ -25,6 +28,8 @@ type Copy = {
   intro: string;
   labels: { code: string; unit: string; checkIn: string; checkOut: string; nights: string; guests: string; total: string };
   cta: string;
+  /** Etiqueta del link de WhatsApp. Misma redacción que RELEASE_COPY.cta. */
+  waCta: string;
   outro: string;
   footer: string;
 };
@@ -36,6 +41,7 @@ const COPY: Record<EmailLocale, Copy> = {
     intro: "Tu reserva en La Casa del Lago Urugua-í está confirmada. ¡Te esperamos!",
     labels: { code: "Código", unit: "Alojamiento", checkIn: "Check-in", checkOut: "Check-out", nights: "Noches", guests: "Huéspedes", total: "Total" },
     cta: "Ver mi reserva",
+    waCta: "Escribinos por WhatsApp",
     outro: "Ante cualquier consulta, respondé este correo o escribinos por WhatsApp.",
     footer: "La Casa del Lago Urugua-í · Lago Urugua-í, Misiones",
   },
@@ -45,6 +51,7 @@ const COPY: Record<EmailLocale, Copy> = {
     intro: "Your booking at La Casa del Lago Urugua-í is confirmed. We look forward to hosting you!",
     labels: { code: "Code", unit: "Accommodation", checkIn: "Check-in", checkOut: "Check-out", nights: "Nights", guests: "Guests", total: "Total" },
     cta: "View my booking",
+    waCta: "Message us on WhatsApp",
     outro: "If you have any questions, reply to this email or message us on WhatsApp.",
     footer: "La Casa del Lago Urugua-í · Lake Urugua-í, Misiones, Argentina",
   },
@@ -54,6 +61,7 @@ const COPY: Record<EmailLocale, Copy> = {
     intro: "Sua reserva na La Casa del Lago Urugua-í está confirmada. Esperamos por você!",
     labels: { code: "Código", unit: "Acomodação", checkIn: "Check-in", checkOut: "Check-out", nights: "Noites", guests: "Hóspedes", total: "Total" },
     cta: "Ver minha reserva",
+    waCta: "Fale conosco pelo WhatsApp",
     outro: "Em caso de dúvidas, responda este e-mail ou fale conosco pelo WhatsApp.",
     footer: "La Casa del Lago Urugua-í · Lago Urugua-í, Misiones, Argentina",
   },
@@ -121,12 +129,21 @@ export function buildConfirmationEmail(input: ConfirmationEmailInput): BuiltEmai
   <div style="text-align:center;margin:26px 0">
     <a href="${input.miReservaUrl}" style="display:inline-block;background:#A04B2A;color:#F8F5F0;text-decoration:none;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 28px;border-radius:4px">${t.cta}</a>
   </div>
-  <p style="font-size:13px;color:#6b665d;line-height:1.6;margin:0 0 18px">${t.outro}</p>`;
+  <p style="font-size:13px;color:#6b665d;line-height:1.6;margin:0 0 18px">${t.outro}</p>
+  ${
+    // El outro invita a escribir por WhatsApp: sin este link, el huésped se
+    // queda sin a dónde ir. Va como link y no como botón para no competir con
+    // el CTA principal, que es "ver mi reserva".
+    input.whatsappUrl
+      ? `<p style="font-size:13px;line-height:1.6;margin:0 0 18px"><a href="${input.whatsappUrl}" style="color:#A04B2A;text-decoration:underline">${t.waCta}</a></p>`
+      : ""
+  }`;
 
   const html = renderEnvelope(t.greeting(name), t.intro, body, t.footer);
 
   const textRows = rows.map(([k, v]) => `${k}: ${v}`).join("\n");
-  const text = `${t.greeting(input.firstName)}\n\n${t.intro}\n\n${textRows}\n\n${t.cta}: ${input.miReservaUrl}\n\n${t.outro}\n${t.footer}`;
+  const waLine = input.whatsappUrl ? `\n${t.waCta}: ${input.whatsappUrl}` : "";
+  const text = `${t.greeting(input.firstName)}\n\n${t.intro}\n\n${textRows}\n\n${t.cta}: ${input.miReservaUrl}\n\n${t.outro}${waLine}\n${t.footer}`;
 
   return { subject: t.subject(input.code), html, text };
 }

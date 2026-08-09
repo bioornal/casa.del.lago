@@ -112,7 +112,21 @@ En `sendConfirmationEmailOnce`, dentro del objeto que se pasa a `buildConfirmati
 
 Es la misma línea que ya existe en `sendReleaseEmail` de este archivo.
 
-- [ ] **Step 5: Envolver la liberación en try/catch**
+- [ ] ~~**Step 5: Envolver la liberación en try/catch**~~ — **DESCARTADO el 2026-08-09**
+
+El test de fail-soft de la liberación **pasó sin tocar nada**, así que el hallazgo que
+motivaba este paso era incorrecto. `sendEmail` de `email/client.ts` ya atrapa adentro y
+devuelve boolean; su comentario lo declara explícitamente:
+
+> *"Por eso los call sites no envuelven los envíos en try/catch: un email que falla no
+> puede tumbar la operación"*
+
+El `try/catch` que Aruma agregó en `sendReleaseEmail` es **redundante** bajo esta
+arquitectura y no se porta. El test queda como guarda de regresión del contrato
+fail-soft, no como arreglo.
+
+<details>
+<summary>Paso original, para referencia</summary>
 
 En `sendReleaseEmail`, envolver el cuerpo existente:
 
@@ -138,6 +152,8 @@ En `sendReleaseEmail`, envolver el cuerpo existente:
 ```
 
 Avisar de fechas liberadas es best-effort: que Resend falle no puede tumbar la operación que ya liberó las fechas en la base.
+
+</details>
 
 - [ ] **Step 6: Correr y verificar que pasan**
 
