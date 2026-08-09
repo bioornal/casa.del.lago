@@ -97,7 +97,7 @@ dominio que se complica se descarta sin arrastrar a los demás.
 
 | # | Dominio | Entra | Conservar de casa |
 |---|---|---|---|
-| 1 | Disponibilidad/calendario | `range.ts`, `ics.ts`, `search.ts` | `availability.server.ts` |
+| 1 | Disponibilidad/calendario | `range.ts`, `RangeCalendar.tsx` | `availability.server.ts` |
 | 2 | Emails | `guest-templates.ts`, `guest.ts`, `email/admin.ts` (nuevo), `comprobante.ts` (nuevo), `scripts/preview-email.mts`, script `email:preview` | `comprobante.server.ts` |
 | 3 | Pricing/tarifas | `method-pricing.ts`, `rate-settings.ts`, `rates.server.ts` | `RateForm.tsx` |
 | 4 | Checkout/pagos | fix del selector de comprobante (`ffe8dad`), `app/api` (4 archivos), `components/reservas` (7) | — |
@@ -204,6 +204,25 @@ Severidad final: **no hay doble reserva ni sobreventa posible**. Lo que se pierd
 conversión — el huésped completa datos y tarjeta para que lo rebocen al final. El
 dominio 1 se mantiene primero por costo/beneficio (dos funciones puras, alto impacto en
 UX), no por urgencia de integridad.
+
+### Corrección de alcance del dominio 1 (2026-08-09)
+
+Al escribir el plan, la inspección sacó tres piezas que este spec listaba:
+
+- **`ics.ts` no se porta.** Es código muerto en la réplica: solo lo importa su propio
+  test. Es residuo del lector de iCal de Google Calendar, eliminado deliberadamente. El
+  archivo que sí se usa es `ics-build.ts`, para el adjunto del email, y no está en el diff.
+- **`search.ts` pasa al dominio 5.** Su diff son los nombres de unidades (divergencia
+  deliberada) y `allowTestUnit`, que importa de `lib/reservation/test-unit.ts`, archivo
+  inexistente en la réplica. Pertenece a la unidad de prueba.
+- **El fix de `StickyBookingCard.tsx` no se porta.** El componente de la réplica tiene 86
+  líneas contra ~350 en Aruma y es una maqueta estática: muestra `— / — / —` como
+  llegada y salida, sin `DayPicker` ni estado. No hay bug que corregir porque no hay
+  selección de fechas. **Es un gap de feature, no de corrección**, y queda registrado
+  para un dominio posterior.
+
+El dominio 1 queda en `range.ts`, sus tests y `RangeCalendar.tsx`. Plan en
+`docs/superpowers/plans/2026-08-09-dominio-1-calendario.md`.
 
 **Riesgo de regresión en merges quirúrgicos.** Los cinco archivos de esa categoría son
 donde puede perderse trabajo propio sin que ningún test lo detecte. Mitigación: revisar
