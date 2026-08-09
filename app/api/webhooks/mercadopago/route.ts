@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPayment, verifyWebhookSignature } from "@/lib/reservation/payments.server";
 import { upsertConfirmedByCode, OverlapError, releasePendingByCode, type Locale } from "@/lib/reservation/reservations.server";
-import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
+import { sendConfirmationEmailOnce } from "@/lib/reservation/email/guest";
 import { alertAdminPaymentWithoutSlot } from "@/lib/reservation/email/admin";
 import type { UnitId } from "@/lib/reservation/reducer";
 

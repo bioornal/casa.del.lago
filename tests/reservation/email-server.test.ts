@@ -11,7 +11,16 @@ vi.mock("@/lib/reservation/reservations.server", () => ({
   markConfirmationEmailSent: (...a: unknown[]) => markConfirmationEmailSent(...a),
 }));
 
-import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
+// sendConfirmationEmailOnce dispara el aviso al dueño (notifyAdminNewReservation)
+// como efecto colateral. Sin este mock, ese código real corría acá desde que
+// el shim se repuntó a email/guest: hoy no manda nada solo porque el entorno
+// de test no trae CDL_ADMIN_EMAIL/ADMIN_EMAILS, pero es frágil — un mock
+// explícito no depende de qué variables falten en el entorno.
+vi.mock("@/lib/reservation/email/admin", () => ({
+  notifyAdminNewReservation: vi.fn(),
+}));
+
+import { sendConfirmationEmailOnce } from "@/lib/reservation/email/guest";
 
 const ROW = {
   code: "CDL-2026-AB12", unit_name: "Casa Aguaribay", first_name: "Juan",

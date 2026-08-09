@@ -13,8 +13,13 @@ vi.mock("@/lib/admin/auth", () => ({
 }));
 
 const sendConfirmationEmailOnce = vi.fn();
-vi.mock("@/lib/reservation/email.server", () => ({
+const sendReleaseEmail = vi.fn();
+// La ruta bajo test importa las dos funciones de email/guest (confirm y
+// release): el factory tiene que devolver ambas o el flujo "release" revienta
+// llamando a undefined() en cuanto el mock apunte al módulo real.
+vi.mock("@/lib/reservation/email/guest", () => ({
   sendConfirmationEmailOnce: (...a: unknown[]) => sendConfirmationEmailOnce(...a),
+  sendReleaseEmail: (...a: unknown[]) => sendReleaseEmail(...a),
 }));
 
 import { POST } from "@/app/api/admin/reservations/[id]/route";

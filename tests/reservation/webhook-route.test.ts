@@ -25,8 +25,12 @@ vi.mock("@/lib/reservation/reservations.server", () => ({
 }));
 
 const sendConfirmationEmailOnce = vi.fn();
-vi.mock("@/lib/reservation/email.server", () => ({
+// email/guest exporta sendConfirmationEmailOnce Y sendReleaseEmail: aunque esta
+// ruta solo use la primera, el factory devuelve las dos para no dejar la otra
+// undefined si algún día se importa desde acá.
+vi.mock("@/lib/reservation/email/guest", () => ({
   sendConfirmationEmailOnce: (...a: unknown[]) => sendConfirmationEmailOnce(...a),
+  sendReleaseEmail: vi.fn(),
 }));
 
 const alertAdminPaymentWithoutSlot = vi.fn();

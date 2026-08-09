@@ -19,7 +19,7 @@ import {
 } from "@/lib/reservation/reservations.server";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { getBookingMode } from "@/lib/site-settings.server";
-import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
+import { sendConfirmationEmailOnce } from "@/lib/reservation/email/guest";
 import type { UnitId } from "@/lib/reservation/reducer";
 
 const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
