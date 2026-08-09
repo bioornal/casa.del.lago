@@ -182,15 +182,28 @@ Ninguno de los dos repos tiene `node_modules`: el trabajo arranca con `pnpm inst
 
 ## Riesgos
 
-**El bug del calendario es una inferencia, no un hecho confirmado.** `range.ts` tiene 9
-líneas en casa contra 55 en Aruma, lo que sugiere que falta el fix `0e2a7d3` que impide
-reservar salteando por encima de fechas ocupadas. Pero esa lógica puede haber migrado a
-`availability.server.ts`, que está 15 líneas más grande.
+**Paso cero del dominio 1: resuelto el 2026-08-09.** El bug existe, pero es de
+experiencia, no de integridad de datos.
 
-**Paso cero del dominio 1:** escribir un test que intente reservar salteando una fecha
-ocupada.
-- Si pasa → bug de doble reserva confirmado, el dominio 1 sube a urgente.
-- Si falla → la lógica ya está cubierta y el dominio 1 se achica a `ics.ts` y `search.ts`.
+Confirmado por inspección:
+- `lib/reservation/range.ts` de casa tiene solo `pickDay`. `rangeHasBlocked` y
+  `firstBlockedAfter` no existen.
+- `RangeCalendar.tsx` hace `disabled={[{ before: new Date() }, ...disabledDates]}` y
+  `onDayClick={pickDay(...)}`, sin validación de rango. Es el escenario exacto que
+  describe `0e2a7d3`: deshabilitar los días ocupados no alcanza, porque las dos puntas
+  del rango están libres y el clic es válido en ambas.
+- `tests/reservation/range.test.ts` solo cubre `pickDay`.
+- No hay guarda equivalente en `StickyBookingCard.tsx`.
+
+**Pero la red server-side de casa es más fuerte que la que tenía Aruma:** el esquema
+define una constraint de exclusión GiST (`reservations_no_overlap`,
+`daterange(check_in, check_out, '[)') with &&`) y `reservations.server.ts` traduce el
+SQLSTATE `23P01` a `OverlapError`. La base rechaza el solapamiento.
+
+Severidad final: **no hay doble reserva ni sobreventa posible**. Lo que se pierde es
+conversión — el huésped completa datos y tarjeta para que lo rebocen al final. El
+dominio 1 se mantiene primero por costo/beneficio (dos funciones puras, alto impacto en
+UX), no por urgencia de integridad.
 
 **Riesgo de regresión en merges quirúrgicos.** Los cinco archivos de esa categoría son
 donde puede perderse trabajo propio sin que ningún test lo detecte. Mitigación: revisar
