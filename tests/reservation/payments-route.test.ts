@@ -63,10 +63,14 @@ const VALID = {
   payment: CARD,
 };
 
-function post(body: unknown) {
+// IP única por request por default (mismo patrón que lookup-route.test.ts):
+// el contador de rate-limit es un mapa en memoria que persiste entre los
+// tests del archivo, así que sin esto los casos existentes empiezan a
+// compartir cupo con el bucket "payments" y dan 429 según el orden en que corran.
+function post(body: unknown, ip: string = String(Math.random())) {
   return new Request("http://t/api/payments", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-forwarded-for": ip },
     body: JSON.stringify(body),
   });
 }
@@ -226,5 +230,14 @@ describe("POST /api/payments", () => {
     expect(insertReservation).toHaveBeenCalledOnce();
     expect(insertReservation.mock.calls[0][0].status).toBe("pending");
     expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("card");
+  });
+
+  it("429 al superar el techo de pedidos por IP", async () => {
+    // Mismo mecanismo que en transfer y lookup: el límite es por IP y por ventana.
+    createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
+    const ip = "198.51.100.23";
+    let last: Response | undefined;
+    for (let i = 0; i < 11; i++) last = await POST(post(VALID, ip));
+    expect(last!.status).toBe(429);
   });
 });

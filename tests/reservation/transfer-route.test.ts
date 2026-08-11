@@ -49,11 +49,19 @@ vi.mock("@/lib/reservation/email/admin", () => ({
 
 import { POST } from "@/app/api/reservations/transfer/route";
 
-function form(fields: Record<string, string>, file?: File) {
+// IP única por request por default (mismo patrón que lookup-route.test.ts):
+// el contador de rate-limit es un mapa en memoria que persiste entre los
+// tests del archivo, así que sin esto los casos existentes empiezan a
+// compartir cupo con el bucket "transfer" y dan 429 según el orden en que corran.
+function form(fields: Record<string, string>, file?: File, ip: string = String(Math.random())) {
   const fd = new FormData();
   Object.entries(fields).forEach(([k, v]) => fd.append(k, v));
   if (file) fd.append("comprobante", file);
-  return new Request("http://t/api/reservations/transfer", { method: "POST", body: fd });
+  return new Request("http://t/api/reservations/transfer", {
+    method: "POST",
+    headers: { "x-forwarded-for": ip },
+    body: fd,
+  });
 }
 
 const VALID = {
@@ -176,5 +184,14 @@ describe("POST /api/reservations/transfer", () => {
 
     await POST(form({ ...VALID, locale: "xx" }, goodFile()));
     expect(insertReservation.mock.calls[2][0].locale).toBe("es");
+  });
+
+  it("429 al superar el techo de pedidos por IP", async () => {
+    // Cada request sube un archivo al storage: sin techo, un script llena el
+    // bucket. El límite es por IP y por ventana, igual que en el lookup.
+    const ip = "203.0.113.77";
+    let last: Response | undefined;
+    for (let i = 0; i < 6; i++) last = await POST(form(VALID, goodFile(), ip));
+    expect(last!.status).toBe(429);
   });
 });

@@ -20,6 +20,7 @@ import {
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { getBookingMode } from "@/lib/site-settings.server";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email/guest";
+import { clientIp, rateLimited } from "@/lib/rate-limit";
 import type { UnitId } from "@/lib/reservation/reducer";
 
 const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
@@ -44,6 +45,11 @@ function isMockPay(v: unknown): v is MockPay {
 }
 
 export async function POST(req: Request) {
+  // Primera línea del handler: cortar antes de leer el body, no después.
+  if (rateLimited("payments", clientIp(req), 10, 60_000)) {
+    return NextResponse.json({ error: "rate" }, { status: 429 });
+  }
+
   // Reservas online pausadas (modo WhatsApp): no se aceptan pagos.
   if (isWhatsAppBookingMode(await getBookingMode())) {
     return NextResponse.json({ error: "bookings_paused" }, { status: 503 });
