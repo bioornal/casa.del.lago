@@ -563,8 +563,8 @@ Expected: verde.
 
 - [ ] **Step 6: Verificar el gate**
 
-Run: `grep -rn "generateBookingCode" app/`
-Expected: sin resultados. Los tres lugares donde nace una reserva piden el código contra la base.
+Run: `grep -rn "generateBookingCode" app/ | grep -v "//"`
+Expected: sin resultados. El `grep` sin filtrar sí devuelve tres líneas, pero son los comentarios que explican por qué **no** se usa el sorteo ciego. Lo que no puede quedar es un import ni una llamada.
 
 - [ ] **Step 7: Commit**
 
