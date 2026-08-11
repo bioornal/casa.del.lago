@@ -525,6 +525,56 @@ Si instalaste `@testing-library/user-event`, sumá `package.json` y `pnpm-lock.y
 
 ---
 
+### Task 5: El tercer lugar donde nace una reserva
+
+Agregada el 2026-08-11, después de la Task 1. El review encontró que `app/admin/reservas/actions.ts:53` también sortea el código a ciegas, para las reservas que el dueño carga a mano desde el panel. Es el mismo bug, el mismo arreglo, y es el tercero y último call site: sin esto el gate del dominio no puede pasar. El archivo pertenece al dominio 5 por el spec, pero esto no es portar la versión de Aruma —es aplicar el mismo fix de una línea—, así que no colisiona con lo que el dominio 5 vaya a hacer ahí.
+
+**Files:**
+- Modify: `app/admin/reservas/actions.ts:5,53`
+- Test: `tests/admin/actions.test.ts`
+
+**Interfaces:**
+- Consumes: `generateUniqueBookingCode` de `@/lib/reservation/reservations.server`, igual que la Task 1.
+- Produces: nada nuevo. La server action suma un camino de error.
+
+- [ ] **Step 1: Ver qué mockea el test**
+
+`tests/admin/actions.test.ts` ya mockea módulos de este árbol. Si mockea `@/lib/reservation/reservations.server`, agregale `generateUniqueBookingCode` al factory **antes** de tocar la action, por la misma razón que en la Task 1: un factory incompleto deja la función en `undefined`. Si no lo mockea, fijate contra qué corre hoy y seguí ese patrón.
+
+- [ ] **Step 2: Escribir los tests que fallan**
+
+En el caso del camino feliz que ya exista, sumá `expect(generateUniqueBookingCode).toHaveBeenCalledOnce();`.
+
+Y un caso nuevo para el fallo. La action devuelve un objeto de resultado, no una `Response`: mirá qué forma tienen sus retornos de error (por ejemplo `{ ok: false, error: "conflict" }` en el caso de solapamiento, `app/admin/reservas/actions.ts:64`) y seguí esa misma forma, con un valor de `error` propio para este caso. El test tiene que verificar que **no se insertó nada** cuando el código falla.
+
+- [ ] **Step 3: Correr y ver el rojo**
+
+Run: `pnpm vitest run tests/admin/actions.test.ts`
+Expected: FAIL — la action sigue usando el sorteo ciego.
+
+- [ ] **Step 4: Cablear**
+
+Sacar el import de `generateBookingCode` y pedir el código antes del `insertReservation`, con el mismo patrón de la Task 1 y un comentario que explique el porqué. La diferencia con las rutas es que acá se devuelve el objeto de resultado de la action, no un `NextResponse`.
+
+- [ ] **Step 5: Correr y ver el verde**
+
+Run: `pnpm test`
+Expected: verde.
+
+- [ ] **Step 6: Verificar el gate**
+
+Run: `grep -rn "generateBookingCode" app/`
+Expected: sin resultados. Los tres lugares donde nace una reserva piden el código contra la base.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add app/admin/reservas/actions.ts tests/admin/actions.test.ts
+git commit -m "fix(admin): la reserva manual también pide el código contra la base"
+```
+
+---
+
 ## Gate de verificación del dominio
 
 - [ ] `pnpm test` en verde, con la salida a la vista
@@ -537,4 +587,4 @@ Si instalaste `@testing-library/user-event`, sumá `package.json` y `pnpm-lock.y
 
 - **`calendar.server` y `test-unit`**: ver Global Constraints.
 - **El verde y el marfil de Aruma en el botón de enviar** (`StepTransferencia.tsx:95`): excede la excepción autorizada, que es solo el selector. Anotado para una pasada de branding aparte, junto con cualquier otro resto del baseline en `components/reservas/`.
-- **Dominio 5 (admin)**: plan aparte.
+- **Dominio 5 (admin)**: plan aparte. La Task 5 toca `app/admin/reservas/actions.ts`, pero solo para aplicarle el fix de la Task 1: no adelanta nada del portado del panel.
