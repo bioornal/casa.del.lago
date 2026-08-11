@@ -2,12 +2,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/admin/auth", () => ({ getAdminUser: vi.fn(() => Promise.resolve({ email: "a@a.com" })) }));
 
-const { OverlapError, insertReservation } = vi.hoisted(() => {
+const { OverlapError, insertReservation, generateUniqueBookingCode } = vi.hoisted(() => {
   class OverlapError extends Error { constructor() { super("overlap"); this.name = "OverlapError"; } }
-  return { OverlapError, insertReservation: vi.fn() };
+  return { OverlapError, insertReservation: vi.fn(), generateUniqueBookingCode: vi.fn() };
 });
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
+  generateUniqueBookingCode: (...a: unknown[]) => generateUniqueBookingCode(...a),
   OverlapError,
 }));
 
@@ -21,6 +22,9 @@ const VALID = {
 beforeEach(() => {
   vi.clearAllMocks();
   insertReservation.mockResolvedValue(undefined);
+  // Alfabeto sin 0/O ni 1/I (ver lib/reservation/code.ts): "AB23" respeta el
+  // regex /^CDL-\d{4}-[A-Z2-9]{4}$/ que ya verifican los tests de forma.
+  generateUniqueBookingCode.mockResolvedValue("CDL-2026-AB23");
 });
 
 describe("createManualReservation", () => {
@@ -31,6 +35,19 @@ describe("createManualReservation", () => {
     expect(row.paymentMethod).toBe("manual");
     expect(row.status).toBe("confirmed");
     expect(row.nights).toBe(3);
+    // generateBookingCode() sortea sobre 32^4 sin mirar la base. El código es la
+    // clave del lookup, del email y del flip de dedup: dos reservas con el mismo
+    // código se pisan.
+    expect(generateUniqueBookingCode).toHaveBeenCalledOnce();
+  });
+
+  it("devuelve error de código si no se consigue uno libre, sin insertar nada", async () => {
+    generateUniqueBookingCode.mockRejectedValueOnce(new Error("sin códigos libres"));
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await createManualReservation(VALID);
+    expect(res).toEqual({ ok: false, error: "code" });
+    expect(insertReservation).not.toHaveBeenCalled();
+    errSpy.mockRestore();
   });
 
   it("devuelve conflict ante OverlapError", async () => {
