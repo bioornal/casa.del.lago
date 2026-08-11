@@ -151,10 +151,12 @@ reservó (es/en/pt), enviado **exactamente una vez** cuando la reserva pasa a `c
 (`markConfirmationEmailSent`); solo el llamado que gana el flip envía. **Fail-soft:** un fallo de
 Resend nunca rompe la confirmación de la reserva. El locale se persiste en `reservations.locale`.
 
-**Archivos:** `lib/reservation/email.server.ts` (envío vía Resend), `lib/reservation/email-template.ts`
-(asunto/HTML/texto en es/en/pt), `lib/reservation/reservations.server.ts` (`markConfirmationEmailSent`),
-llamado desde `app/api/payments/route.ts`, `app/api/webhooks/mercadopago/route.ts` y
-`app/api/admin/reservations/[id]/route.ts`.
+**Archivos:** `lib/reservation/email/guest.ts` (envío al huésped, exactly-once) y
+`lib/reservation/email/client.ts` (único punto que habla con Resend), `lib/reservation/email/guest-templates.ts`
+(asunto/HTML/texto en es/en/pt), `lib/reservation/email/admin.ts` (avisos operativos al dueño: reserva
+nueva y pago aprobado sin fechas disponibles), `lib/reservation/reservations.server.ts`
+(`markConfirmationEmailSent`), llamado desde `app/api/payments/route.ts`,
+`app/api/webhooks/mercadopago/route.ts` y `app/api/admin/reservations/[id]/route.ts`.
 
 **Config:** `RESEND_API_KEY` y `CDL_EMAIL_FROM` (ver `.env.example`).
 **Pendiente de lanzamiento:** verificar el dominio del remitente en Resend; hasta entonces se usa

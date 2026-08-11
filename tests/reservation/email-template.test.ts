@@ -50,19 +50,29 @@ describe("robustez del mail rediseñado", () => {
   // y el escapado anti-inyección- también vive acá, en el template vigente, y
   // se había quedado sin cobertura propia.
   it("genera subject/html/text para los 3 locales", () => {
+    // El subject de es y pt es idéntico ("Reserva confirmada — …"), así que
+    // solo comprobar que el código aparece pasaría con cualquier copy —incluso
+    // con la selección de idioma rota. El saludo sí varía por locale (Hola/Hi/
+    // Olá): es el fragmento que hace discriminante el test.
+    const greetingFragment = { es: "Hola Juan,", en: "Hi Juan,", pt: "Olá Juan," } as const;
     for (const locale of ["es", "en", "pt"] as const) {
       const out = buildConfirmationEmail({ ...input, locale });
       expect(out.subject).toContain("CDL-2026-AB12");
       expect(out.html).toContain("CDL-2026-AB12");
       expect(out.text).toContain("CDL-2026-AB12");
+      expect(out.html).toContain(greetingFragment[locale]);
+      expect(out.text).toContain(greetingFragment[locale]);
     }
   });
 
   it("locale inválido cae a es", () => {
+    // Comparar solo el subject no sirve: es y pt comparten el mismo subject,
+    // así que un fallback roto a "pt" pasaría igual. El html completo (saludo,
+    // intro, etc.) sí distingue es de pt.
     // @ts-expect-error probamos un locale fuera del union
     const out = buildConfirmationEmail({ ...input, locale: "fr" });
     const es = buildConfirmationEmail({ ...input, locale: "es" });
-    expect(out.subject).toBe(es.subject);
+    expect(out.html).toBe(es.html);
   });
 
   it("escapa HTML en campos del huésped (anti-inyección)", () => {

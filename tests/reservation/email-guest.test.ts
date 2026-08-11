@@ -95,6 +95,18 @@ describe("sendConfirmationEmailOnce", () => {
     });
   });
 
+  it("payment_method transfer → NO avisa al dueño (ya se avisó al subir el comprobante)", async () => {
+    // El único camino que confirma una transferencia es el panel de admin
+    // (app/api/admin/reservations/[id]/route.ts, que exige payment_method ===
+    // "transfer"). El aviso "[Revisar comprobante]" ya salió cuando el huésped
+    // subió el comprobante; repetirlo acá sería avisarle al dueño de la acción
+    // que él mismo acaba de hacer en el panel.
+    markConfirmationEmailSent.mockResolvedValue({ ...ROW, payment_method: "transfer" });
+    await sendConfirmationEmailOnce("CDL-2026-AB12");
+    expect(send).toHaveBeenCalledOnce(); // el huésped sí recibe su confirmación
+    expect(notifyAdminNewReservation).not.toHaveBeenCalled();
+  });
+
   it("flip no ganado → tampoco avisa al dueño (dedup compartida)", async () => {
     // El checkout y el webhook confirman la misma reserva: sin esta guarda
     // llegan dos avisos.

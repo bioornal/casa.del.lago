@@ -103,7 +103,11 @@ describe("notifyAdminNewReservation", () => {
 
   it("escapa HTML en campos del huésped (anti-inyección)", async () => {
     await notifyAdminNewReservation({ ...NUEVA, lastName: "<script>x</script>" });
-    expect(send.mock.calls[0][0].html).not.toContain("<script>x</script>");
+    const html = send.mock.calls[0][0].html;
+    expect(html).not.toContain("<script>x</script>");
+    // No alcanza con que el crudo no aparezca: hay que verificar que el dato
+    // sobrevive escapado, no que el campo se borró silenciosamente.
+    expect(html).toContain("&lt;script&gt;");
   });
 
   it("fail-soft: si Resend rechaza, no lanza", async () => {

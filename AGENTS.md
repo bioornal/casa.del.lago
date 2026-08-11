@@ -35,7 +35,8 @@ Cabañas a orillas del **lago Urugua-í**, entre Puerto Iguazú y Puerto Liberta
 - Distancias / banco / servicios / check-in-out: `lib/site.ts`
 - Textos visibles: `messages/es.json`, `messages/en.json`, `messages/pt.json`
 - SEO / JSON-LD / OG: `app/[locale]/page.tsx`
-- Emails de confirmación: `lib/reservation/email-template.ts`
+- Emails de confirmación (huésped): `lib/reservation/email/guest-templates.ts`
+- Emails operativos (dueño): `lib/reservation/email/admin.ts`
 - Variables de entorno: `.env.example` (plantilla) → `.env.local` (valores reales, gitignored)
 
 ## Port de features de Aruma (2026-07-20, segunda tanda)

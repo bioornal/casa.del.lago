@@ -67,20 +67,29 @@ export async function sendConfirmationEmailOnce(code: string): Promise<void> {
     // El aviso al dueño va acá y no en las rutas: este bloque ya corre una sola
     // vez por reserva (flip atómico de markConfirmationEmailSent) y la fila ya
     // tiene todo. Cablearlo en el checkout y en el webhook mandaría dos.
-    await notifyAdminNewReservation({
-      code: row.code,
-      unitName: row.unit_name,
-      firstName: row.first_name,
-      lastName: row.last_name,
-      email: row.email,
-      phone: row.phone ?? "",
-      checkIn: row.check_in,
-      checkOut: row.check_out,
-      nights: row.nights,
-      guests: row.guests,
-      total: row.total,
-      paymentMethod: row.payment_method,
-    });
+    //
+    // Excepción: si payment_method es "transfer", el único camino que llega
+    // hasta acá es app/api/admin/reservations/[id]/route.ts confirmando a mano
+    // (exige r.payment_method === "transfer" para la acción "confirm"). El aviso
+    // "[Revisar comprobante]" ya salió cuando el huésped subió el comprobante
+    // (transfer/route.ts); avisarle de nuevo acá sería avisarle de su propia
+    // acción recién hecha en el panel — el mismo ruido que el caso "manual".
+    if (row.payment_method !== "transfer") {
+      await notifyAdminNewReservation({
+        code: row.code,
+        unitName: row.unit_name,
+        firstName: row.first_name,
+        lastName: row.last_name,
+        email: row.email,
+        phone: row.phone ?? "",
+        checkIn: row.check_in,
+        checkOut: row.check_out,
+        nights: row.nights,
+        guests: row.guests,
+        total: row.total,
+        paymentMethod: row.payment_method,
+      });
+    }
   } catch (err) {
     console.error(
       `[email] confirmación falló (code ${code}):`,

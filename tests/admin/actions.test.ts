@@ -54,6 +54,11 @@ describe("POST /api/admin/reservations/[id]", () => {
     const res = await POST(post("release"), ctx);
     expect(res.status).toBe(200);
     expect(setReservationStatus).toHaveBeenCalledWith("abc", "released");
+    // Sin esta aserción, un export mal nombrado en email/guest da undefined()
+    // acá: el try/catch de la ruta se lo traga y el test sigue en verde.
+    expect(sendReleaseEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ code: "CDL-2026-AB12" }),
+    );
   });
 
   it("401 si no hay admin", async () => {
