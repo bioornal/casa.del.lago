@@ -3,6 +3,7 @@ import { uploadComprobante, removeComprobante, isAllowedMime, MAX_BYTES } from "
 import { insertReservation, OverlapError } from "@/lib/reservation/reservations.server";
 import { generateBookingCode } from "@/lib/reservation/code";
 import { getUnit } from "@/lib/units";
+import { notifyAdminNewReservation } from "@/lib/reservation/email/admin";
 import { computeNights } from "@/lib/reservation/pricing";
 import { methodTotal } from "@/lib/reservation/method-pricing";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
@@ -108,6 +109,19 @@ export async function POST(req: Request) {
     }
     console.error("[transfer] insert fallo:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "db" }, { status: 502 });
+  }
+
+  // El comprobante necesita ojo humano: sin este aviso la transferencia entra
+  // en silencio. En try/catch porque un aviso caído no puede desarmar una
+  // reserva que ya quedó tomada y con el archivo subido.
+  try {
+    await notifyAdminNewReservation({
+      code, unitName: unit.name, firstName, lastName, email, phone,
+      checkIn, checkOut, nights, guests, total,
+      paymentMethod: "transfer",
+    });
+  } catch (err) {
+    console.error("[transfer] aviso al dueño falló:", err instanceof Error ? err.message : err);
   }
 
   return NextResponse.json({ status: "pending", code });

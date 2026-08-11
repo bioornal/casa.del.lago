@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/admin/auth";
 import { getReservationById, setReservationStatus } from "@/lib/reservation/reservations.server";
-import { sendConfirmationEmailOnce, sendReleaseEmail } from "@/lib/reservation/email.server";
+import { sendConfirmationEmailOnce, sendReleaseEmail } from "@/lib/reservation/email/guest";
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   // Defensa en profundidad (el middleware ya bloquea, pero re-verificamos).

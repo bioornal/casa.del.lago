@@ -40,6 +40,11 @@ vi.mock("@/lib/site-settings.server", () => ({
   getBookingMode: vi.fn(async () => "online" as const),
 }));
 
+const notifyAdminNewReservation = vi.fn();
+vi.mock("@/lib/reservation/email/admin", () => ({
+  notifyAdminNewReservation: (...a: unknown[]) => notifyAdminNewReservation(...a),
+}));
+
 import { POST } from "@/app/api/reservations/transfer/route";
 
 function form(fields: Record<string, string>, file?: File) {
@@ -73,6 +78,27 @@ describe("POST /api/reservations/transfer", () => {
     expect(insertReservation).toHaveBeenCalledOnce();
     expect(insertReservation.mock.calls[0][0].status).toBe("pending");
     expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("transfer");
+  });
+
+  it("avisa al dueño que hay un comprobante para revisar", async () => {
+    // Sin esto la transferencia entra en silencio: el comprobante queda
+    // esperando a que alguien mire el panel por casualidad.
+    const res = await POST(form(VALID, goodFile()));
+    expect(res.status).toBe(200);
+    expect(notifyAdminNewReservation).toHaveBeenCalledOnce();
+    expect(notifyAdminNewReservation.mock.calls[0][0]).toMatchObject({
+      paymentMethod: "transfer",
+      lastName: "Pérez",
+    });
+  });
+
+  it("si el aviso falla, la reserva igual queda tomada", async () => {
+    notifyAdminNewReservation.mockRejectedValueOnce(new Error("resend caído"));
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await POST(form(VALID, goodFile()));
+    expect(res.status).toBe(200);
+    expect((await res.json()).status).toBe("pending");
+    errSpy.mockRestore();
   });
 
   it("responde 409 y borra el comprobante si las fechas se solapan", async () => {

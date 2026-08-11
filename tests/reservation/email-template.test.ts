@@ -1,10 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { buildConfirmationEmail } from "@/lib/reservation/email-template";
-// El template VIVO es este. email-template.ts es un duplicado de 126 líneas que
-// nadie importa fuera de este archivo: lo mantienen vivo los tests de arriba.
-// Se retira en 2C.
+// El template VIVO es este: email-template.ts (el duplicado de 126 líneas que
+// solo mantenían vivo los tests de acá abajo) se retiró en 2C.
 import {
-  buildConfirmationEmail as buildReal,
+  buildConfirmationEmail,
   buildReleaseEmail,
 } from "@/lib/reservation/email/guest-templates";
 
@@ -20,48 +18,13 @@ const base = {
   miReservaUrl: "https://aruma.test/es/mi-reserva?code=CDL-2026-AB12",
 } as const;
 
-describe("buildConfirmationEmail", () => {
-  it("genera subject/html/text para los 3 locales", () => {
-    for (const locale of ["es", "en", "pt"] as const) {
-      const out = buildConfirmationEmail({ ...base, locale });
-      expect(out.subject).toContain("CDL-2026-AB12");
-      expect(out.html).toContain("CDL-2026-AB12");
-      expect(out.text).toContain("CDL-2026-AB12");
-    }
-  });
-
-  it("incluye total, unidad y la URL a mi-reserva en el cuerpo", () => {
-    const out = buildConfirmationEmail({ ...base, locale: "es" });
-    expect(out.html).toContain("Casa Aguaribay");
-    expect(out.html).toContain(base.miReservaUrl);
-    expect(out.html).toContain("480.000"); // formato es-AR
-    expect(out.text).toContain(base.miReservaUrl);
-  });
-
-  it("locale inválido cae a es", () => {
-    // @ts-expect-error probamos un locale fuera del union
-    const out = buildConfirmationEmail({ ...base, locale: "fr" });
-    const es = buildConfirmationEmail({ ...base, locale: "es" });
-    expect(out.subject).toBe(es.subject);
-  });
-
-  it("escapa HTML en campos del huésped (anti-inyección)", () => {
-    const out = buildConfirmationEmail({
-      ...base, locale: "es", firstName: "<script>x</script>", unitName: "<b>u</b>",
-    });
-    expect(out.html).not.toContain("<script>x</script>");
-    expect(out.html).not.toContain("<b>u</b>");
-    expect(out.html).toContain("&lt;script&gt;");
-  });
-});
-
 describe("robustez del mail rediseñado", () => {
   const input = { ...base, locale: "es" as const, whatsappUrl: "https://wa.me/549123?text=hola" };
 
   it("sin imágenes, sigue entregando código, unidad, total y estado", () => {
     // Gmail y Outlook bloquean imágenes por defecto: todo dato tiene que
     // viajar como texto, las imágenes son decorativas.
-    const { html } = buildReal(input);
+    const { html } = buildConfirmationEmail(input);
     const sinImgs = html.replace(/<img[^>]*>/g, "");
     expect(sinImgs).toContain("CDL-2026-AB12");
     expect(sinImgs).toContain("Casa Aguaribay");
@@ -71,15 +34,54 @@ describe("robustez del mail rediseñado", () => {
   it("la maqueta es una tabla de ancho fijo, no un div con max-width", () => {
     // Outlook de escritorio renderiza con el motor de Word, que ignora
     // max-width: con un div el mail se estira a toda la ventana.
-    const { html } = buildReal(input);
+    const { html } = buildConfirmationEmail(input);
     expect(html).toContain('width="560"');
     expect(html).not.toMatch(/<div[^>]*max-width/);
   });
 
   it("menciona el .ics adjunto, que hoy se manda y nunca se nombra", () => {
-    const { html, text } = buildReal(input);
+    const { html, text } = buildConfirmationEmail(input);
     expect(html.toLowerCase()).toMatch(/calendario|agenda/);
     expect(text.toLowerCase()).toMatch(/calendario|agenda/);
+  });
+
+  // Los tres casos de abajo vivían en email-template.ts (el duplicado muerto,
+  // retirado en 2C). Esa lógica -los 3 locales, el fallback de locale inválido
+  // y el escapado anti-inyección- también vive acá, en el template vigente, y
+  // se había quedado sin cobertura propia.
+  it("genera subject/html/text para los 3 locales", () => {
+    // El subject de es y pt es idéntico ("Reserva confirmada — …"), así que
+    // solo comprobar que el código aparece pasaría con cualquier copy —incluso
+    // con la selección de idioma rota. El saludo sí varía por locale (Hola/Hi/
+    // Olá): es el fragmento que hace discriminante el test.
+    const greetingFragment = { es: "Hola Juan,", en: "Hi Juan,", pt: "Olá Juan," } as const;
+    for (const locale of ["es", "en", "pt"] as const) {
+      const out = buildConfirmationEmail({ ...input, locale });
+      expect(out.subject).toContain("CDL-2026-AB12");
+      expect(out.html).toContain("CDL-2026-AB12");
+      expect(out.text).toContain("CDL-2026-AB12");
+      expect(out.html).toContain(greetingFragment[locale]);
+      expect(out.text).toContain(greetingFragment[locale]);
+    }
+  });
+
+  it("locale inválido cae a es", () => {
+    // Comparar solo el subject no sirve: es y pt comparten el mismo subject,
+    // así que un fallback roto a "pt" pasaría igual. El html completo (saludo,
+    // intro, etc.) sí distingue es de pt.
+    // @ts-expect-error probamos un locale fuera del union
+    const out = buildConfirmationEmail({ ...input, locale: "fr" });
+    const es = buildConfirmationEmail({ ...input, locale: "es" });
+    expect(out.html).toBe(es.html);
+  });
+
+  it("escapa HTML en campos del huésped (anti-inyección)", () => {
+    const out = buildConfirmationEmail({
+      ...input, firstName: "<script>x</script>", unitName: "<b>u</b>",
+    });
+    expect(out.html).not.toContain("<script>x</script>");
+    expect(out.html).not.toContain("<b>u</b>");
+    expect(out.html).toContain("&lt;script&gt;");
   });
 });
 

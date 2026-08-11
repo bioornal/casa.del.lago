@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getPayment, verifyWebhookSignature } from "@/lib/reservation/payments.server";
 import { upsertConfirmedByCode, OverlapError, releasePendingByCode, type Locale } from "@/lib/reservation/reservations.server";
-import { sendConfirmationEmailOnce } from "@/lib/reservation/email.server";
+import { sendConfirmationEmailOnce } from "@/lib/reservation/email/guest";
+import { alertAdminPaymentWithoutSlot } from "@/lib/reservation/email/admin";
 import type { UnitId } from "@/lib/reservation/reducer";
 
 const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
@@ -79,7 +80,34 @@ export async function POST(req: Request) {
     await upsertConfirmedByCode(upsertInput);
   } catch (err) {
     if (err instanceof OverlapError) {
+      // El console.error se conserva como última red: el mail puede no salir
+      // (sin RESEND_API_KEY, sin destinatario configurado, Resend caído) y
+      // esta plata ya se cobró sin que exista una reserva.
       console.error(`[webhook] pago ${payment.id} aprobado pero fechas ocupadas (code ${code}); requiere reembolso manual`);
+      // Try/catch propio: sendEmail no lanza hoy, pero si esto alguna vez lo
+      // hiciera, un throw acá tumbaría el POST → Mercado Pago reintenta el
+      // webhook → OverlapError de nuevo → alerta de nuevo → 500 de nuevo. Un
+      // bucle de reintentos sobre plata ya cobrada, sin que el dueño se entere
+      // nunca (el catch de afuera nunca se alcanza).
+      try {
+        await alertAdminPaymentWithoutSlot({
+          code,
+          paymentId: String(payment.id),
+          unitName: upsertInput.unitName,
+          checkIn: upsertInput.checkIn,
+          checkOut: upsertInput.checkOut,
+          firstName: upsertInput.firstName,
+          lastName: upsertInput.lastName,
+          email: upsertInput.email,
+          phone: upsertInput.phone,
+          total: upsertInput.total,
+        });
+      } catch (alertErr) {
+        console.error(
+          "[webhook] alerta crítica falló:",
+          alertErr instanceof Error ? alertErr.message : alertErr,
+        );
+      }
       return NextResponse.json({ ok: true });
     }
     console.error("[webhook] persist supabase fallo:", err instanceof Error ? err.message : err);
