@@ -6,6 +6,7 @@ import messages from "@/messages/es.json";
 import { StepTransferencia } from "@/components/reservas/StepTransferencia";
 
 import { DEFAULT_RATE_SETTINGS } from "@/lib/reservation/rate-settings";
+import { MAX_BYTES } from "@/lib/reservation/comprobante";
 import type { State } from "@/lib/reservation/reducer";
 
 // Las tres props que declara el componente: state, settings y onPending.
@@ -23,14 +24,20 @@ function renderStep() {
 }
 
 describe("selector de comprobante", () => {
-  it("el input nativo está oculto pero sigue en el tab order", () => {
-    // display:none lo sacaría del foco por teclado: quien navega sin mouse se
-    // queda sin poder adjuntar.
+  it("el input de archivo sigue siendo alcanzable por teclado y tiene un label asociado", async () => {
+    // `style.display !== "none"` no protege nada: display:none, visibility:hidden,
+    // el atributo hidden y tabIndex={-1} sacan igual un elemento del tab order
+    // sin que ese chequeo puntual lo note. Lo que importa de verdad es el
+    // resultado — que Tab lo enfoque y que tenga un label — no un valor de estilo.
     renderStep();
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     expect(input).toBeTruthy();
-    expect(input.style.display).not.toBe("none");
-    expect(screen.getByText(/Elegir archivo/)).toBeInTheDocument();
+
+    await userEvent.tab();
+    expect(document.activeElement).toBe(input);
+
+    const label = document.querySelector(`label[for="${input.id}"]`);
+    expect(label).toBeTruthy();
   });
 
   it("rechaza un formato no admitido antes de subirlo", async () => {
@@ -54,5 +61,18 @@ describe("selector de comprobante", () => {
     await userEvent.upload(input, new File(["x"], "comprobante.pdf", { type: "application/pdf" }));
     expect(screen.getByText("comprobante.pdf")).toBeInTheDocument();
     expect(screen.getByText(/Cambiar archivo/)).toBeInTheDocument();
+  });
+
+  it("rechaza un archivo que supera el máximo e interpola el tamaño en el mensaje", async () => {
+    // transferFileTooBig es la única clave de mensajes que interpola {size}
+    // (ver messages/es.json): si el placeholder de next-intl estuviera mal
+    // escrito o desalineado con lo que pasa StepTransferencia, esto revienta
+    // en runtime en vez de solo fallar un test.
+    renderStep();
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const big = new File([new Uint8Array(MAX_BYTES + 1)], "grande.jpg", { type: "image/jpeg" });
+    await userEvent.upload(input, big);
+    expect(screen.getByRole("alert")).toHaveTextContent(/6\.1 MB/);
+    expect(screen.getByRole("alert")).toHaveTextContent(/6 MB/);
   });
 });

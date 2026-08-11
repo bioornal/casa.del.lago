@@ -35,6 +35,18 @@ export function isAllowedMime(mime: string): mime is AllowedMime {
 /** Tamaño legible para mostrar en el checkout: "512 B", "2 KB", "3.0 MB". */
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+
+  // Se compara contra el KB ya redondeado, no contra el byte crudo: con el
+  // byte crudo, 1048575 B (1 MB menos 1 byte) redondea a 1024 KB, un número
+  // que la rama de KB nunca debería poder mostrar.
+  const kb = Math.round(bytes / 1024);
+  if (kb < 1024) return `${kb} KB`;
+
+  // Redondeo hacia arriba, no al más cercano: este texto se usa en el mensaje
+  // de "el archivo pesa X y el máximo son 6 MB" cuando se RECHAZA un archivo.
+  // Con redondeo al más cercano, 6291457 B (un byte más que el máximo) da
+  // "6.0 MB", y el mensaje termina diciendo que el archivo pesa lo mismo que
+  // el límite que superó.
+  const mb = Math.ceil((bytes / (1024 * 1024)) * 10) / 10;
+  return `${mb.toFixed(1)} MB`;
 }

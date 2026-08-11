@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  MAX_BYTES, ACCEPT_ATTR, isAllowedMime, extFor, formatBytes,
+  MAX_BYTES, isAllowedMime, extFor, formatBytes,
 } from "@/lib/reservation/comprobante";
 import * as server from "@/lib/reservation/comprobante.server";
 
@@ -12,13 +12,14 @@ describe("reglas del comprobante", () => {
     expect(isAllowedMime("")).toBe(false);
   });
 
-  it("el accept del input lista los mismos tipos que valida el servidor", () => {
-    // Si divergieran, el huésped elegiría un archivo que la UI acepta y el POST
-    // rechaza, y el error aparecería recién al final del paso.
-    for (const mime of ACCEPT_ATTR.split(",")) {
-      expect(isAllowedMime(mime)).toBe(true);
-    }
-  });
+  // El test que había acá ("el accept del input lista los mismos tipos que
+  // valida el servidor") era tautológico: ACCEPT_ATTR se deriva de
+  // ALLOWED_MIME con un join, así que solo probaba que join+split son
+  // inversos. La divergencia real cliente/servidor —que MAX_BYTES e
+  // isAllowedMime sean literalmente los mismos valores en los dos módulos—
+  // ya la cubre el test de más abajo. Un chequeo contra el accept del <input>
+  // real, si hiciera falta, va en el test del componente (StepTransferencia),
+  // no acá donde no hay DOM.
 
   it("la extensión sale del mime, con fallback", () => {
     expect(extFor("image/jpeg")).toBe("jpg");
@@ -30,6 +31,17 @@ describe("reglas del comprobante", () => {
     expect(formatBytes(512)).toBe("512 B");
     expect(formatBytes(2048)).toBe("2 KB");
     expect(formatBytes(3 * 1024 * 1024)).toBe("3.0 MB");
+  });
+
+  it("redondea hacia arriba en MB: un byte más que el máximo no puede mostrar el mismo número que el límite", () => {
+    // 6291457 B (MAX_BYTES + 1) es el valor exacto que dispara el rechazo por
+    // tamaño. Con redondeo al más cercano daba "6.0 MB", y el mensaje de
+    // error terminaba diciendo "pesa 6.0 MB, el máximo son 6 MB".
+    expect(formatBytes(MAX_BYTES + 1)).toBe("6.1 MB");
+  });
+
+  it("no se estanca en '1024 KB': el KB redondeado que llega a 1024 pasa a mostrarse en MB", () => {
+    expect(formatBytes(1024 * 1024 - 1)).toBe("1.0 MB");
   });
 
   it("el .server re-exporta los mismos valores: una sola fuente de verdad", () => {

@@ -234,10 +234,17 @@ describe("POST /api/payments", () => {
 
   it("429 al superar el techo de pedidos por IP", async () => {
     // Mismo mecanismo que en transfer y lookup: el límite es por IP y por ventana.
+    // El máximo de la ruta es 10 (ver rateLimited("payments", ..., 10, ...)):
+    // hay que probar que las primeras 10 pasan y recién la 11ª se bloquea, no
+    // solo que la última de una tanda cualquiera da 429 (eso pasaría igual si
+    // la ruta devolviera 429 siempre).
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
     const ip = "198.51.100.23";
-    let last: Response | undefined;
-    for (let i = 0; i < 11; i++) last = await POST(post(VALID, ip));
-    expect(last!.status).toBe(429);
+    for (let i = 0; i < 10; i++) {
+      const res = await POST(post(VALID, ip));
+      expect(res.status).not.toBe(429);
+    }
+    const blocked = await POST(post(VALID, ip));
+    expect(blocked.status).toBe(429);
   });
 });

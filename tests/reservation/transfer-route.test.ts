@@ -189,9 +189,16 @@ describe("POST /api/reservations/transfer", () => {
   it("429 al superar el techo de pedidos por IP", async () => {
     // Cada request sube un archivo al storage: sin techo, un script llena el
     // bucket. El límite es por IP y por ventana, igual que en el lookup.
+    // El máximo de la ruta es 5 (ver rateLimited("transfer", ..., 5, ...)):
+    // hay que probar que las primeras 5 pasan y recién la 6ª se bloquea, no
+    // solo que la última de una tanda cualquiera da 429 (eso pasaría igual si
+    // la ruta devolviera 429 siempre).
     const ip = "203.0.113.77";
-    let last: Response | undefined;
-    for (let i = 0; i < 6; i++) last = await POST(form(VALID, goodFile(), ip));
-    expect(last!.status).toBe(429);
+    for (let i = 0; i < 5; i++) {
+      const res = await POST(form(VALID, goodFile(), ip));
+      expect(res.status).not.toBe(429);
+    }
+    const blocked = await POST(form(VALID, goodFile(), ip));
+    expect(blocked.status).toBe(429);
   });
 });

@@ -34,7 +34,12 @@ export function ManualReservationForm({ disabledByUnit }: Props) {
     });
     setBusy(false);
     if (res.ok) { setRange({ checkIn: null, checkOut: null }); router.refresh(); }
-    else setMsg(res.error === "conflict" ? "Esas fechas ya están ocupadas." : "Revisá los datos.");
+    else if (res.error === "conflict") setMsg("Esas fechas ya están ocupadas.");
+    // "code" (no se consiguió un código único) y "server" (falló el insert)
+    // son fallas de la base, no de lo que cargó el dueño: si le decimos
+    // "Revisá los datos" va a corregir campos que ya estaban bien, sin fin.
+    else if (res.error === "code" || res.error === "server") setMsg("Hubo un problema al guardar. No es algo que hayas cargado mal: probá de nuevo en un momento.");
+    else setMsg("Revisá los datos.");
   };
 
   return (
