@@ -5,7 +5,6 @@ import {
   isMockMode,
   type PaymentOutcome,
 } from "@/lib/reservation/payments.server";
-import { generateBookingCode } from "@/lib/reservation/code";
 import { getUnit } from "@/lib/units";
 import { computeNights } from "@/lib/reservation/pricing";
 import { methodTotal } from "@/lib/reservation/method-pricing";
@@ -13,6 +12,7 @@ import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
 import {
   insertReservation,
+  generateUniqueBookingCode,
   upsertConfirmedByCode,
   setReservationStatusByCode,
   OverlapError,
@@ -89,7 +89,16 @@ export async function POST(req: Request) {
   // Precio de lista = método tarjeta (comisión MP incluida; ver method-pricing.ts)
   const total = methodTotal(settings, "card", unit.slug, nights);
 
-  const code = generateBookingCode();
+  // Contra la base, no a ciegas: generateBookingCode() sortea sobre 32^4 sin
+  // mirar si el código ya existe, y el código es la clave del lookup, del email
+  // y del flip de deduplicación.
+  let code: string;
+  try {
+    code = await generateUniqueBookingCode();
+  } catch (err) {
+    console.error("[payments] código único falló:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: "code" }, { status: 502 });
+  }
 
   // Retención ANTES de cobrar: la constraint de exclusión es el candado atómico.
   // Si las fechas están tomadas, nunca se cobra.

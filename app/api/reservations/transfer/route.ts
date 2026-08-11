@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { uploadComprobante, removeComprobante, isAllowedMime, MAX_BYTES } from "@/lib/reservation/comprobante.server";
-import { insertReservation, OverlapError } from "@/lib/reservation/reservations.server";
-import { generateBookingCode } from "@/lib/reservation/code";
+import {
+  insertReservation,
+  generateUniqueBookingCode,
+  OverlapError,
+} from "@/lib/reservation/reservations.server";
 import { getUnit } from "@/lib/units";
 import { notifyAdminNewReservation } from "@/lib/reservation/email/admin";
 import { computeNights } from "@/lib/reservation/pricing";
@@ -82,7 +85,16 @@ export async function POST(req: Request) {
   // Total del método TRANSFERENCIA (menor al precio de lista; ver method-pricing.ts)
   const total = methodTotal(settings, "transfer", unit.slug, nights);
 
-  const code = generateBookingCode();
+  // Contra la base, no a ciegas: generateBookingCode() sortea sobre 32^4 sin
+  // mirar si el código ya existe, y el código es la clave del lookup, del email
+  // y del flip de deduplicación.
+  let code: string;
+  try {
+    code = await generateUniqueBookingCode();
+  } catch (err) {
+    console.error("[transfer] código único falló:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: "code" }, { status: 502 });
+  }
 
   // 1. Subir comprobante.
   let comprobantePath: string;

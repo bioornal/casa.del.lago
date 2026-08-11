@@ -18,10 +18,12 @@ const { OverlapError } = vi.hoisted(() => {
 const insertReservation = vi.fn();
 const upsertConfirmedByCode = vi.fn();
 const setReservationStatusByCode = vi.fn();
+const generateUniqueBookingCode = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
   upsertConfirmedByCode: (...a: unknown[]) => upsertConfirmedByCode(...a),
   setReservationStatusByCode: (...a: unknown[]) => setReservationStatusByCode(...a),
+  generateUniqueBookingCode: (...a: unknown[]) => generateUniqueBookingCode(...a),
   OverlapError,
 }));
 
@@ -78,6 +80,10 @@ beforeEach(() => {
   setReservationStatusByCode.mockReset();
   setReservationStatusByCode.mockResolvedValue(undefined);
   sendConfirmationEmailOnce.mockReset();
+  generateUniqueBookingCode.mockReset();
+  // Alfabeto sin 0/O ni 1/I (ver lib/reservation/code.ts): "AB23" respeta el
+  // regex /^CDL-\d{4}-[A-Z2-9]{4}$/ que ya verifican los tests de forma.
+  generateUniqueBookingCode.mockResolvedValue("CDL-2026-AB23");
   delete process.env.PAYMENTS_MOCK;
 });
 afterEach(() => { delete process.env.PAYMENTS_MOCK; });
@@ -108,12 +114,26 @@ describe("POST /api/payments", () => {
     const body = await res.json();
     expect(body.status).toBe("approved");
     expect(body.code).toMatch(/^CDL-\d{4}-[A-Z2-9]{4}$/);
+    // generateBookingCode() sortea sobre 32^4 sin mirar la base. El código es la
+    // clave del lookup, del email y del flip de dedup: dos reservas con el mismo
+    // código se pisan.
+    expect(generateUniqueBookingCode).toHaveBeenCalledOnce();
     expect(insertReservation.mock.calls[0][0].status).toBe("pending");
     expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("card");
     expect(upsertConfirmedByCode).toHaveBeenCalledOnce();
     expect(upsertConfirmedByCode.mock.calls[0][0].paymentId).toBe("pay-1");
     expect(setReservationStatusByCode).not.toHaveBeenCalled();
     expect(sendConfirmationEmailOnce).toHaveBeenCalledWith(expect.stringMatching(/^CDL-/));
+  });
+
+  it("502 si no se consigue un código libre, sin cobrar", async () => {
+    generateUniqueBookingCode.mockRejectedValueOnce(new Error("sin códigos libres"));
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await POST(post(VALID));
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("code");
+    expect(createCardPayment).not.toHaveBeenCalled();
+    errSpy.mockRestore();
   });
 
   it("cobra el total recalculado server-side, ignorando lo que mande el cliente", async () => {
