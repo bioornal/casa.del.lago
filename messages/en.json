@@ -389,6 +389,7 @@
     "transferMissingFile": "Attach the receipt to continue.",
     "transferErrorServer": "We couldn't process the booking. Please try again.",
     "transferSaves": "Pay by bank transfer and save {amount}",
+    "transferDiscount": "Bank transfer discount",
     "transferTotalLabel": "Total by bank transfer",
     "checkStatus": "Check your reservation status"
   },

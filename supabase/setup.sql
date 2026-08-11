@@ -94,6 +94,20 @@ alter table public.rate_settings
   add column if not exists card_fee_pct     numeric(5,2) not null default 7.7,
   add column if not exists transfer_fee_pct numeric(5,2) not null default 5;
 
+-- El desglose del checkout (priceBreakdown, method-pricing.ts) deriva el
+-- precio de lista SIEMPRE del método tarjeta y muestra la transferencia como
+-- descuento: si transfer_fee_pct superara a card_fee_pct, las líneas
+-- mostradas dejarían de sumar el Total. parseRateSettingsInput ya lo rechaza
+-- al guardar desde /admin/tarifas; este CHECK es el resguardo a nivel fila
+-- para cuando se edita a mano en SQL. OJO: no protege bases ya creadas hasta
+-- que se corra este ALTER contra ellas — rowToSettings (rate-settings.ts)
+-- clampea en la lectura como red mientras tanto.
+alter table public.rate_settings
+  drop constraint if exists rate_settings_transfer_fee_le_card_fee;
+alter table public.rate_settings
+  add constraint rate_settings_transfer_fee_le_card_fee
+    check (transfer_fee_pct <= card_fee_pct);
+
 -- =============================================================
 -- 2026-07-22 — Supabase como fuente única de disponibilidad.
 -- Candado anti-doble-booking + reservas manuales. Google Calendar retirado.

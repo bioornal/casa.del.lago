@@ -4,6 +4,7 @@ import {
   methodRates,
   methodTotal,
   transferSavings,
+  priceBreakdown,
 } from "@/lib/reservation/method-pricing";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 
@@ -46,26 +47,30 @@ describe("grossUp", () => {
 });
 
 describe("methodRates", () => {
-  it("card usa cardFeePct en nightly y limpieza", () => {
+  it("card grossea la noche con cardFeePct", () => {
     const r = methodRates(SETTINGS, "card");
-    expect(r.nightly.aratiri).toBe(140900);
-    expect(r.cleaningFee).toBe(grossUp(30000, 7.7)); // 30000/0.923=32502.7 → 32600
-    expect(r.cleaningFee).toBe(32600);
+    expect(r.nightly.aratiri).toBe(grossUp(SETTINGS.nightly.aratiri, SETTINGS.cardFeePct));
   });
 
-  it("transfer usa transferFeePct", () => {
+  it("transfer grossea la noche con transferFeePct", () => {
     const r = methodRates(SETTINGS, "transfer");
-    expect(r.nightly.aratiri).toBe(136900);
-    expect(r.cleaningFee).toBe(31600); // 30000/0.95=31578.9 → 31600
+    expect(r.nightly.aratiri).toBe(grossUp(SETTINGS.nightly.aratiri, SETTINGS.transferFeePct));
+  });
+
+  it("la limpieza NO se grossea: vale lo mismo en los dos métodos", () => {
+    // El bug que este dominio arregla: la MISMA tasa aparecía a dos precios
+    // según la pestaña, sin nada en pantalla que lo explicara.
+    expect(methodRates(SETTINGS, "card").cleaningFee).toBe(SETTINGS.cleaningFee);
+    expect(methodRates(SETTINGS, "transfer").cleaningFee).toBe(SETTINGS.cleaningFee);
   });
 });
 
 describe("methodTotal", () => {
-  it("total = nightly grosseada × noches + limpieza grosseada", () => {
-    // card, aratiri, 3 noches: 140900*3 + 32600 = 455300
-    expect(methodTotal(SETTINGS, "card", "aratiri", 3)).toBe(455300);
-    // transfer: 136900*3 + 31600 = 442300
-    expect(methodTotal(SETTINGS, "transfer", "aratiri", 3)).toBe(442300);
+  it("total = noche grosseada × noches + limpieza al neto", () => {
+    const cardNight = grossUp(SETTINGS.nightly.aratiri, SETTINGS.cardFeePct);
+    const trNight = grossUp(SETTINGS.nightly.aratiri, SETTINGS.transferFeePct);
+    expect(methodTotal(SETTINGS, "card", "aratiri", 3)).toBe(cardNight * 3 + SETTINGS.cleaningFee);
+    expect(methodTotal(SETTINGS, "transfer", "aratiri", 3)).toBe(trNight * 3 + SETTINGS.cleaningFee);
   });
 
   it("0 noches → 0", () => {
@@ -75,11 +80,62 @@ describe("methodTotal", () => {
 
 describe("transferSavings", () => {
   it("ahorro = totalCard − totalTransfer, positivo con card > transfer", () => {
-    expect(transferSavings(SETTINGS, "aratiri", 3)).toBe(455300 - 442300);
+    expect(transferSavings(SETTINGS, "aratiri", 3)).toBe(
+      methodTotal(SETTINGS, "card", "aratiri", 3) - methodTotal(SETTINGS, "transfer", "aratiri", 3),
+    );
   });
 
   it("nunca negativo aunque los pct estén invertidos", () => {
     const inverted = { ...SETTINGS, cardFeePct: 2, transferFeePct: 9 };
     expect(transferSavings(inverted, "aratiri", 3)).toBe(0);
+  });
+});
+
+describe("priceBreakdown", () => {
+  it("los dos métodos muestran el MISMO precio de lista", () => {
+    // Es el corazón del arreglo: la única diferencia visible entre las dos
+    // pestañas pasa a ser el descuento, no dos juegos de importes.
+    const card = priceBreakdown(SETTINGS, "card", "aratiri", 3);
+    const tr = priceBreakdown(SETTINGS, "transfer", "aratiri", 3);
+    expect(tr.nightly).toBe(card.nightly);
+    expect(tr.cleaningFee).toBe(card.cleaningFee);
+    expect(tr.listTotal).toBe(card.listTotal);
+  });
+
+  it("con tarjeta no hay descuento; con transferencia es el ahorro", () => {
+    const card = priceBreakdown(SETTINGS, "card", "aratiri", 3);
+    const tr = priceBreakdown(SETTINGS, "transfer", "aratiri", 3);
+    expect(card.discount).toBe(0);
+    expect(tr.discount).toBe(transferSavings(SETTINGS, "aratiri", 3));
+  });
+
+  it("el desglose es lineal: lodging + limpieza − descuento = total", () => {
+    for (const method of ["card", "transfer"] as const) {
+      for (const nights of [1, 2, 3, 7]) {
+        const bd = priceBreakdown(SETTINGS, method, "aratiri", nights);
+        expect(bd.lodging).toBe(bd.nightly * nights);
+        expect(bd.listTotal).toBe(bd.lodging + bd.cleaningFee);
+        expect(bd.listTotal - bd.discount).toBe(bd.total);
+      }
+    }
+  });
+
+  it("el total mostrado es el que recalculan las rutas de cobro", () => {
+    // Si estos dos divergieran, el huésped vería un precio y se le cobraría
+    // otro. /api/payments y /api/reservations/transfer usan methodTotal.
+    for (const method of ["card", "transfer"] as const) {
+      for (const nights of [1, 2, 3, 7]) {
+        expect(priceBreakdown(SETTINGS, method, "aratiri", nights).total).toBe(
+          methodTotal(SETTINGS, method, "aratiri", nights),
+        );
+      }
+    }
+  });
+
+  it("0 noches → todo en cero, sin descuento", () => {
+    const bd = priceBreakdown(SETTINGS, "transfer", "aratiri", 0);
+    expect(bd.lodging).toBe(0);
+    expect(bd.total).toBe(0);
+    expect(bd.discount).toBe(0);
   });
 });

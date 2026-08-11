@@ -51,6 +51,21 @@ function parsePct(v: number | string | null | undefined, fallback: number): numb
 }
 
 export function rowToSettings(row: RateSettingsRow): RateSettings {
+  const cardFeePct = parsePct(row.card_fee_pct, DEFAULT_RATE_SETTINGS.cardFeePct);
+  // priceBreakdown (method-pricing.ts) deriva el precio de lista SIEMPRE del
+  // método tarjeta y presenta la transferencia como línea de descuento: si
+  // transferFeePct superara a cardFeePct, las líneas mostradas dejarían de
+  // sumar el Total. parseRateSettingsInput ya rechaza esa combinación cuando
+  // se guarda desde /admin/tarifas, pero esta función lee lo que sea que haya
+  // en la fila — incluida una editada a mano en SQL — y también arma la
+  // inversión sola: alcanza con que card_fee_pct quede fuera de 0–30 (parsePct
+  // cae al default 7,7 más abajo) mientras transfer_fee_pct guarda un valor
+  // válido y mayor. Clampeamos acá, en la lectura, para que el invariante
+  // valga siempre, sin importar cómo llegó la fila.
+  const transferFeePct = Math.min(
+    parsePct(row.transfer_fee_pct, DEFAULT_RATE_SETTINGS.transferFeePct),
+    cardFeePct,
+  );
   return {
     nightly: {
       aratiri: row.nightly_aratiri,
@@ -59,8 +74,8 @@ export function rowToSettings(row: RateSettingsRow): RateSettings {
     cleaningFee: row.cleaning_fee,
     baseGuests: row.base_guests,
     extraGuestFee: row.extra_guest_fee,
-    cardFeePct: parsePct(row.card_fee_pct, DEFAULT_RATE_SETTINGS.cardFeePct),
-    transferFeePct: parsePct(row.transfer_fee_pct, DEFAULT_RATE_SETTINGS.transferFeePct),
+    cardFeePct,
+    transferFeePct,
   };
 }
 
@@ -119,5 +134,16 @@ export function parseRateSettingsInput(
   if (cardFeePct === null) return { ok: false, error: "La comisión de tarjeta debe ser un % entre 0 y 30." };
   const transferFeePct = parsePctInput(raw.transfer_fee_pct);
   if (transferFeePct === null) return { ok: false, error: "El costo de transferencia debe ser un % entre 0 y 30." };
+  // El desglose del checkout (priceBreakdown, en method-pricing.ts) deriva el
+  // precio de lista SIEMPRE del método tarjeta y presenta la transferencia como
+  // línea de descuento. Si la transferencia costara más que la tarjeta, ese
+  // descuento no existiría (queda clampeado en 0) y las líneas mostradas
+  // dejarían de sumar el total cobrado. Se corta acá, donde entra el dato.
+  if (transferFeePct > cardFeePct) {
+    return {
+      ok: false,
+      error: "El costo de transferencia no puede ser mayor que la comisión de tarjeta: la transferencia tiene que seguir siendo la opción más barata.",
+    };
+  }
   return { ok: true, value: { nightly, cleaningFee, baseGuests, extraGuestFee, cardFeePct, transferFeePct } };
 }

@@ -85,16 +85,31 @@ tocar las clases `rdp-lago-*`.
 
 ### Excepciones autorizadas
 
-Tres cambios de Aruma son visuales pero vienen pegados a funcionalidad que sí se quiere.
+Cuatro cambios de Aruma son visuales pero vienen pegados a funcionalidad que sí se quiere.
 Quedan **autorizados explícitamente**:
 
 | Dominio | Excepción | Por qué |
 |---|---|---|
 | 2 — Emails | Rediseño de `guest-templates.ts` (+202 líneas de HTML y estilos) | `f1ce901` mezcla el rediseño con tres arreglos funcionales en el mismo archivo. Además es un email transaccional, no el sitio |
+| 3 — Pricing | Línea "Descuento por transferencia" en `OrderSummary.tsx` | Autorizado el 2026-08-11, ver abajo |
 | 4 — Checkout | Rediseño del selector de comprobante en `StepTransferencia.tsx` | `ffe8dad` reemplaza el `<input type="file">` crudo por un label accesible. El input nativo queda fuera de vista pero en el tab order, no con `display:none` |
 | 5 — Admin | `TestUnitToggle.tsx`, componente nuevo | Sin él, el flag `test_unit_enabled` existe pero solo se puede activar tocando la base |
 
-Fuera de estas tres, cualquier otro cambio visual requiere aprobación previa.
+Fuera de estas cuatro, cualquier otro cambio visual requiere aprobación previa.
+
+#### Excepción del dominio 3 (autorizada el 2026-08-11)
+
+El arreglo de precios de `aaeabd2` tiene dos mitades y la de adelante es visual. Sin
+ella, el hueco que queda es el más visible de los dos: la limpieza se empareja entre
+métodos pero **el precio por noche sigue cambiando** entre las dos pestañas del
+checkout ($140.900 con tarjeta contra $136.900 con transferencia para Aratirí), sin
+nada en pantalla que lo explique.
+
+Autorizado: que las dos pestañas muestren el mismo precio de lista y que la
+transferencia agregue una línea de descuento. Alcance acotado al bloque de precios de
+`OrderSummary.tsx` —una fila nueva, condicional, con las clases y los colores que el
+componente ya usa— más la clave i18n `reservas.transferDiscount` en los tres idiomas.
+No se toca el layout de la tarjeta, ni su tipografía, ni el resto de sus filas.
 
 ## Clasificación del gap
 
@@ -248,6 +263,23 @@ Al escribir el plan, la inspección sacó tres piezas que este spec listaba:
 
 El dominio 1 queda en `range.ts`, sus tests y `RangeCalendar.tsx`. Plan en
 `docs/superpowers/plans/2026-08-09-dominio-1-calendario.md`.
+
+### Corrección de alcance del dominio 3 (2026-08-11)
+
+Al escribir el plan, la inspección sacó dos de los tres archivos que este spec listaba
+para el dominio:
+
+- **`rate-settings.ts` no se porta.** Sus 4 líneas de diferencia son la tercera unidad
+  de Aruma y que allá `rowToSettings` recibe `any` con fallbacks de nombres de columna
+  viejos (`nightly_mberu`, `nightly_tatu`). La réplica lo tiene tipado con
+  `RateSettingsRow`: **está mejor**. Conservar.
+- **`rates.server.ts` no se porta.** La única diferencia es cómo se itera el rango de
+  noches (`setDate` mutando contra reconstruir la fecha). Viene del commit inicial de
+  Aruma, no de un fix posterior, y Argentina no tiene horario de verano desde 2009, que
+  es lo único que separaría a las dos formas. No es atraso.
+
+El dominio 3 queda en `method-pricing.ts`, sus tests, y el bloque de precios de
+`OrderSummary.tsx` con su clave i18n.
 
 **Riesgo de regresión en merges quirúrgicos.** Los cinco archivos de esa categoría son
 donde puede perderse trabajo propio sin que ningún test lo detecte. Mitigación: revisar

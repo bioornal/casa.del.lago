@@ -389,6 +389,7 @@
     "transferMissingFile": "Adjuntá el comprobante para continuar.",
     "transferErrorServer": "No pudimos procesar la reserva. Probá de nuevo.",
     "transferSaves": "Pagando por transferencia ahorrás {amount}",
+    "transferDiscount": "Descuento por transferencia",
     "transferTotalLabel": "Total por transferencia",
     "checkStatus": "Consultá el estado de tu reserva"
   },

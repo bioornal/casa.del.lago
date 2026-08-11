@@ -3,12 +3,8 @@ import { format } from "date-fns";
 import type { State } from "@/lib/reservation/reducer";
 import { getUnit } from "@/lib/units";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
-import {
-  computeNights,
-  computeSubtotal,
-  computeTotal,
-} from "@/lib/reservation/pricing";
-import { methodRates, transferSavings, type PaymentMethod } from "@/lib/reservation/method-pricing";
+import { computeNights } from "@/lib/reservation/pricing";
+import { priceBreakdown, transferSavings, type PaymentMethod } from "@/lib/reservation/method-pricing";
 
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
 
@@ -23,11 +19,7 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
   const t = useTranslations("reservas");
   const unit = getUnit(state.unitId)!;
   const nights = computeNights(state.checkIn, state.checkOut);
-  const rates = methodRates(settings, method);
-  const nightly = rates.nightly[state.unitId];
-  const cleaningFee = rates.cleaningFee;
-  const subtotal = computeSubtotal(nightly, nights);
-  const total = computeTotal(nightly, nights, cleaningFee);
+  const bd = priceBreakdown(settings, method, state.unitId, nights);
   const savings = transferSavings(settings, state.unitId, nights);
 
   // Format date range
@@ -97,18 +89,24 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
           <span className="text-muted">
-            {money(nightly)} × {nights || 0}
+            {money(bd.nightly)} × {nights || 0}
           </span>
           <span style={{ color: "var(--color-carbon)" }}>
-            {nights > 0 ? money(subtotal) : "—"}
+            {nights > 0 ? money(bd.lodging) : "—"}
           </span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
           <span className="text-muted">{t("cleaning")}</span>
           <span style={{ color: "var(--color-carbon)" }}>
-            {nights > 0 ? money(cleaningFee) : "—"}
+            {nights > 0 ? money(bd.cleaningFee) : "—"}
           </span>
         </div>
+        {nights > 0 && bd.discount > 0 && (
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+            <span style={{ color: "#2f6b46" }}>{t("transferDiscount")}</span>
+            <span style={{ color: "#2f6b46" }}>−{money(bd.discount)}</span>
+          </div>
+        )}
       </div>
 
       {/* Total */}
@@ -125,7 +123,7 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
           Total
         </span>
         <span className="font-display" style={{ fontSize: 30, color: "var(--color-carbon)" }}>
-          {nights > 0 ? money(total) : "—"}
+          {nights > 0 ? money(bd.total) : "—"}
         </span>
       </div>
 

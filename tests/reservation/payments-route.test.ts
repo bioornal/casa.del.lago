@@ -120,8 +120,8 @@ describe("POST /api/payments", () => {
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
     await POST(post({ ...VALID, amount: 1, total: 1 }));
     // aguaribay 3 noches, precio de lista (tarjeta): 95.000 ÷ 0,923 → $103.000/noche
-    // × 3 + limpieza grosseada $32.600 = $341.600 (ver method-pricing.ts)
-    expect(createCardPayment.mock.calls[0][0].amount).toBe(341600);
+    // × 3 + limpieza al neto $30.000 (ya no se grossea, ver method-pricing.ts) = $339.000
+    expect(createCardPayment.mock.calls[0][0].amount).toBe(339000);
   });
 
   it("rejected → libera la retención por code, responde 200 rejected", async () => {
