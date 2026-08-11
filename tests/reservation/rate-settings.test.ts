@@ -136,4 +136,14 @@ describe("parseRateSettingsInput", () => {
   it.each(["0", "21", "2.5", "x"])("rechaza base_guests=%s", (v) => {
     expect(parseRateSettingsInput({ ...VALID, base_guests: v }).ok).toBe(false);
   });
+
+  it("rechaza transferFeePct > cardFeePct: la transferencia no puede costar más que la tarjeta", () => {
+    const r = parseRateSettingsInput({ ...VALID, card_fee_pct: "2", transfer_fee_pct: "9" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("acepta transferFeePct === cardFeePct: no es mayor, el descuento simplemente da 0", () => {
+    const r = parseRateSettingsInput({ ...VALID, card_fee_pct: "5", transfer_fee_pct: "5" });
+    expect(r.ok).toBe(true);
+  });
 });

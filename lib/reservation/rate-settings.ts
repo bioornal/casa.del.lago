@@ -119,5 +119,16 @@ export function parseRateSettingsInput(
   if (cardFeePct === null) return { ok: false, error: "La comisión de tarjeta debe ser un % entre 0 y 30." };
   const transferFeePct = parsePctInput(raw.transfer_fee_pct);
   if (transferFeePct === null) return { ok: false, error: "El costo de transferencia debe ser un % entre 0 y 30." };
+  // El desglose del checkout (priceBreakdown, en method-pricing.ts) deriva el
+  // precio de lista SIEMPRE del método tarjeta y presenta la transferencia como
+  // línea de descuento. Si la transferencia costara más que la tarjeta, ese
+  // descuento no existiría (queda clampeado en 0) y las líneas mostradas
+  // dejarían de sumar el total cobrado. Se corta acá, donde entra el dato.
+  if (transferFeePct > cardFeePct) {
+    return {
+      ok: false,
+      error: "El costo de transferencia no puede ser mayor que la comisión de tarjeta: la transferencia tiene que seguir siendo la opción más barata.",
+    };
+  }
   return { ok: true, value: { nightly, cleaningFee, baseGuests, extraGuestFee, cardFeePct, transferFeePct } };
 }
