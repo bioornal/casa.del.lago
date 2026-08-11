@@ -79,6 +79,32 @@ describe("rowToSettings / settingsToRow", () => {
     expect(absurdo.cardFeePct).toBe(7.7);
     expect(absurdo.transferFeePct).toBe(5);
   });
+
+  it("clampea transferFeePct a cardFeePct si la fila llega invertida (editada a mano en SQL)", () => {
+    const base = {
+      nightly_aratiri: 1, nightly_aguaribay: 2,
+      cleaning_fee: 4, base_guests: 5, extra_guest_fee: 6,
+    };
+    // El parser del form ya rechaza esta combinación, pero rowToSettings lee
+    // cualquier fila: sin clamp, priceBreakdown mostraría líneas que no suman
+    // el Total (ver bug reportado con card=2/transfer=9 en Aratirí).
+    const s = rowToSettings({ ...base, card_fee_pct: 2, transfer_fee_pct: 9 });
+    expect(s.cardFeePct).toBe(2);
+    expect(s.transferFeePct).toBe(2);
+  });
+
+  it("clampea aunque la inversión se arme sola: card fuera de rango (→ default) y transfer válido pero mayor", () => {
+    const base = {
+      nightly_aratiri: 1, nightly_aguaribay: 2,
+      cleaning_fee: 4, base_guests: 5, extra_guest_fee: 6,
+    };
+    // Nadie tocó un par a mano: card_fee_pct=99 es inválido (parsePct cae al
+    // default 7,7) y transfer_fee_pct=20 es perfectamente válido por sí solo,
+    // pero juntos invierten el orden igual.
+    const s = rowToSettings({ ...base, card_fee_pct: 99, transfer_fee_pct: 20 });
+    expect(s.cardFeePct).toBe(7.7);
+    expect(s.transferFeePct).toBe(7.7);
+  });
 });
 
 describe("parseRateSettingsInput", () => {
