@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import type { State } from "@/lib/reservation/reducer";
 import { createTransferReservation } from "@/lib/reservation/transfer";
@@ -9,6 +9,7 @@ import type { RateSettings } from "@/lib/reservation/rate-settings";
 import { computeNights } from "@/lib/reservation/pricing";
 import { methodTotal, transferSavings } from "@/lib/reservation/method-pricing";
 import { BANK_DETAILS } from "@/lib/site";
+import { ACCEPT_ATTR, MAX_BYTES, isAllowedMime, formatBytes } from "@/lib/reservation/comprobante";
 
 interface Props {
   state: State;
@@ -22,6 +23,17 @@ export function StepTransferencia({ state, settings, onPending }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Valida antes de subir, contra los mismos límites que aplica el servidor:
+  // si divergieran, el huésped vería el archivo aceptado acá y rechazado en el POST.
+  function pickFile(f: File | null) {
+    if (!f) { setFile(null); return; }
+    if (!isAllowedMime(f.type)) { setFile(null); setError(t("transferFileBadType")); return; }
+    if (f.size > MAX_BYTES) { setFile(null); setError(t("transferFileTooBig", { size: formatBytes(f.size) })); return; }
+    setError(null);
+    setFile(f);
+  }
 
   const nights = computeNights(state.checkIn!, state.checkOut!);
   // Total del método TRANSFERENCIA (más barato que el precio de lista).
@@ -80,12 +92,52 @@ export function StepTransferencia({ state, settings, onPending }: Props) {
       <label style={{ display: "block", fontSize: 13, color: "#6b665d", marginBottom: 8 }}>
         {t("transferUpload")}
       </label>
+      {/* Oculto fuera de vista pero dentro del tab order: display:none o
+          visibility:hidden lo sacarían del foco por teclado. */}
       <input
+        ref={inputRef}
+        id="comprobante"
         type="file"
-        accept="image/jpeg,image/png,image/webp,application/pdf"
-        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        style={{ fontSize: 13, marginBottom: 20 }}
+        accept={ACCEPT_ATTR}
+        onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+        style={{
+          position: "absolute", width: 1, height: 1, padding: 0, margin: -1,
+          overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", border: 0,
+        }}
       />
+      {!file ? (
+        <label
+          htmlFor="comprobante"
+          style={{
+            display: "block", textAlign: "center", padding: "22px 16px", marginBottom: 20,
+            border: "1px dashed #ece5d8", borderRadius: 6, background: "#fbf8f2", cursor: "pointer",
+          }}
+        >
+          <span style={{ fontWeight: 700, textDecoration: "underline" }}>{t("transferPickFile")}</span>
+          <div style={{ fontSize: 12, color: "#6b665d", marginTop: 4 }}>{t("transferPickHint")}</div>
+        </label>
+      ) : (
+        <div
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+            padding: "14px 16px", marginBottom: 20, border: "1px solid #ece5d8", borderRadius: 6, background: "#fbf8f2",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: "#2f6b46", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {file.name}
+            </div>
+            <div style={{ fontSize: 12, color: "#6b665d" }}>{formatBytes(file.size)}</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            style={{ background: "none", border: "none", color: "#a24b2a", fontSize: 13, cursor: "pointer", flexShrink: 0 }}
+          >
+            {t("transferChangeFile")}
+          </button>
+        </div>
+      )}
 
       <button
         type="button"
