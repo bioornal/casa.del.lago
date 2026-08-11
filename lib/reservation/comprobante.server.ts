@@ -1,25 +1,14 @@
 import crypto from "node:crypto";
 import { getServiceClient } from "@/lib/supabase/server";
+import { extFor } from "./comprobante";
 
 const BUCKET = "comprobantes";
-export const MAX_BYTES = 6 * 1024 * 1024;
-export const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "application/pdf"] as const;
-export type AllowedMime = (typeof ALLOWED_MIME)[number];
 
-const EXT: Record<AllowedMime, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-  "application/pdf": "pdf",
-};
-
-export function extFor(mime: string): string {
-  return EXT[mime as AllowedMime] ?? "bin";
-}
-
-export function isAllowedMime(mime: string): mime is AllowedMime {
-  return (ALLOWED_MIME as readonly string[]).includes(mime);
-}
+// Los límites y la validación viven en comprobante.ts (client-safe) porque el
+// checkout los necesita del lado del cliente también. Re-exportados acá para
+// que los importadores actuales de este módulo no cambien.
+export { MAX_BYTES, ALLOWED_MIME, extFor, isAllowedMime } from "./comprobante";
+export type { AllowedMime } from "./comprobante";
 
 /** Sube el archivo a comprobantes/<code>/<uuid>.<ext>. Devuelve el path. Lanza si falla. */
 export async function uploadComprobante(code: string, file: File): Promise<string> {

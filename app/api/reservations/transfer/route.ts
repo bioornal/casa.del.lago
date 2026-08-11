@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { uploadComprobante, removeComprobante, isAllowedMime, MAX_BYTES } from "@/lib/reservation/comprobante.server";
-import { insertReservation, OverlapError } from "@/lib/reservation/reservations.server";
-import { generateBookingCode } from "@/lib/reservation/code";
+import {
+  insertReservation,
+  generateUniqueBookingCode,
+  OverlapError,
+} from "@/lib/reservation/reservations.server";
 import { getUnit } from "@/lib/units";
 import { notifyAdminNewReservation } from "@/lib/reservation/email/admin";
 import { computeNights } from "@/lib/reservation/pricing";
@@ -10,6 +13,7 @@ import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { getBookingMode } from "@/lib/site-settings.server";
+import { clientIp, rateLimited } from "@/lib/rate-limit";
 import type { UnitId } from "@/lib/reservation/reducer";
 
 const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
@@ -31,6 +35,13 @@ function isFileLike(v: unknown): v is File {
 }
 
 export async function POST(req: Request) {
+  // Cada pedido sube un archivo al storage: el techo es más bajo que el del
+  // lookup, que solo lee. Primera línea del handler para cortar antes de
+  // gastar en parsear el FormData.
+  if (rateLimited("transfer", clientIp(req), 5, 60_000)) {
+    return NextResponse.json({ error: "rate" }, { status: 429 });
+  }
+
   // Reservas online pausadas (modo WhatsApp): no se aceptan reservas por transferencia.
   if (isWhatsAppBookingMode(await getBookingMode())) {
     return NextResponse.json({ error: "bookings_paused" }, { status: 503 });
@@ -82,7 +93,16 @@ export async function POST(req: Request) {
   // Total del método TRANSFERENCIA (menor al precio de lista; ver method-pricing.ts)
   const total = methodTotal(settings, "transfer", unit.slug, nights);
 
-  const code = generateBookingCode();
+  // Contra la base, no a ciegas: generateBookingCode() sortea sobre 32^4 sin
+  // mirar si el código ya existe, y el código es la clave del lookup, del email
+  // y del flip de deduplicación.
+  let code: string;
+  try {
+    code = await generateUniqueBookingCode();
+  } catch (err) {
+    console.error("[transfer] código único falló:", err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: "code" }, { status: 502 });
+  }
 
   // 1. Subir comprobante.
   let comprobantePath: string;

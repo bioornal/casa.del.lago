@@ -23,8 +23,10 @@ const { OverlapError } = vi.hoisted(() => {
   return { OverlapError };
 });
 const insertReservation = vi.fn();
+const generateUniqueBookingCode = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
+  generateUniqueBookingCode: (...a: unknown[]) => generateUniqueBookingCode(...a),
   OverlapError,
 }));
 
@@ -47,11 +49,19 @@ vi.mock("@/lib/reservation/email/admin", () => ({
 
 import { POST } from "@/app/api/reservations/transfer/route";
 
-function form(fields: Record<string, string>, file?: File) {
+// IP única por request por default (mismo patrón que lookup-route.test.ts):
+// el contador de rate-limit es un mapa en memoria que persiste entre los
+// tests del archivo, así que sin esto los casos existentes empiezan a
+// compartir cupo con el bucket "transfer" y dan 429 según el orden en que corran.
+function form(fields: Record<string, string>, file?: File, ip: string = String(Math.random())) {
   const fd = new FormData();
   Object.entries(fields).forEach(([k, v]) => fd.append(k, v));
   if (file) fd.append("comprobante", file);
-  return new Request("http://t/api/reservations/transfer", { method: "POST", body: fd });
+  return new Request("http://t/api/reservations/transfer", {
+    method: "POST",
+    headers: { "x-forwarded-for": ip },
+    body: fd,
+  });
 }
 
 const VALID = {
@@ -66,6 +76,9 @@ beforeEach(() => {
   uploadComprobante.mockResolvedValue("comprobantes/x.jpg");
   removeComprobante.mockResolvedValue(undefined);
   insertReservation.mockResolvedValue(undefined);
+  // Alfabeto sin 0/O ni 1/I (ver lib/reservation/code.ts): "AB23" respeta el
+  // regex /^CDL-\d{4}-[A-Z2-9]{4}$/ que ya verifican los tests de forma.
+  generateUniqueBookingCode.mockResolvedValue("CDL-2026-AB23");
 });
 
 describe("POST /api/reservations/transfer", () => {
@@ -75,9 +88,24 @@ describe("POST /api/reservations/transfer", () => {
     expect(res.status).toBe(200);
     expect(body.status).toBe("pending");
     expect(body.code).toMatch(/^CDL-\d{4}-[A-Z2-9]{4}$/);
+    // generateBookingCode() sortea sobre 32^4 sin mirar la base. El código es la
+    // clave del lookup, del email y del flip de dedup: dos reservas con el mismo
+    // código se pisan.
+    expect(generateUniqueBookingCode).toHaveBeenCalledOnce();
     expect(insertReservation).toHaveBeenCalledOnce();
     expect(insertReservation.mock.calls[0][0].status).toBe("pending");
     expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("transfer");
+  });
+
+  it("502 si no se consigue un código libre, sin subir el comprobante", async () => {
+    generateUniqueBookingCode.mockRejectedValueOnce(new Error("sin códigos libres"));
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await POST(form(VALID, goodFile()));
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("code");
+    expect(uploadComprobante).not.toHaveBeenCalled();
+    expect(insertReservation).not.toHaveBeenCalled();
+    errSpy.mockRestore();
   });
 
   it("avisa al dueño que hay un comprobante para revisar", async () => {
@@ -156,5 +184,21 @@ describe("POST /api/reservations/transfer", () => {
 
     await POST(form({ ...VALID, locale: "xx" }, goodFile()));
     expect(insertReservation.mock.calls[2][0].locale).toBe("es");
+  });
+
+  it("429 al superar el techo de pedidos por IP", async () => {
+    // Cada request sube un archivo al storage: sin techo, un script llena el
+    // bucket. El límite es por IP y por ventana, igual que en el lookup.
+    // El máximo de la ruta es 5 (ver rateLimited("transfer", ..., 5, ...)):
+    // hay que probar que las primeras 5 pasan y recién la 6ª se bloquea, no
+    // solo que la última de una tanda cualquiera da 429 (eso pasaría igual si
+    // la ruta devolviera 429 siempre).
+    const ip = "203.0.113.77";
+    for (let i = 0; i < 5; i++) {
+      const res = await POST(form(VALID, goodFile(), ip));
+      expect(res.status).not.toBe(429);
+    }
+    const blocked = await POST(form(VALID, goodFile(), ip));
+    expect(blocked.status).toBe(429);
   });
 });

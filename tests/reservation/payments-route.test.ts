@@ -18,10 +18,12 @@ const { OverlapError } = vi.hoisted(() => {
 const insertReservation = vi.fn();
 const upsertConfirmedByCode = vi.fn();
 const setReservationStatusByCode = vi.fn();
+const generateUniqueBookingCode = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
   upsertConfirmedByCode: (...a: unknown[]) => upsertConfirmedByCode(...a),
   setReservationStatusByCode: (...a: unknown[]) => setReservationStatusByCode(...a),
+  generateUniqueBookingCode: (...a: unknown[]) => generateUniqueBookingCode(...a),
   OverlapError,
 }));
 
@@ -61,10 +63,14 @@ const VALID = {
   payment: CARD,
 };
 
-function post(body: unknown) {
+// IP única por request por default (mismo patrón que lookup-route.test.ts):
+// el contador de rate-limit es un mapa en memoria que persiste entre los
+// tests del archivo, así que sin esto los casos existentes empiezan a
+// compartir cupo con el bucket "payments" y dan 429 según el orden en que corran.
+function post(body: unknown, ip: string = String(Math.random())) {
   return new Request("http://t/api/payments", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "x-forwarded-for": ip },
     body: JSON.stringify(body),
   });
 }
@@ -78,6 +84,10 @@ beforeEach(() => {
   setReservationStatusByCode.mockReset();
   setReservationStatusByCode.mockResolvedValue(undefined);
   sendConfirmationEmailOnce.mockReset();
+  generateUniqueBookingCode.mockReset();
+  // Alfabeto sin 0/O ni 1/I (ver lib/reservation/code.ts): "AB23" respeta el
+  // regex /^CDL-\d{4}-[A-Z2-9]{4}$/ que ya verifican los tests de forma.
+  generateUniqueBookingCode.mockResolvedValue("CDL-2026-AB23");
   delete process.env.PAYMENTS_MOCK;
 });
 afterEach(() => { delete process.env.PAYMENTS_MOCK; });
@@ -108,12 +118,26 @@ describe("POST /api/payments", () => {
     const body = await res.json();
     expect(body.status).toBe("approved");
     expect(body.code).toMatch(/^CDL-\d{4}-[A-Z2-9]{4}$/);
+    // generateBookingCode() sortea sobre 32^4 sin mirar la base. El código es la
+    // clave del lookup, del email y del flip de dedup: dos reservas con el mismo
+    // código se pisan.
+    expect(generateUniqueBookingCode).toHaveBeenCalledOnce();
     expect(insertReservation.mock.calls[0][0].status).toBe("pending");
     expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("card");
     expect(upsertConfirmedByCode).toHaveBeenCalledOnce();
     expect(upsertConfirmedByCode.mock.calls[0][0].paymentId).toBe("pay-1");
     expect(setReservationStatusByCode).not.toHaveBeenCalled();
     expect(sendConfirmationEmailOnce).toHaveBeenCalledWith(expect.stringMatching(/^CDL-/));
+  });
+
+  it("502 si no se consigue un código libre, sin cobrar", async () => {
+    generateUniqueBookingCode.mockRejectedValueOnce(new Error("sin códigos libres"));
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await POST(post(VALID));
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("code");
+    expect(createCardPayment).not.toHaveBeenCalled();
+    errSpy.mockRestore();
   });
 
   it("cobra el total recalculado server-side, ignorando lo que mande el cliente", async () => {
@@ -206,5 +230,21 @@ describe("POST /api/payments", () => {
     expect(insertReservation).toHaveBeenCalledOnce();
     expect(insertReservation.mock.calls[0][0].status).toBe("pending");
     expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("card");
+  });
+
+  it("429 al superar el techo de pedidos por IP", async () => {
+    // Mismo mecanismo que en transfer y lookup: el límite es por IP y por ventana.
+    // El máximo de la ruta es 10 (ver rateLimited("payments", ..., 10, ...)):
+    // hay que probar que las primeras 10 pasan y recién la 11ª se bloquea, no
+    // solo que la última de una tanda cualquiera da 429 (eso pasaría igual si
+    // la ruta devolviera 429 siempre).
+    createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
+    const ip = "198.51.100.23";
+    for (let i = 0; i < 10; i++) {
+      const res = await POST(post(VALID, ip));
+      expect(res.status).not.toBe(429);
+    }
+    const blocked = await POST(post(VALID, ip));
+    expect(blocked.status).toBe(429);
   });
 });

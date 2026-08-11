@@ -1,8 +1,11 @@
 "use server";
 
 import { getAdminUser } from "@/lib/admin/auth";
-import { insertReservation, OverlapError } from "@/lib/reservation/reservations.server";
-import { generateBookingCode } from "@/lib/reservation/code";
+import {
+  insertReservation,
+  generateUniqueBookingCode,
+  OverlapError,
+} from "@/lib/reservation/reservations.server";
 import { computeNights } from "@/lib/reservation/pricing";
 import { getUnit } from "@/lib/units";
 import { isValidEmail } from "@/lib/reservation/validation";
@@ -25,7 +28,7 @@ export type ManualReservationInput = {
 
 export type ManualReservationResult =
   | { ok: true }
-  | { ok: false; error: "conflict" | "validation" | "server" };
+  | { ok: false; error: "conflict" | "validation" | "server" | "code" };
 
 export async function createManualReservation(
   input: ManualReservationInput,
@@ -48,9 +51,20 @@ export async function createManualReservation(
 
   const nights = computeNights(new Date(checkIn), new Date(checkOut));
 
+  // Contra la base, no a ciegas: generateBookingCode() sortea sobre 32^4 sin
+  // mirar si el código ya existe, y el código es la clave del lookup, del email
+  // y del flip de deduplicación.
+  let code: string;
+  try {
+    code = await generateUniqueBookingCode();
+  } catch (err) {
+    console.error("[admin] código único falló:", err instanceof Error ? err.message : err);
+    return { ok: false, error: "code" };
+  }
+
   try {
     await insertReservation({
-      code: generateBookingCode(),
+      code,
       unitId: unitId as UnitId,
       unitName: unit.name,
       checkIn, checkOut, nights, guests,
