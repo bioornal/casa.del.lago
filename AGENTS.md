@@ -21,7 +21,7 @@ Cabañas a orillas del **lago Urugua-í**, entre Puerto Iguazú y Puerto Liberta
 - **Variables de entorno:** `ARUMA_ICS_*`→`CDL_ICS_*`, `ARUMA_CAL_*`→`CDL_CAL_*`, `NEXT_PUBLIC_ARUMA_BANK_*`→`NEXT_PUBLIC_CDL_BANK_*`, `ARUMA_EMAIL_FROM`→`CDL_EMAIL_FROM`.
 - **Bypass del admin:** eliminado (2026-07-21). El panel exige sesión real de
   Supabase Auth con un email en `ADMIN_EMAILS`; no hay env var que lo saltee.
-- **Bucket de fotos (Supabase Storage):** `Aruma-fotos` → `casa-lago-fotos` (`components/ui/ImageSlot.tsx`).
+- **Bucket de fotos (Supabase Storage):** `Aruma-fotos` → `imagenes` (`components/ui/ImageSlot.tsx`).
 - **Identificadores internos:** keyframes `aruma-kb`/`aruma-cue` → `lago-kb`/`lago-cue`; clases `rdp-aruma-*` → `rdp-lago-*`.
 - **Descriptor de pago MP:** `ARUMALODGE` → `CASADELLAGO`.
 - **`.env.local`** se reemplazó por una plantilla limpia (sin los secretos reales de Aruma).

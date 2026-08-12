@@ -29,8 +29,8 @@ Falta cargar los **datos reales del alojamiento**. Cada punto indica el archivo 
 ## 5. Imágenes y logo
 - [ ] Logo: hoy apunta a la imagen de Aruma en Cloudinary (`ArumaLodge/ALARGADA…`) en
       `components/layout/SiteNav.tsx` y `SiteFooter.tsx`. Subir el logo propio y cambiar la URL.
-- [ ] Hero y galería: `components/home/Hero.tsx` (Cloudinary) y bucket Supabase
-      `casa-lago-fotos` (`components/ui/ImageSlot.tsx`). Crear el bucket y subir fotos reales.
+- [x] Hero y galería: `components/home/Hero.tsx` (Cloudinary) y bucket Supabase
+      `imagenes` (`components/ui/ImageSlot.tsx`). Bucket creado y fotos subidas.
 - [ ] `app/icon.png` — favicon propio.
 
 ## 6. Identidad visual (opcional, cuando haya branding)
@@ -39,7 +39,7 @@ Falta cargar los **datos reales del alojamiento**. Cada punto indica el archivo 
 
 ## 7. Credenciales / entorno (`.env.local` — ya limpio, sin secretos de Aruma)
 - [ ] Supabase (proyecto nuevo): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-      → correr `supabase/setup.sql` en el proyecto nuevo y crear el bucket `casa-lago-fotos`.
+      → correr `supabase/setup.sql` en el proyecto nuevo y crear el bucket `imagenes`.
 - [ ] Mercado Pago (cuenta propia): `MERCADOPAGO_ACCESS_TOKEN`, `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`
 - [ ] Resend: `RESEND_API_KEY`, `CDL_EMAIL_FROM` (remitente verificado)
 - [ ] Google Calendar (1 por cabaña): `CDL_ICS_*` (lectura), `CDL_CAL_*` + `GOOGLE_SERVICE_ACCOUNT_JSON` (escritura)
