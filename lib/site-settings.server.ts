@@ -73,11 +73,18 @@ export async function saveSiteSettings(s: SiteSettings): Promise<void> {
  * legítimo y pausaría las reservas sin que nadie lo pidiera.
  */
 export async function saveTestUnitEnabled(enabled: boolean): Promise<void> {
-  const { error } = await getServiceClient()
+  // .update().eq("id", 1) sobre CERO filas no devuelve error: Supabase no
+  // distingue "actualicé 1 fila" de "no encontré ninguna". Sin el .select acá
+  // abajo, una fila id=1 faltante haría que la acción responda "guardado" con
+  // el toggle en realidad apagado — grave porque este toggle habilita cobros.
+  const { data, error } = await getServiceClient()
     .from("site_settings")
     .update({ test_unit_enabled: enabled })
-    .eq("id", 1);
+    .eq("id", 1)
+    .select("id")
+    .maybeSingle();
   if (error) throw new Error(`saveTestUnitEnabled: ${error.message}`);
+  if (data === null) throw new Error("saveTestUnitEnabled: no existe la fila id=1 en site_settings");
   invalidateSiteSettingsCache();
 }
 

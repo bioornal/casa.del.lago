@@ -301,4 +301,17 @@ describe("POST /api/payments", () => {
     expect(res.status).toBe(503);
     expect((await res.json()).error).toBe("bookings_paused");
   });
+
+  it("con el flag apagado, 'prueba' en modo WhatsApp da 503 igual que cualquier otro id", async () => {
+    // Antes del fix, el corte solo miraba el unitId (nunca el flag): con el
+    // flag apagado, "prueba" colaba distinto (400) que un id inexistente
+    // (503) — un prober podía usar el status code para saber que la unidad
+    // de prueba existe. Las dos condiciones tienen que dar la MISMA respuesta.
+    mockedIsTestUnitEnabled.mockResolvedValue(false);
+    mockedGetBookingMode.mockResolvedValue("whatsapp");
+    const res = await POST(post({ ...VALID, unitId: "prueba" }));
+    expect(res.status).toBe(503);
+    expect((await res.json()).error).toBe("bookings_paused");
+    expect(createCardPayment).not.toHaveBeenCalled();
+  });
 });

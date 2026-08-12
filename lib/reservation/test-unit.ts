@@ -1,4 +1,5 @@
 import { getUnit, type Unit, type UnitSlug } from "@/lib/units";
+import { isWhatsAppBookingMode, type BookingMode } from "@/lib/booking-mode";
 import type { RateSettings } from "./rate-settings";
 import { methodTotal, transferSavings, type PaymentMethod } from "./method-pricing";
 
@@ -44,10 +45,32 @@ export function allowsTestUnit(requestedUnit: unknown, flagEnabled: boolean): bo
   return flagEnabled && typeof requestedUnit === "string" && isTestUnit(requestedUnit);
 }
 
+/**
+ * El borde de más privilegio del dominio: decide si /reservas debe redirigir
+ * a tarifas por estar el sitio en modo WhatsApp. Vive acá, separada de la
+ * page, para que el caso puntual que la vuelve interesante —flag prendido
+ * pero unidad pedida real— tenga un test directo e invocable. Sin esto, un
+ * refactor que cambiara "las DOS condiciones" por "alcanza con el flag" (el
+ * bug que allowsTestUnit entero viene a prevenir) podría colarse en la page
+ * sin que ningún test lo note.
+ */
+export function shouldRedirectReservasToTarifas(
+  requestedUnit: unknown,
+  testUnitEnabled: boolean,
+  bookingMode: BookingMode,
+): boolean {
+  return !allowsTestUnit(requestedUnit, testUnitEnabled) && isWhatsAppBookingMode(bookingMode);
+}
+
 export function resolveUnit(id: BookableUnitId): BookableUnit {
   if (isTestUnit(id)) return TEST_UNIT;
-  // getUnit(id) siempre resuelve acá: id es UnitSlug cuando no es TEST_UNIT_ID.
-  return getUnit(id) as BookableUnit;
+  const unit = getUnit(id);
+  // Todos los llamadores validan el id antes de llegar acá (isUnitId /
+  // allowsTestUnit), así que esto es un cinturón extra: si algún día no fuera
+  // así, mejor un Error con nombre acá que un TypeError opaco más abajo
+  // leyendo unit.specs de undefined.
+  if (!unit) throw new Error(`resolveUnit: unidad desconocida "${id}"`);
+  return unit as BookableUnit;
 }
 
 /**

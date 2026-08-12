@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   TEST_UNIT_ID, TEST_UNIT_TOTAL, TEST_UNIT,
   isTestUnit, allowsTestUnit, resolveUnit, checkoutTotal, checkoutSavings,
+  shouldRedirectReservasToTarifas,
 } from "@/lib/reservation/test-unit";
 import { DEFAULT_RATE_SETTINGS } from "@/lib/reservation/rate-settings";
 import { methodTotal, transferSavings } from "@/lib/reservation/method-pricing";
@@ -66,5 +67,36 @@ describe("checkoutTotal y checkoutSavings", () => {
   it("resolveUnit devuelve la ficha correcta según el id", () => {
     expect(resolveUnit(TEST_UNIT_ID).slug).toBe(TEST_UNIT_ID);
     expect(resolveUnit("aratiri").name).toBe(getUnit("aratiri")!.name);
+  });
+
+  it("resolveUnit lanza con nombre en vez de devolver undefined para un id inexistente", () => {
+    // Todos los llamadores validan antes de llegar acá, pero si alguno no lo
+    // hiciera, un Error con nombre es mejor que un TypeError opaco leyendo
+    // .specs de undefined más abajo.
+    expect(() => resolveUnit("inventada" as never)).toThrow(/inventada/);
+  });
+});
+
+describe("shouldRedirectReservasToTarifas", () => {
+  // Es el borde de más privilegio del dominio: la línea que /reservas usa
+  // para saltear el corte de modo WhatsApp. Si alguien la refactorizara a
+  // "alcanza con el flag" (el bug que allowsTestUnit entero viene a
+  // prevenir), este caso puntual —flag prendido, unidad pedida REAL— es el
+  // que lo detecta.
+  it("con el flag prendido, pedir una unidad real sigue redirigiendo en modo WhatsApp", () => {
+    expect(shouldRedirectReservasToTarifas("aratiri", true, "whatsapp")).toBe(true);
+  });
+
+  it("con el flag prendido, pedir la unidad de prueba por id no redirige", () => {
+    expect(shouldRedirectReservasToTarifas(TEST_UNIT_ID, true, "whatsapp")).toBe(false);
+  });
+
+  it("con el flag apagado, pedir la unidad de prueba en WhatsApp igual redirige", () => {
+    expect(shouldRedirectReservasToTarifas(TEST_UNIT_ID, false, "whatsapp")).toBe(true);
+  });
+
+  it("en modo online nunca redirige, tenga o no la unidad de prueba", () => {
+    expect(shouldRedirectReservasToTarifas("aratiri", false, "online")).toBe(false);
+    expect(shouldRedirectReservasToTarifas(TEST_UNIT_ID, true, "online")).toBe(false);
   });
 });

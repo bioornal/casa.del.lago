@@ -48,6 +48,13 @@ export function TestUnitToggle({ current }: { current: boolean }) {
         Cobra {money(TEST_UNIT_TOTAL)} reales con la tarjeta que se use para probar.
       </p>
 
+      <p style={hint}>
+        Apagar el flag puede tardar hasta 30 segundos en propagarse a todos los
+        servidores: la lectura de este valor tiene un memo con ese TTL y en
+        serverless hay varias instancias corriendo a la vez. No asumas que
+        quedó cerrado al instante de tocar el botón.
+      </p>
+
       {current && (
         <p style={hint}>
           Link de prueba:{" "}
@@ -60,6 +67,16 @@ export function TestUnitToggle({ current }: { current: boolean }) {
         <button
           type="submit"
           disabled={pending}
+          onClick={(e) => {
+            // Solo al HABILITAR: es la acción que abre un endpoint de cobro
+            // real. Apagar no necesita confirmación, igual que ModeToggle
+            // solo la pide para abrir el cobro online, no para pausarlo.
+            if (!current && !confirm(
+              `Vas a HABILITAR la unidad de prueba: un endpoint de cobro REAL de ${money(TEST_UNIT_TOTAL)}, alcanzable por cualquiera que tenga el link.\n\n¿Te vas a acordar de apagarla apenas termine la prueba?`
+            )) {
+              e.preventDefault();
+            }
+          }}
           style={{
             padding: "13px 30px",
             background: pending ? "#8a8170" : current ? "#8a3b1d" : "#23362B",

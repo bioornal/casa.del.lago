@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAvailabilityServer } from "@/lib/reservation/availability.server";
 import { isTestUnitEnabled } from "@/lib/site-settings.server";
-import { isTestUnit } from "@/lib/reservation/test-unit";
+import { allowsTestUnit } from "@/lib/reservation/test-unit";
 import type { UnitId } from "@/lib/reservation/reducer";
 
 const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
@@ -9,8 +9,10 @@ const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
 // La unidad de prueba solo es un UnitId válido cuando el flag global la
 // habilita: las dos condiciones, no una — si bastara con el flag, prenderlo
 // abriría el endpoint de disponibilidad de las unidades reales a cualquiera.
+// allowsTestUnit (lib/reservation/test-unit.ts) es el dueño único de esa
+// regla: no se reescribe a mano acá.
 function isUnitId(v: string, allowTestUnit: boolean): v is UnitId {
-  if (isTestUnit(v)) return allowTestUnit;
+  if (allowsTestUnit(v, allowTestUnit)) return true;
   return (VALID_UNITS as string[]).includes(v);
 }
 

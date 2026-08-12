@@ -2,12 +2,17 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const maybeSingle = vi.fn();
 const upsert = vi.fn();
+const updateMaybeSingle = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({
   getServiceClient: () => ({
     from: () => ({
       select: () => ({ eq: () => ({ maybeSingle }) }),
       upsert,
+      // .update().eq().select().maybeSingle(): la cadena que usa
+      // saveTestUnitEnabled, separada de select/upsert porque hay que poder
+      // simular las cero-filas-afectadas sin tocar los otros mocks.
+      update: () => ({ eq: () => ({ select: () => ({ maybeSingle: updateMaybeSingle }) }) }),
     }),
   }),
 }));
@@ -22,6 +27,7 @@ async function freshModule() {
 beforeEach(() => {
   maybeSingle.mockReset();
   upsert.mockReset();
+  updateMaybeSingle.mockReset();
   delete process.env.NEXT_PUBLIC_BOOKING_MODE;
 });
 
@@ -124,5 +130,30 @@ describe("saveSiteSettings", () => {
     await expect(
       saveSiteSettings({ bookingMode: "online", testUnitEnabled: false }),
     ).rejects.toThrow(/permission denied/);
+  });
+});
+
+describe("saveTestUnitEnabled", () => {
+  it("si la fila id=1 no existe, falla en vez de reportar éxito falso", async () => {
+    // .update().eq("id", 1) sobre cero filas no devuelve error de Supabase:
+    // sin el .select().maybeSingle() de abajo, esto respondería "guardado"
+    // con el toggle en realidad apagado — grave porque habilita un cobro.
+    updateMaybeSingle.mockResolvedValue({ data: null, error: null });
+    const { saveTestUnitEnabled } = await freshModule();
+    await expect(saveTestUnitEnabled(true)).rejects.toThrow(/id=1/);
+  });
+
+  it("con la fila existente, guarda e invalida el memo", async () => {
+    updateMaybeSingle.mockResolvedValue({ data: { id: 1 }, error: null });
+    maybeSingle.mockResolvedValue({ data: { test_unit_enabled: true }, error: null });
+    const { saveTestUnitEnabled, isTestUnitEnabled } = await freshModule();
+    await saveTestUnitEnabled(true);
+    expect(await isTestUnitEnabled()).toBe(true);
+  });
+
+  it("propaga el error de la DB", async () => {
+    updateMaybeSingle.mockResolvedValue({ data: null, error: { message: "permission denied" } });
+    const { saveTestUnitEnabled } = await freshModule();
+    await expect(saveTestUnitEnabled(true)).rejects.toThrow(/permission denied/);
   });
 });

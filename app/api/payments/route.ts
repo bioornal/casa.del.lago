@@ -17,7 +17,7 @@ import {
 } from "@/lib/reservation/reservations.server";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
 import { getBookingMode, isTestUnitEnabled } from "@/lib/site-settings.server";
-import { isTestUnit, resolveUnit, checkoutTotal } from "@/lib/reservation/test-unit";
+import { isTestUnit, allowsTestUnit, resolveUnit, checkoutTotal } from "@/lib/reservation/test-unit";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email/guest";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 import type { UnitId } from "@/lib/reservation/reducer";
@@ -55,6 +55,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "rate" }, { status: 429 });
   }
 
+  // Reservas online pausadas (modo WhatsApp): no se aceptan pagos. Las DOS
+  // condiciones habilitan la excepción de la unidad de prueba —flag Y unitId
+  // pedido explícitamente, nunca el flag solo (mismo criterio que
+  // lib/reservation/test-unit.ts)—. Con el flag apagado no hay ningún pedido
+  // que pueda prosperar estando pausado, así que se corta ACÁ, antes de leer
+  // el body: ni "prueba" ni cualquier otro id se distinguen por status code.
+  const paused = isWhatsAppBookingMode(await getBookingMode());
+  const testUnitOn = await isTestUnitEnabled();
+  if (paused && !testUnitOn) {
+    return NextResponse.json({ error: "bookings_paused" }, { status: 503 });
+  }
+
   let body: Record<string, unknown>;
   try {
     body = (await req.json()) as Record<string, unknown>;
@@ -65,16 +77,13 @@ export async function POST(req: Request) {
   const { unitId, checkIn, checkOut, guests, firstName, lastName, email, phone, payment, locale: localeRaw } = body;
   const locale = localeRaw === "en" || localeRaw === "pt" ? localeRaw : "es";
 
-  // Reservas online pausadas (modo WhatsApp): no se aceptan pagos. Se saltea
-  // SOLO cuando la unidad pedida es la de prueba (nunca por tener el flag
-  // prendido: eso lo decide isUnitId más abajo) — es el escenario de uso,
-  // probar el cobro con el sitio todavía cerrado al público.
-  const requestedTestUnit = typeof unitId === "string" && isTestUnit(unitId);
-  if (!requestedTestUnit && isWhatsAppBookingMode(await getBookingMode())) {
+  // Con el flag prendido, el corte de arriba se saltea SOLO si además piden
+  // la unidad de prueba por id explícito: allowsTestUnit es el dueño único de
+  // esa regla, no la reescribimos a mano acá.
+  if (paused && !allowsTestUnit(unitId, testUnitOn)) {
     return NextResponse.json({ error: "bookings_paused" }, { status: 503 });
   }
 
-  const testUnitOn = await isTestUnitEnabled();
   if (
     !isUnitId(unitId, testUnitOn) ||
     typeof checkIn !== "string" || !DATE_RE.test(checkIn) ||
