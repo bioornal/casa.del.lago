@@ -44,11 +44,21 @@ vi.mock("@/lib/reservation/rate-settings.server", async () => {
   return { getRateSettings: () => Promise.resolve(DEFAULT_RATE_SETTINGS) };
 });
 
+// Factory completo a propósito (misma trampa que en availability-route.test.ts):
+// si el módulo bajo prueba importa algo de site-settings.server que acá falta,
+// queda en undefined en runtime. getBookingMode se reusa tal cual ya estaba
+// (no se declara otro); se importa más abajo para poder pisarlo con
+// mockResolvedValue en los tests que lo necesitan.
 vi.mock("@/lib/site-settings.server", () => ({
   getBookingMode: vi.fn(async () => "online" as const),
+  isTestUnitEnabled: vi.fn(),
 }));
 
+import { getBookingMode, isTestUnitEnabled } from "@/lib/site-settings.server";
 import { POST } from "@/app/api/payments/route";
+
+const mockedGetBookingMode = vi.mocked(getBookingMode);
+const mockedIsTestUnitEnabled = vi.mocked(isTestUnitEnabled);
 
 const CARD = { token: "tok-1", paymentMethodId: "visa", installments: 1 };
 const VALID = {
@@ -77,6 +87,16 @@ function post(body: unknown, ip: string = String(Math.random())) {
 
 beforeEach(() => {
   createCardPayment.mockReset();
+  // mockReset() borraría también el default async () => "online" que trae el
+  // factory de arriba: hay que reponerlo, si no las reservas reales de los
+  // tests existentes (que no tocan este mock) quedarían con booking mode
+  // undefined y el corte de WhatsApp las bloquearía por accidente.
+  mockedGetBookingMode.mockReset();
+  mockedGetBookingMode.mockResolvedValue("online");
+  // Cerrado por default (fail-safe, mismo criterio que isTestUnitEnabled real):
+  // los tests que no piden la unidad de prueba no dependen de este valor.
+  mockedIsTestUnitEnabled.mockReset();
+  mockedIsTestUnitEnabled.mockResolvedValue(false);
   insertReservation.mockReset();
   insertReservation.mockResolvedValue(undefined);
   upsertConfirmedByCode.mockReset();
@@ -246,5 +266,52 @@ describe("POST /api/payments", () => {
     }
     const blocked = await POST(post(VALID, ip));
     expect(blocked.status).toBe(429);
+  });
+
+  it("con el flag apagado, la unidad de prueba se rechaza como cualquier basura", async () => {
+    mockedIsTestUnitEnabled.mockResolvedValue(false);
+    const res = await POST(post({ ...VALID, unitId: "prueba" }));
+    expect(res.status).toBe(400);
+    expect(createCardPayment).not.toHaveBeenCalled();
+  });
+
+  it("con el flag prendido cobra el monto plano, no el de una unidad real", async () => {
+    // El monto lo recalcula el server con checkoutTotal: nunca viaja del cliente.
+    mockedIsTestUnitEnabled.mockResolvedValue(true);
+    createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
+    await POST(post({ ...VALID, unitId: "prueba" }));
+    expect(createCardPayment.mock.calls[0][0].amount).toBe(2500);
+  });
+
+  it("la unidad de prueba saltea el corte de modo WhatsApp", async () => {
+    // Es el escenario de uso: probar el cobro con el sitio cerrado al público.
+    mockedIsTestUnitEnabled.mockResolvedValue(true);
+    mockedGetBookingMode.mockResolvedValue("whatsapp");
+    createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
+    const res = await POST(post({ ...VALID, unitId: "prueba" }));
+    expect(res.status).not.toBe(503);
+  });
+
+  it("con el flag prendido, una unidad real NO saltea el corte", async () => {
+    // Si el flag global alcanzara, prenderlo abriría el checkout de las
+    // unidades reales a cualquiera con un deep-link.
+    mockedIsTestUnitEnabled.mockResolvedValue(true);
+    mockedGetBookingMode.mockResolvedValue("whatsapp");
+    const res = await POST(post(VALID));
+    expect(res.status).toBe(503);
+    expect((await res.json()).error).toBe("bookings_paused");
+  });
+
+  it("con el flag apagado, 'prueba' en modo WhatsApp da 503 igual que cualquier otro id", async () => {
+    // Antes del fix, el corte solo miraba el unitId (nunca el flag): con el
+    // flag apagado, "prueba" colaba distinto (400) que un id inexistente
+    // (503) — un prober podía usar el status code para saber que la unidad
+    // de prueba existe. Las dos condiciones tienen que dar la MISMA respuesta.
+    mockedIsTestUnitEnabled.mockResolvedValue(false);
+    mockedGetBookingMode.mockResolvedValue("whatsapp");
+    const res = await POST(post({ ...VALID, unitId: "prueba" }));
+    expect(res.status).toBe(503);
+    expect((await res.json()).error).toBe("bookings_paused");
+    expect(createCardPayment).not.toHaveBeenCalled();
   });
 });

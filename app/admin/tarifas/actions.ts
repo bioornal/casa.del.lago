@@ -5,6 +5,7 @@ import { routing } from "@/lib/i18n/routing";
 import { UNITS } from "@/lib/units";
 import { parseRateSettingsInput, type RateSettingsInput } from "@/lib/reservation/rate-settings";
 import { saveRateSettings } from "@/lib/reservation/rate-settings.server";
+import { getAdminUser } from "@/lib/admin/auth";
 
 export type SaveRatesState = { ok?: boolean; error?: string } | undefined;
 
@@ -12,6 +13,12 @@ export async function saveRates(
   _prev: SaveRatesState,
   formData: FormData,
 ): Promise<SaveRatesState> {
+  // El middleware guarda por PATH, no por acción: un POST con el Next-Action
+  // id correcto puede llegar directo acá sin pasar por guardAdmin (ver
+  // middleware.ts). La Server Action tiene que exigir su propia sesión.
+  const admin = await getAdminUser();
+  if (!admin) return { error: "No autorizado." };
+
   const raw = {
     nightly_aratiri: String(formData.get("nightly_aratiri") ?? ""),
     nightly_aguaribay: String(formData.get("nightly_aguaribay") ?? ""),

@@ -2,10 +2,10 @@ import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import { Link } from "@/lib/i18n/navigation";
 import type { State } from "@/lib/reservation/reducer";
-import { getUnit } from "@/lib/units";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 import { computeNights } from "@/lib/reservation/pricing";
-import { methodTotal, type PaymentMethod } from "@/lib/reservation/method-pricing";
+import type { PaymentMethod } from "@/lib/reservation/method-pricing";
+import { resolveUnit, checkoutTotal } from "@/lib/reservation/test-unit";
 
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
 
@@ -21,9 +21,9 @@ interface ConfirmacionProps {
 export function Confirmacion({ state, settings, method = "card", code, pending }: ConfirmacionProps) {
   const t = useTranslations("reservas");
   const tCta = useTranslations("cta");
-  const unit = getUnit(state.unitId)!;
+  const unit = resolveUnit(state.unitId);
   const nights = computeNights(state.checkIn, state.checkOut);
-  const total = methodTotal(settings, method, state.unitId, nights);
+  const total = checkoutTotal(settings, method, state.unitId, nights);
 
   const formatDate = (d: Date) => format(d, "d MMM");
   const rangeLabel =

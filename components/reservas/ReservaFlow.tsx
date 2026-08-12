@@ -15,7 +15,13 @@ import { parseCheckoutQuery, buildTarifasUrl } from "@/lib/reservation/search";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 import type { PaymentMethod } from "@/lib/reservation/method-pricing";
 
-export function ReservaFlow({ settings }: { settings: RateSettings }) {
+export function ReservaFlow({
+  settings,
+  allowTestUnit,
+}: {
+  settings: RateSettings;
+  allowTestUnit: boolean;
+}) {
   const t = useTranslations("reservas");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -25,8 +31,8 @@ export function ReservaFlow({ settings }: { settings: RateSettings }) {
   const checkOut = searchParams.get("checkOut") ?? undefined;
   const guests = searchParams.get("guests") ?? undefined;
   const query = useMemo(
-    () => parseCheckoutQuery({ unit, checkIn, checkOut, guests }),
-    [unit, checkIn, checkOut, guests],
+    () => parseCheckoutQuery({ unit, checkIn, checkOut, guests }, { allowTestUnit }),
+    [unit, checkIn, checkOut, guests, allowTestUnit],
   );
 
   const [state, dispatch] = useReducer(

@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 import { getAvailabilityServer } from "@/lib/reservation/availability.server";
+import { isTestUnitEnabled } from "@/lib/site-settings.server";
+import { allowsTestUnit } from "@/lib/reservation/test-unit";
 import type { UnitId } from "@/lib/reservation/reducer";
 
 const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
 
-function isUnitId(v: string): v is UnitId {
+// La unidad de prueba solo es un UnitId válido cuando el flag global la
+// habilita: las dos condiciones, no una — si bastara con el flag, prenderlo
+// abriría el endpoint de disponibilidad de las unidades reales a cualquiera.
+// allowsTestUnit (lib/reservation/test-unit.ts) es el dueño único de esa
+// regla: no se reescribe a mano acá.
+function isUnitId(v: string, allowTestUnit: boolean): v is UnitId {
+  if (allowsTestUnit(v, allowTestUnit)) return true;
   return (VALID_UNITS as string[]).includes(v);
 }
 
@@ -21,7 +29,7 @@ export async function GET(
   ctx: { params: Promise<{ unitId: string }> },
 ) {
   const { unitId } = await ctx.params;
-  if (!isUnitId(unitId)) {
+  if (!isUnitId(unitId, await isTestUnitEnabled())) {
     return NextResponse.json(STUB, { status: 400 });
   }
 

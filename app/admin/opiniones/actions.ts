@@ -11,6 +11,7 @@ import {
   moveTestimonio,
   saveReviewsAggregate,
 } from "@/lib/reviews/testimonios.server";
+import { getAdminUser } from "@/lib/admin/auth";
 
 export type ActionState =
   | {
@@ -29,6 +30,14 @@ export type ActionState =
 /** Mensaje típico cuando falta correr el bloque de setup.sql. */
 const SIN_TABLA =
   "No se pudo guardar en Supabase. ¿Corriste el bloque de testimonials del setup.sql en el SQL Editor?";
+
+// El middleware guarda por PATH, no por acción: un POST con el Next-Action id
+// correcto puede llegar directo a cualquiera de estas Server Actions sin pasar
+// por guardAdmin (ver middleware.ts). Cada una exige su propia sesión.
+async function requireAdmin(): Promise<ActionState> {
+  const admin = await getAdminUser();
+  return admin ? undefined : { error: "No autorizado." };
+}
 
 /**
  * La home es estática: sin revalidar seguiría sirviendo el HTML con los
@@ -50,6 +59,8 @@ function leerInput(formData: FormData) {
 }
 
 export async function crearTestimonio(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   const parsed = parseTestimonioInput(leerInput(formData));
   if (!parsed.ok) return { error: parsed.error };
   try {
@@ -62,6 +73,8 @@ export async function crearTestimonio(_prev: ActionState, formData: FormData): P
 }
 
 export async function editarTestimonio(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   const id = String(formData.get("id") ?? "");
   if (!id) return { error: "Falta el id del testimonio." };
   const parsed = parseTestimonioInput(leerInput(formData));
@@ -76,6 +89,8 @@ export async function editarTestimonio(_prev: ActionState, formData: FormData): 
 }
 
 export async function alternarPublicado(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   const id = String(formData.get("id") ?? "");
   // El checkbox manda el estado que HAY; la acción guarda el contrario.
   const publicado = String(formData.get("published") ?? "") === "true";
@@ -90,6 +105,8 @@ export async function alternarPublicado(_prev: ActionState, formData: FormData):
 }
 
 export async function moverTestimonio(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   const id = String(formData.get("id") ?? "");
   const dir = String(formData.get("dir") ?? "");
   if (!id) return { error: "Falta el id del testimonio." };
@@ -104,6 +121,8 @@ export async function moverTestimonio(_prev: ActionState, formData: FormData): P
 }
 
 export async function borrarTestimonio(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   const id = String(formData.get("id") ?? "");
   if (!id) return { error: "Falta el id del testimonio." };
   // Se borra de verdad: para sacarlo de la home sin perderlo está "despublicar",
@@ -118,6 +137,8 @@ export async function borrarTestimonio(_prev: ActionState, formData: FormData): 
 }
 
 export async function guardarAgregado(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   const parsed = parseAggregateInput({
     rating: String(formData.get("rating") ?? ""),
     count: String(formData.get("count") ?? ""),

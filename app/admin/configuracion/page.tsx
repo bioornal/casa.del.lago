@@ -3,6 +3,7 @@ import { getSiteSettings } from "@/lib/site-settings.server";
 import { hasBookingModeOverride } from "@/lib/booking-mode";
 import { signOut } from "../login/actions";
 import { ModeToggle } from "./ModeToggle";
+import { TestUnitToggle } from "./TestUnitToggle";
 
 export const metadata = { title: "Configuración — Panel La Casa del Lago" };
 
@@ -30,7 +31,10 @@ export default async function AdminConfiguracionPage() {
         </div>
       </div>
 
-      <ModeToggle current={settings.bookingMode} overridden={hasBookingModeOverride()} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <ModeToggle current={settings.bookingMode} overridden={hasBookingModeOverride()} />
+        <TestUnitToggle current={settings.testUnitEnabled} />
+      </div>
     </div>
   );
 }

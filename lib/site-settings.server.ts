@@ -62,3 +62,37 @@ export async function saveSiteSettings(s: SiteSettings): Promise<void> {
   if (error) throw new Error(`saveSiteSettings: ${error.message}`);
   invalidateSiteSettingsCache();
 }
+
+/**
+ * Persiste SOLO la columna del toggle de prueba, con un update dirigido.
+ *
+ * No reusa saveSiteSettings a propósito: ese hace upsert de un SiteSettings
+ * completo, y armarlo exigiría leer el estado actual con getSiteSettings() —
+ * que ante un error de Supabase devuelve el default CERRADO. Un blip de red en
+ * medio de ese merge escribiría booking_mode='whatsapp' pisando un 'online'
+ * legítimo y pausaría las reservas sin que nadie lo pidiera.
+ */
+export async function saveTestUnitEnabled(enabled: boolean): Promise<void> {
+  // .update().eq("id", 1) sobre CERO filas no devuelve error: Supabase no
+  // distingue "actualicé 1 fila" de "no encontré ninguna". Sin el .select acá
+  // abajo, una fila id=1 faltante haría que la acción responda "guardado" con
+  // el toggle en realidad apagado — grave porque este toggle habilita cobros.
+  const { data, error } = await getServiceClient()
+    .from("site_settings")
+    .update({ test_unit_enabled: enabled })
+    .eq("id", 1)
+    .select("id")
+    .maybeSingle();
+  if (error) throw new Error(`saveTestUnitEnabled: ${error.message}`);
+  if (data === null) throw new Error("saveTestUnitEnabled: no existe la fila id=1 en site_settings");
+  invalidateSiteSettingsCache();
+}
+
+/**
+ * Punto de entrada único para preguntar si la unidad de prueba está habilitada.
+ * Igual que getBookingMode: no llamar a getSiteSettings() directo para decidir
+ * si se puede cobrar.
+ */
+export async function isTestUnitEnabled(): Promise<boolean> {
+  return (await getSiteSettings()).testUnitEnabled;
+}
