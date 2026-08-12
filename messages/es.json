@@ -71,6 +71,8 @@
       "airport": "Aeropuerto (IGR)",
       "falls": "Cataratas del Iguazú",
       "downtown": "Puerto Libertad",
+      "foz": "Foz do Iguaçu, Brasil (centro)",
+      "cde": "Ciudad del Este, Paraguay (Monalisa)",
       "km": "{km} km"
     },
     "conditions": {

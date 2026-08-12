@@ -1,11 +1,14 @@
 // Datos estáticos del alojamiento para la página de tarifas.
-// PLACEHOLDERS: el dueño confirma km reales al lago, horarios y política de mascotas.
+// Distancias reales por ruta (OSRM/OpenStreetMap, ago-2026) desde el complejo
+// (-25.8439634, -54.5348569, Ex Ruta 12, Puerto Libertad).
 
-export type DistanceKey = "airport" | "falls" | "downtown";
+export type DistanceKey = "airport" | "falls" | "downtown" | "foz" | "cde";
 export const DISTANCES: { key: DistanceKey; km: number }[] = [
-  { key: "airport", km: 0 }, // TODO: km reales aeropuerto IGR ↔ lago Urugua-í
-  { key: "falls", km: 0 },   // TODO: km reales Cataratas ↔ lago
-  { key: "downtown", km: 0 }, // TODO: km reales Puerto Libertad ↔ lago
+  { key: "airport", km: 30 }, // Aeropuerto IGR (~40 min)
+  { key: "falls", km: 27 },   // Acceso Parque Nacional Iguazú, lado argentino (~35 min)
+  { key: "downtown", km: 15 }, // Puerto Libertad centro (~20 min)
+  { key: "foz", km: 45 },     // Foz do Iguaçu centro, BR (~55 min + aduana)
+  { key: "cde", km: 50 },     // Ciudad del Este (Monalisa), PY (~65 min + 2 aduanas)
 ];
 
 export const CHECK_IN = "15:00";

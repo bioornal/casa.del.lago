@@ -5,7 +5,7 @@
 
 ## Alojamientos
 
-- **Cabaña Aratiri** — hasta 6 huéspedes, 2 dormitorios, 1 baño, 75 m².
+- **Cabaña Aratiri** — hasta 6 huéspedes, 2 dormitorios, 1 baño, 65 m².
 - **Cabaña Aguaribay** — hasta 4 huéspedes, 1 dormitorio, 1 baño, 45 m².
 
 Tarifa plana por unidad, sin cargo por huésped adicional. Se suma una tasa de
@@ -14,10 +14,14 @@ limpieza única por estadía. Precios actualizados en /es/tarifas.
 ## Ubicación
 
 Costa del lago Urugua-í, entre Puerto Iguazú y Puerto Libertad, Misiones, Argentina.
+Distancias reales por ruta:
 - Lago Urugua-í: 0 km (acceso directo al agua)
-- Puerto Libertad: 12 km
-- Puerto Iguazú: 45 km
-- Cataratas del Iguazú: 50 km
+- Puerto Libertad: 15 km
+- Cataratas del Iguazú (acceso Parque Nacional, lado argentino): 27 km
+- Aeropuerto Internacional de Iguazú (IGR): 30 km
+- Puerto Iguazú: 34 km
+- Foz do Iguaçu, Brasil (centro): 45 km
+- Ciudad del Este, Paraguay (zona Shopping Monalisa): 50 km
 
 ## Servicios
 
