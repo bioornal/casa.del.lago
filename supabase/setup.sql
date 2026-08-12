@@ -213,3 +213,10 @@ alter table public.site_settings
     check (reviews_rating >= 0 and reviews_rating <= 5),
   add column if not exists reviews_count integer not null default 88
     check (reviews_count >= 0);
+
+-- =============================================================
+-- 2026-08-11 — Unidad de prueba (ver lib/reservation/test-unit.ts).
+-- Arranca en false: habilitar un cobro es siempre una acción explícita.
+-- =============================================================
+alter table public.site_settings
+  add column if not exists test_unit_enabled boolean not null default false;
