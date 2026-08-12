@@ -32,6 +32,18 @@ describe("parseCheckoutQuery", () => {
     expect(parseCheckoutQuery({ unit: "xxx", checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4" })).toBeNull();
     expect(parseCheckoutQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4" })).toBeNull();
   });
+
+  it("sin opts, la unidad de prueba se rechaza", () => {
+    // El default es false a propósito: quien no opta explícitamente sigue
+    // rechazándola. El único que puede optar es el server.
+    expect(parseCheckoutQuery({ unit: "prueba", checkIn: "2027-01-01", checkOut: "2027-01-02", guests: "2" })).toBeNull();
+  });
+
+  it("con allowTestUnit la acepta, y sigue rechazando basura", () => {
+    const opts = { allowTestUnit: true };
+    expect(parseCheckoutQuery({ unit: "prueba", checkIn: "2027-01-01", checkOut: "2027-01-02", guests: "2" }, opts)).not.toBeNull();
+    expect(parseCheckoutQuery({ unit: "inventada", checkIn: "2027-01-01", checkOut: "2027-01-02", guests: "2" }, opts)).toBeNull();
+  });
 });
 
 describe("builders", () => {

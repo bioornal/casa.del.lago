@@ -4,8 +4,9 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
 import { ReservaFlow } from "@/components/reservas/ReservaFlow";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
-import { getBookingMode } from "@/lib/site-settings.server";
+import { getBookingMode, isTestUnitEnabled } from "@/lib/site-settings.server";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
+import { allowsTestUnit } from "@/lib/reservation/test-unit";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -33,14 +34,24 @@ export async function generateMetadata({
 
 export default async function ReservasPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const sp = await searchParams;
 
-  // Reservas online pausadas: el checkout deriva a tarifas (reserva vía WhatsApp).
-  if (isWhatsAppBookingMode(await getBookingMode())) {
+  // Las DOS condiciones, no una: el flag global solo habilita la unidad de
+  // prueba cuando además el deep-link la pide explícitamente por id (ver
+  // lib/reservation/test-unit.ts). Nunca "flag prendido → dejar pasar".
+  const allowTestUnit = allowsTestUnit(sp.unit, await isTestUnitEnabled());
+
+  // Reservas online pausadas: el checkout deriva a tarifas (reserva vía
+  // WhatsApp) — salvo el deep-link de la unidad de prueba, que necesita poder
+  // probar el cobro con el sitio todavía cerrado al público.
+  if (!allowTestUnit && isWhatsAppBookingMode(await getBookingMode())) {
     redirect(`/${locale}/tarifas`);
   }
 
@@ -49,7 +60,7 @@ export default async function ReservasPage({
   return (
     <main>
       <Suspense fallback={null}>
-        <ReservaFlow settings={settings} />
+        <ReservaFlow settings={settings} allowTestUnit={allowTestUnit} />
       </Suspense>
     </main>
   );
