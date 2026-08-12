@@ -109,7 +109,9 @@ describe("saveSiteSettings", () => {
     const { getSiteSettings, saveSiteSettings } = await freshModule();
 
     await getSiteSettings(); // llena el memo con whatsapp
-    await saveSiteSettings({ bookingMode: "online" });
+    // testUnitEnabled no viaja: siteSettingsToRow no la emite, así que este
+    // valor nunca llega al upsert (ver assert de abajo).
+    await saveSiteSettings({ bookingMode: "online", testUnitEnabled: false });
     expect(upsert).toHaveBeenCalledWith({ id: 1, booking_mode: "online" });
 
     maybeSingle.mockResolvedValue({ data: { booking_mode: "online" }, error: null });
@@ -119,6 +121,8 @@ describe("saveSiteSettings", () => {
   it("propaga el error de la DB para que el panel lo muestre", async () => {
     upsert.mockResolvedValue({ error: { message: "permission denied" } });
     const { saveSiteSettings } = await freshModule();
-    await expect(saveSiteSettings({ bookingMode: "online" })).rejects.toThrow(/permission denied/);
+    await expect(
+      saveSiteSettings({ bookingMode: "online", testUnitEnabled: false }),
+    ).rejects.toThrow(/permission denied/);
   });
 });
