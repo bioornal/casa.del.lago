@@ -3,9 +3,17 @@ import { getPayment, verifyWebhookSignature } from "@/lib/reservation/payments.s
 import { upsertConfirmedByCode, OverlapError, releasePendingByCode, type Locale } from "@/lib/reservation/reservations.server";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email/guest";
 import { alertAdminPaymentWithoutSlot } from "@/lib/reservation/email/admin";
+import { TEST_UNIT_ID } from "@/lib/reservation/test-unit";
 import type { UnitId } from "@/lib/reservation/reducer";
 
-const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
+// TEST_UNIT_ID entra SIN consultar el flag isTestUnitEnabled, a propósito:
+// Mercado Pago puede entregar esta notificación minutos después del cobro,
+// cuando el toggle de /admin/configuracion ya se apagó. Si acá se consultara
+// el flag, se mataría este segundo camino de confirmación (webhook, además
+// del retorno síncrono de /api/payments) — que es justamente uno de los
+// efectos que la unidad de prueba viene a verificar. No agrega riesgo: para
+// llegar a este punto el cobro ya ocurrió.
+const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay", TEST_UNIT_ID];
 
 export async function POST(req: Request) {
   let body: { type?: string; data?: { id?: string } };

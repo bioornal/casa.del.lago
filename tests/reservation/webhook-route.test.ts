@@ -152,4 +152,20 @@ describe("POST /api/webhooks/mercadopago", () => {
     expect(res.status).toBe(200);
     expect(releasePendingByCode).not.toHaveBeenCalled();
   });
+
+  it("pago aprobado de la unidad de prueba (unit_id: 'prueba') se confirma, no se descarta", async () => {
+    // Sin consultar isTestUnitEnabled: para llegar acá el cobro ya ocurrió, y
+    // Mercado Pago puede entregar esta notificación minutos después de que el
+    // toggle se haya apagado. Es el segundo camino de confirmación que la
+    // unidad de prueba viene a verificar.
+    getPayment.mockResolvedValue({
+      ...APPROVED_PAYMENT,
+      metadata: { ...APPROVED_PAYMENT.metadata, unit_id: "prueba" },
+    });
+    const res = await POST(approvedReq());
+    expect(res.status).toBe(200);
+    expect(upsertConfirmedByCode).toHaveBeenCalledOnce();
+    expect(upsertConfirmedByCode.mock.calls[0][0].unitId).toBe("prueba");
+    expect(sendConfirmationEmailOnce).toHaveBeenCalledWith("CDL-2026-AB12");
+  });
 });

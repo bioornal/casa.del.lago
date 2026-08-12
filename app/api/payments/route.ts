@@ -5,9 +5,7 @@ import {
   isMockMode,
   type PaymentOutcome,
 } from "@/lib/reservation/payments.server";
-import { getUnit } from "@/lib/units";
 import { computeNights } from "@/lib/reservation/pricing";
-import { methodTotal } from "@/lib/reservation/method-pricing";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
 import {
@@ -18,7 +16,8 @@ import {
   OverlapError,
 } from "@/lib/reservation/reservations.server";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
-import { getBookingMode } from "@/lib/site-settings.server";
+import { getBookingMode, isTestUnitEnabled } from "@/lib/site-settings.server";
+import { isTestUnit, resolveUnit, checkoutTotal } from "@/lib/reservation/test-unit";
 import { sendConfirmationEmailOnce } from "@/lib/reservation/email/guest";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 import type { UnitId } from "@/lib/reservation/reducer";
@@ -26,8 +25,14 @@ import type { UnitId } from "@/lib/reservation/reducer";
 const VALID_UNITS: UnitId[] = ["aratiri", "aguaribay"];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-function isUnitId(v: unknown): v is UnitId {
-  return typeof v === "string" && (VALID_UNITS as string[]).includes(v);
+// La unidad de prueba solo es un UnitId válido cuando el flag global la
+// habilita: las dos condiciones, no una (mismo criterio que en la ruta de
+// disponibilidad) — si bastara con el flag, prenderlo abriría el checkout de
+// las unidades reales a cualquiera con un deep-link.
+function isUnitId(v: unknown, allowTestUnit: boolean): v is UnitId {
+  if (typeof v !== "string") return false;
+  if (isTestUnit(v)) return allowTestUnit;
+  return (VALID_UNITS as string[]).includes(v);
 }
 
 type CardPayment = { token: string; paymentMethodId: string; issuerId?: string; installments: number; deviceId?: string };
@@ -50,11 +55,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "rate" }, { status: 429 });
   }
 
-  // Reservas online pausadas (modo WhatsApp): no se aceptan pagos.
-  if (isWhatsAppBookingMode(await getBookingMode())) {
-    return NextResponse.json({ error: "bookings_paused" }, { status: 503 });
-  }
-
   let body: Record<string, unknown>;
   try {
     body = (await req.json()) as Record<string, unknown>;
@@ -65,8 +65,18 @@ export async function POST(req: Request) {
   const { unitId, checkIn, checkOut, guests, firstName, lastName, email, phone, payment, locale: localeRaw } = body;
   const locale = localeRaw === "en" || localeRaw === "pt" ? localeRaw : "es";
 
+  // Reservas online pausadas (modo WhatsApp): no se aceptan pagos. Se saltea
+  // SOLO cuando la unidad pedida es la de prueba (nunca por tener el flag
+  // prendido: eso lo decide isUnitId más abajo) — es el escenario de uso,
+  // probar el cobro con el sitio todavía cerrado al público.
+  const requestedTestUnit = typeof unitId === "string" && isTestUnit(unitId);
+  if (!requestedTestUnit && isWhatsAppBookingMode(await getBookingMode())) {
+    return NextResponse.json({ error: "bookings_paused" }, { status: 503 });
+  }
+
+  const testUnitOn = await isTestUnitEnabled();
   if (
-    !isUnitId(unitId) ||
+    !isUnitId(unitId, testUnitOn) ||
     typeof checkIn !== "string" || !DATE_RE.test(checkIn) ||
     typeof checkOut !== "string" || !DATE_RE.test(checkOut) ||
     checkOut <= checkIn ||
@@ -78,7 +88,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 
-  const unit = getUnit(unitId)!;
+  const unit = resolveUnit(unitId);
   if (guests > unit.specs.guests) {
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
@@ -92,8 +102,10 @@ export async function POST(req: Request) {
 
   const nights = computeNights(new Date(checkIn), new Date(checkOut));
   const settings = await getRateSettings();
-  // Precio de lista = método tarjeta (comisión MP incluida; ver method-pricing.ts)
-  const total = methodTotal(settings, "card", unit.slug, nights);
+  // Precio de lista = método tarjeta (comisión MP incluida; ver method-pricing.ts).
+  // checkoutTotal recalcula acá server-side, igual que el checkout muestra: la
+  // unidad de prueba cobra el monto plano de TEST_UNIT_TOTAL, no un precio real.
+  const total = checkoutTotal(settings, "card", unit.slug, nights);
 
   // Contra la base, no a ciegas: generateBookingCode() sortea sobre 32^4 sin
   // mirar si el código ya existe, y el código es la clave del lookup, del email
