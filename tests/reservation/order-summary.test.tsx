@@ -101,14 +101,24 @@ describe("OrderSummary", () => {
     expect(screen.queryByText(/Estadía de prueba/)).not.toBeInTheDocument();
   });
 
-  it("con la unidad de prueba muestra el precio plano y ningún desglose", () => {
+  it("con la unidad de prueba muestra el precio plano, el Total, y ningún desglose", () => {
     render(
       <NextIntlClientProvider locale="es" messages={messages}>
         <OrderSummary state={{ ...STATE, unitId: TEST_UNIT_ID }} settings={DEFAULT_RATE_SETTINGS} method="card" />
       </NextIntlClientProvider>,
     );
     expect(screen.getByText(/Estadía de prueba/)).toBeInTheDocument();
-    expect(screen.getByText("$2.500")).toBeInTheDocument();
+
+    // El Total se ubica por su etiqueta y se lee el nodo hermano (como en el
+    // caso de arriba): con precio plano la fila "Estadía de prueba" y el Total
+    // muestran la MISMA cifra a propósito (es la fidelidad con el checkout
+    // real lo que importa acá, no que el importe sea único en pantalla).
+    const totalLabel = screen.getByText("Total");
+    expect(totalLabel.nextElementSibling).toHaveTextContent("$2.500");
+
+    // Sin desglose por noche ni limpieza: es precio plano, no hay nada que prorratear.
+    expect(screen.queryByText("Limpieza")).not.toBeInTheDocument();
+    expect(screen.queryByText(/×/)).not.toBeInTheDocument();
     expect(screen.queryByText("$30.000")).not.toBeInTheDocument();
   });
 });

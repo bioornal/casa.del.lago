@@ -122,29 +122,23 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
         )}
       </div>
 
-      {/* Total: con la unidad de prueba la fila de arriba YA es el total (precio
-          plano, una sola línea), así que repetirlo acá sería la misma cifra dos
-          veces sin aportar nada — se omite y solo se muestra para unidades reales. */}
-      {bd && (
-        <>
-          <div style={{ borderTop: "1px solid var(--color-borde-claro)", margin: "24px 0 0" }} />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "baseline",
-              marginTop: 20,
-            }}
-          >
-            <span className="font-display" style={{ fontSize: 24, color: "var(--color-carbon)" }}>
-              Total
-            </span>
-            <span className="font-display" style={{ fontSize: 30, color: "var(--color-carbon)" }}>
-              {nights > 0 ? money(total) : "—"}
-            </span>
-          </div>
-        </>
-      )}
+      {/* Total */}
+      <div style={{ borderTop: "1px solid var(--color-borde-claro)", margin: "24px 0 0" }} />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
+          marginTop: 20,
+        }}
+      >
+        <span className="font-display" style={{ fontSize: 24, color: "var(--color-carbon)" }}>
+          Total
+        </span>
+        <span className="font-display" style={{ fontSize: 30, color: "var(--color-carbon)" }}>
+          {nights > 0 ? money(total) : "—"}
+        </span>
+      </div>
 
       {/* Ahorro eligiendo transferencia (solo si está mirando tarjeta) */}
       {method === "card" && nights > 0 && savings > 0 && (
