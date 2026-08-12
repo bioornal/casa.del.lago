@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 
-const ROWS = ["igr", "cataratas", "wanda", "posadas"] as const;
+const ROWS = ["igr", "cataratas", "wanda", "foz", "cde", "posadas"] as const;
 
 export function ComoLlegar() {
   const t = useTranslations("comoLlegar");

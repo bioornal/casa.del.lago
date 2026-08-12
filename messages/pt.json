@@ -135,25 +135,33 @@
   "comoLlegar": {
     "kicker": "Como chegar",
     "title": "Está mais perto do que parece.",
-    "body": "Puerto Libertad fica na rodovia RN12, entre Puerto Esperanza e Wanda, a caminho de Iguazú. Você estaciona na porta e não usa mais o carro.",
+    "body": "Às margens do lago Urugua-í, na antiga RN12 entre Puerto Iguazú e Puerto Libertad: acesso por asfalto e estacionamento na porta. Para Foz e Ciudad del Este, some o tempo de alfândega.",
     "checkin": "Check-in 15 h · Check-out 11 h",
     "mapLink": "Abrir no Maps →",
     "rows": {
       "igr": {
         "place": "Aeroporto de Iguazú (IGR)",
-        "distance": "55 km · 45 min"
+        "distance": "30 km · 40 min"
       },
       "cataratas": {
         "place": "Cataratas do Iguaçu",
-        "distance": "70 km · 1 h"
+        "distance": "27 km · 36 min"
       },
       "wanda": {
         "place": "Minas de Wanda",
-        "distance": "25 km · 20 min"
+        "distance": "21 km · 28 min"
+      },
+      "foz": {
+        "place": "Foz do Iguaçu, Brasil (centro)",
+        "distance": "45 km · 55 min"
+      },
+      "cde": {
+        "place": "Ciudad del Este, Paraguai (Monalisa)",
+        "distance": "50 km · 1 h 05"
       },
       "posadas": {
         "place": "Posadas",
-        "distance": "270 km · 3 h 30"
+        "distance": "269 km · 4 h 15"
       }
     }
   },
