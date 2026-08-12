@@ -7,7 +7,7 @@ import { createTransferReservation } from "@/lib/reservation/transfer";
 import { formatDateOnly } from "@/lib/reservation/booking";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 import { computeNights } from "@/lib/reservation/pricing";
-import { methodTotal, transferSavings } from "@/lib/reservation/method-pricing";
+import { checkoutTotal, checkoutSavings } from "@/lib/reservation/test-unit";
 import { BANK_DETAILS } from "@/lib/site";
 import { ACCEPT_ATTR, MAX_BYTES, isAllowedMime, formatBytes } from "@/lib/reservation/comprobante";
 
@@ -37,8 +37,8 @@ export function StepTransferencia({ state, settings, onPending }: Props) {
 
   const nights = computeNights(state.checkIn!, state.checkOut!);
   // Total del método TRANSFERENCIA (más barato que el precio de lista).
-  const total = methodTotal(settings, "transfer", state.unitId, nights);
-  const savings = transferSavings(settings, state.unitId, nights);
+  const total = checkoutTotal(settings, "transfer", state.unitId, nights);
+  const savings = checkoutSavings(settings, state.unitId, nights);
   const money = (n: number) => `$${new Intl.NumberFormat("es-AR").format(n)}`;
 
   const submit = async () => {

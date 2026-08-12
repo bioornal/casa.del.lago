@@ -8,7 +8,8 @@ import { createPayment, type PaymentResult } from "@/lib/reservation/payments";
 import { formatDateOnly } from "@/lib/reservation/booking";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 import { computeNights } from "@/lib/reservation/pricing";
-import { methodTotal, type PaymentMethod } from "@/lib/reservation/method-pricing";
+import type { PaymentMethod } from "@/lib/reservation/method-pricing";
+import { checkoutTotal, isTestUnit } from "@/lib/reservation/test-unit";
 import { StepTransferencia } from "./StepTransferencia";
 
 const MOCK = process.env.NEXT_PUBLIC_PAYMENTS_MOCK === "1";
@@ -32,7 +33,7 @@ export function StepPago({ state, settings, method, onMethodChange, onApproved, 
   const nights = computeNights(state.checkIn, state.checkOut);
   // Total del método TARJETA (precio de lista): es lo que muestra este paso y
   // lo que cobra el Brick. El de transferencia lo muestra StepTransferencia.
-  const total = methodTotal(settings, "card", state.unitId, nights);
+  const total = checkoutTotal(settings, "card", state.unitId, nights);
 
   useEffect(() => {
     if (!MOCK && PUBLIC_KEY) initMercadoPago(PUBLIC_KEY, { locale: "es-AR" });
@@ -99,10 +100,14 @@ export function StepPago({ state, settings, method, onMethodChange, onApproved, 
     );
   }
 
+  // La unidad de prueba es solo tarjeta: ni el selector ni la pestaña de
+  // transferencia tienen sentido para un cobro que no representa una estadía real.
+  const cardOnly = isTestUnit(state.unitId);
+
   return (
     <div>
-      <MethodTabs method={method} setMethod={onMethodChange} t={t} />
-      {method === "transfer" ? (
+      {!cardOnly && <MethodTabs method={method} setMethod={onMethodChange} t={t} />}
+      {!cardOnly && method === "transfer" ? (
         <StepTransferencia state={state} settings={settings} onPending={onPending} />
       ) : (
         <>

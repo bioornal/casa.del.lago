@@ -1,8 +1,12 @@
 import { isValidEmail } from "./validation";
 import { parseDateOnly } from "./booking";
 import type { CheckoutQuery } from "./search";
+import type { BookableUnitId } from "./test-unit";
 
-export type UnitId = "aratiri" | "aguaribay";
+// El conjunto reservable = catálogo público + unidad de prueba. El alias se
+// mantiene porque `UnitId` es el nombre que importan varios módulos; ampliar
+// acá hace que TypeScript marque cada lugar que quedó incompleto.
+export type UnitId = BookableUnitId;
 export type GuestField = "firstName" | "lastName" | "email" | "phone";
 export type State = {
   step: 1 | 2 | 3;

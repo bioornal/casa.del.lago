@@ -4,9 +4,11 @@ import { NextIntlClientProvider } from "next-intl";
 import messages from "@/messages/es.json";
 import { OrderSummary } from "@/components/reservas/OrderSummary";
 import { DEFAULT_RATE_SETTINGS } from "@/lib/reservation/rate-settings";
-import { priceBreakdown, methodTotal } from "@/lib/reservation/method-pricing";
+import { priceBreakdown } from "@/lib/reservation/method-pricing";
 import { computeNights } from "@/lib/reservation/pricing";
 import type { State } from "@/lib/reservation/reducer";
+import type { UnitSlug } from "@/lib/units";
+import { TEST_UNIT_ID, checkoutTotal } from "@/lib/reservation/test-unit";
 
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
 
@@ -22,6 +24,11 @@ const STATE: State = {
   email: "juan@test.com",
   phone: "+54 9 376 000000",
 };
+
+// priceBreakdown sigue siendo solo para unidades reales (Task 2): estos tests
+// la ejercitan directamente, no a través de OrderSummary, así que necesitan el
+// tipo angosto aunque STATE.unitId ahora sea BookableUnitId.
+const REAL_UNIT_ID = STATE.unitId as UnitSlug;
 
 function renderCon(method: "card" | "transfer") {
   return render(
@@ -56,18 +63,19 @@ describe("OrderSummary", () => {
     // recalculan /api/payments y /api/reservations/transfer). Este test debe
     // fallar si alguien hace ese cambio.
     const nights = computeNights(STATE.checkIn, STATE.checkOut);
-    const cardBd = priceBreakdown(DEFAULT_RATE_SETTINGS, "card", STATE.unitId, nights);
+    const cardBd = priceBreakdown(DEFAULT_RATE_SETTINGS, "card", REAL_UNIT_ID, nights);
 
     for (const method of ["card", "transfer"] as const) {
-      const bd = priceBreakdown(DEFAULT_RATE_SETTINGS, method, STATE.unitId, nights);
+      const bd = priceBreakdown(DEFAULT_RATE_SETTINGS, method, REAL_UNIT_ID, nights);
       // Con transferencia, total y listTotal DIFIEREN (hay descuento): si esta
       // comparación colapsara (mismo valor), el test de abajo no blindaría nada.
       if (method === "transfer") expect(bd.total).not.toBe(bd.listTotal);
 
       const { unmount } = renderCon(method);
 
-      // Total mostrado === methodTotal, no listTotal.
-      expect(bd.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, method, STATE.unitId, nights));
+      // Total mostrado === checkoutTotal (methodTotal para una unidad real,
+      // nunca listTotal).
+      expect(bd.total).toBe(checkoutTotal(DEFAULT_RATE_SETTINGS, method, STATE.unitId, nights));
       const totalLabel = screen.getByText("Total");
       expect(totalLabel.nextElementSibling).toHaveTextContent(money(bd.total));
 
@@ -83,5 +91,24 @@ describe("OrderSummary", () => {
 
       unmount();
     }
+  });
+
+  it("con una unidad real el desglose es el mismo de siempre", () => {
+    // La unidad de prueba no puede alterar lo que ve un huésped real: es la
+    // condición de toda esta task.
+    renderCon("card");
+    expect(screen.getByText("$30.000")).toBeInTheDocument();
+    expect(screen.queryByText(/Estadía de prueba/)).not.toBeInTheDocument();
+  });
+
+  it("con la unidad de prueba muestra el precio plano y ningún desglose", () => {
+    render(
+      <NextIntlClientProvider locale="es" messages={messages}>
+        <OrderSummary state={{ ...STATE, unitId: TEST_UNIT_ID }} settings={DEFAULT_RATE_SETTINGS} method="card" />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.getByText(/Estadía de prueba/)).toBeInTheDocument();
+    expect(screen.getByText("$2.500")).toBeInTheDocument();
+    expect(screen.queryByText("$30.000")).not.toBeInTheDocument();
   });
 });
