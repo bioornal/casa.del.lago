@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
-import { ImageSlot } from "@/components/ui/ImageSlot";
+import { ImageSlot, UNIT_COVER_PHOTOS } from "@/components/ui/ImageSlot";
 import { Link } from "@/lib/i18n/navigation";
 import { UNITS } from "@/lib/units";
 import type { UnitSlug } from "@/lib/units";
@@ -62,6 +62,8 @@ export function UnitsGrid({ prices }: { prices: Record<UnitSlug, number> }) {
                 <div className="relative aspect-[4/3] overflow-hidden rounded-[6px] bg-slot">
                   <ImageSlot
                     label={name}
+                    photo={UNIT_COVER_PHOTOS[slug]}
+                    position={slug === "aratiri" ? "50% 85%" : undefined}
                     className="h-full w-full transition-transform duration-[900ms] ease-[cubic-bezier(.16,.84,.44,1)] group-hover:scale-[1.04]"
                   />
                 </div>

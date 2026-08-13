@@ -24,7 +24,7 @@ const BUCKET_READY =
 // sueltos de la raíz: 400 en toda la galería). Regenerar esta lista cada vez que
 // se suban o borren fotos.
 const BUCKET_FILES = new Set([
-  // ── Cabaña Aguaribay (26 fotos; no hay 22) ──────────────────────────────
+  // ── Cabaña Aratirí visible (carpeta cab abajo, 26 fotos) ────────────────
   "cab abajo/1.jpeg", // cocina-quincho con horno de ladrillo
   "cab abajo/2.jpeg", // la misma cocina, la barra y la parrilla
   "cab abajo/3.jpeg", // tabla de asado con el lago detrás (apaisada)
@@ -51,7 +51,7 @@ const BUCKET_FILES = new Set([
   "cab abajo/25.jpeg", // el kayak sobre las raíces (cuadrada)
   "cab abajo/26.jpeg", // la costa, la vegetación y el lago
   "cab abajo/27.jpeg", // la pileta y la cabaña, día abierto
-  // ── Cabaña Aratirí (22 fotos) ───────────────────────────────────────────
+  // ── Cabaña Aguaribay visible (carpeta cab arriba, 22 fotos) ─────────────
   "cab arriba/1.jpeg", // living con sofá gris y comedor al fondo
   "cab arriba/2.jpeg", // cocina con mesada de granito negro
   "cab arriba/3.jpeg", // living-comedor con mesa maciza (apaisada)
@@ -113,9 +113,16 @@ const REAL_PHOTOS: Record<string, string> = {
   // cada cabaña tiene su carpeta, las dos van con un exterior propio: es lo que
   // las distingue de un vistazo, porque los interiores se parecen entre sí. No
   // compiten con la galería del home, que es toda de la carpeta relato/.
-  "cabana-aratiri": "cab arriba/13.jpeg", // la cabaña desde afuera, deck y sauces
-  "cabana-aguaribay": "cab abajo/27.jpeg", // la pileta turquesa y la cabaña
+  "cabana-aratiri": "cab abajo/27.jpeg", // nombre visible Aratirí; slug interno aguaribay
+  "cabana-aguaribay": "cab arriba/13.jpeg", // nombre visible Aguaribay; slug interno aratiri
 };
+
+// Las portadas siguen al slug interno, no al nombre visible: los nombres
+// comerciales se corrigieron sin alterar fotos ni reservas históricas.
+export const UNIT_COVER_PHOTOS = {
+  aratiri: "cab arriba/13.jpeg",
+  aguaribay: "cab abajo/27.jpeg",
+} as const;
 
 // Ajustes finos por foto: filtro para tomas oscuras y objectPosition para reencuadrar
 // el recorte de object-cover (x% <50 muestra más del lado izquierdo de la foto).

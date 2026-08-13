@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
-import { ImageSlot } from "@/components/ui/ImageSlot";
+import { ImageSlot, UNIT_COVER_PHOTOS } from "@/components/ui/ImageSlot";
 import { Link } from "@/lib/i18n/navigation";
 import { StickyBookingCard } from "./StickyBookingCard";
 import { UNITS } from "@/lib/units";
@@ -72,7 +72,7 @@ type GalleryPhoto = { photo: string; alt: string; span?: "hero" | "wide" | "tall
 // El orden cuenta la cabaña: se entra por el estar, se recorren los dormitorios
 // y el baño, después la cocina y el fuego, y se sale al deck, la pileta y el lago.
 
-// Cabaña Aratirí — carpeta "cab arriba" del bucket (22 fotos).
+// Nombre visible Aguaribay — slug interno aratiri, carpeta "cab arriba" (22 fotos).
 const ARATIRI_PHOTOS: GalleryPhoto[] = [
   { photo: "cab arriba/3.jpeg", alt: "Living comedor con mesa de madera maciza y ventanal al deck", span: "hero" },
   { photo: "cab arriba/13.jpeg", alt: "La cabaña desde afuera, con el deck bajo los sauces" },
@@ -98,7 +98,7 @@ const ARATIRI_PHOTOS: GalleryPhoto[] = [
   { photo: "cab arriba/21.jpeg", alt: "El kayak apoyado junto al árbol", span: "tall" },
 ];
 
-// Cabaña Aguaribay — carpeta "cab abajo" del bucket (26 fotos: 1-21 y 23-27).
+// Nombre visible Aratirí — slug interno aguaribay, carpeta "cab abajo" (26 fotos: 1-21 y 23-27).
 const AGUARIBAY_PHOTOS: GalleryPhoto[] = [
   { photo: "cab abajo/11.jpeg", alt: "Living con sofá grande y ventanales al lago", span: "hero" },
   { photo: "cab abajo/27.jpeg", alt: "La pileta turquesa con la cabaña entre los árboles", span: "tall" },
@@ -391,7 +391,7 @@ export function UnitDetail({
                   className="block text-inherit no-underline transition-transform duration-500 ease-[cubic-bezier(.16,.84,.44,1)] hover:-translate-y-2"
                 >
                   <div className="overflow-hidden rounded-[3px] bg-slot">
-                    <ImageSlot label={other.name} className="h-[240px] w-full md:h-[360px]" />
+                     <ImageSlot label={other.name} photo={UNIT_COVER_PHOTOS[other.slug]} className="h-[240px] w-full md:h-[360px]" />
                   </div>
                   <div className="mt-[18px] flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                     <h3 className="font-display m-0 font-medium text-[26px] text-carbon">

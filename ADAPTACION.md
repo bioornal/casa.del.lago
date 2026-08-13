@@ -22,7 +22,7 @@ Falta cargar los **datos reales del alojamiento**. Cada punto indica el archivo 
 
 ## 4. Contenido visible — i18n (`messages/es.json`, `en.json`, `pt.json`)
 - [ ] Dirección exacta en `contacto.address` (hoy: "Costa del lago Urugua-í…")
-- [x] **Unidades**: Aratirí hasta 6 huéspedes y Aguaribay hasta 7. Temporada baja:
+- [x] **Unidades**: Aguaribay hasta 6 huéspedes y Aratirí hasta 7. Temporada baja:
       base de $99.800 para 2 huéspedes + $20.000 por huésped adicional.
 - [x] **Condiciones de temporada baja**: mínimo 2 noches lunes a jueves; paquete de fin de
       semana de 3 noches al valor de 2,5.

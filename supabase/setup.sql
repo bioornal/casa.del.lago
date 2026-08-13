@@ -87,6 +87,16 @@ create table if not exists public.rate_settings (
   updated_at       timestamptz not null default now()
 );
 
+-- Corrección de nombres comerciales: los slugs internos no cambian para no
+-- romper reservas ni URLs, pero la etiqueta guardada debe coincidir con la web.
+update public.reservations
+set unit_name = case unit_id
+  when 'aratiri' then 'Cabaña Aguaribay'
+  when 'aguaribay' then 'Cabaña Aratirí'
+  else unit_name
+end
+where unit_id in ('aratiri', 'aguaribay');
+
 -- Fila inicial con los mismos valores que lib/units.ts
 insert into public.rate_settings (id) values (1) on conflict (id) do nothing;
 

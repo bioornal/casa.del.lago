@@ -51,7 +51,7 @@
     "total": "Total",
     "reserve": "Book",
     "reserveWhatsApp": "Book via WhatsApp",
-    "waMessage": "Hi! I would like to book {unit} from {checkIn} to {checkOut} for {guests, plural, one {# guest} other {# guests}}.",
+    "waMessage": "Hi! I saw the availability on La Casa del Lago's website and would like to book {unit} from {checkIn} to {checkOut} for {guests, plural, one {# guest} other {# guests}}.",
     "waNote": "We confirm your booking instantly via WhatsApp",
     "unavailable": "Not available for these dates",
     "weekendPackage": "Weekend package: 3 nights for the price of 2.5",
@@ -105,11 +105,11 @@
     "fromPrice": "From {price}",
     "perNight": "a night",
     "aratiri": {
-      "name": "Cabaña Aratirí",
+      "name": "Cabaña Aguaribay",
       "sub": "Up to 6 guests · 2 bedrooms · porch with grill · lake view"
     },
     "aguaribay": {
-      "name": "Cabaña Aguaribay",
+      "name": "Cabaña Aratirí",
       "sub": "Up to 7 guests · 1 bedroom · wood stove · deck on the water"
     },
     "note": "Every cabin has its own pool and its own grill. Both include linens, wifi, parking and dock access."
@@ -277,7 +277,7 @@
     "subtitle": "Design, comfort and first-class amenities, on the shores of Lake Urugua-í.",
     "spaceTitle": "The space",
     "spaceBody": {
-      "aratiri": "Wood and brick facing the lake: two bedrooms, a covered deck with a grill and a deck where the day ends watching the sunset over the water. The Aratirí is the roomiest cabin in the house, with a full kitchen, a wood stove for cool nights and direct access to the dock and the pool — perfect for families or two couples who want to disconnect without giving up comfort.",
+      "aratiri": "Wood and brick facing the lake: two bedrooms, a covered deck with a grill and a deck where the day ends watching the sunset over the water. The Aguaribay is the roomiest cabin in the house, with a full kitchen, a wood stove for cool nights and direct access to the dock and the pool — perfect for families or two couples who want to disconnect without giving up comfort.",
       "aguaribay": "A bright cabin: 1 bedroom, a full bathroom, an equipped kitchen, living and dining rooms. With pool access, on the shores of Lake Urugua-í, between Iguazú and Libertad."
     },
     "featuresTitle": "Features",

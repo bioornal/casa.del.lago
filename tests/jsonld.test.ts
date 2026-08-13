@@ -9,7 +9,7 @@ describe("accommodationJsonLd", () => {
 
   it("es un Accommodation con el nombre de la unidad", () => {
     expect(ld["@type"]).toBe("Accommodation");
-    expect(ld.name).toBe("Cabaña Aratirí");
+    expect(ld.name).toBe("Cabaña Aguaribay");
   });
 
   it("publica el precio por noche en ARS", () => {
@@ -38,7 +38,7 @@ describe("breadcrumbJsonLd", () => {
   it("tiene 3 niveles: inicio, alojamientoss, unidad", () => {
     expect(ld["@type"]).toBe("BreadcrumbList");
     expect(ld.itemListElement).toHaveLength(3);
-    expect(ld.itemListElement[2].name).toBe("Cabaña Aratirí");
+    expect(ld.itemListElement[2].name).toBe("Cabaña Aguaribay");
   });
 
   it("las posiciones van de 1 a 3 en orden", () => {

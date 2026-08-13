@@ -1,6 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
-import { ImageSlot } from "@/components/ui/ImageSlot";
+import { ImageSlot, UNIT_COVER_PHOTOS } from "@/components/ui/ImageSlot";
 import { buildCheckoutUrl, type RateQuery } from "@/lib/reservation/search";
 import type { UnitRate } from "@/lib/reservation/rates.server";
 import type { Unit, UnitSlug } from "@/lib/units";
@@ -50,6 +50,7 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
       <div className="relative h-[270px] overflow-hidden bg-slot sm:h-[310px]">
          <ImageSlot
            label={unit.name}
+           photo={UNIT_COVER_PHOTOS[unit.slug]}
            position={unit.slug === "aratiri" ? "50% 85%" : undefined}
            className="h-full w-full transition-transform duration-700 group-hover:scale-[1.035]"
          />

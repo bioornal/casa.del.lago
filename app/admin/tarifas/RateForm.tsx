@@ -208,7 +208,7 @@ export function RateForm({ settings }: { settings: RateSettings }) {
         <ul style={{ margin: 0, paddingLeft: 20, color: "#6b665d", fontSize: 13, lineHeight: 1.8 }}>
           <li>Lunes a jueves: estadía mínima de {LOW_SEASON_WEEKDAY_MIN_NIGHTS} noches.</li>
           <li>Fin de semana: paquete de {WEEKEND_PACKAGE_NIGHTS} noches al valor de {WEEKEND_PACKAGE_BILLED_NIGHTS}.</li>
-          <li>Aratirí admite hasta 6 huéspedes; Aguaribay admite hasta 7.</li>
+          <li>Aguaribay admite hasta 6 huéspedes; Aratirí admite hasta 7.</li>
         </ul>
       </section>
 

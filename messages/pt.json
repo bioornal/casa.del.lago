@@ -51,7 +51,7 @@
     "total": "Total",
     "reserve": "Reservar",
     "reserveWhatsApp": "Reservar pelo WhatsApp",
-    "waMessage": "Olá! Quero reservar {unit} de {checkIn} a {checkOut} para {guests, plural, one {# hóspede} other {# hóspedes}}.",
+    "waMessage": "Olá! Vi a disponibilidade no site da La Casa del Lago e quero reservar {unit} de {checkIn} a {checkOut} para {guests, plural, one {# hóspede} other {# hóspedes}}.",
     "waNote": "Confirmamos sua reserva na hora pelo WhatsApp",
     "unavailable": "Indisponível para estas datas",
     "weekendPackage": "Pacote de fim de semana: 3 noites pelo valor de 2,5",
@@ -105,11 +105,11 @@
     "fromPrice": "A partir de {price}",
     "perNight": "a noite",
     "aratiri": {
-      "name": "Cabaña Aratirí",
+      "name": "Cabaña Aguaribay",
       "sub": "Até 6 hóspedes · 2 quartos · varanda com churrasqueira · vista para o lago"
     },
     "aguaribay": {
-      "name": "Cabaña Aguaribay",
+      "name": "Cabaña Aratirí",
       "sub": "Até 7 hóspedes · 1 quarto · salamandra · deck na água"
     },
     "note": "Cada cabana tem sua piscina e sua churrasqueira. As duas incluem roupa de cama, wifi, estacionamento e acesso ao píer."
@@ -277,7 +277,7 @@
     "subtitle": "Design, conforto e equipamento de primeira, às margens do lago Urugua-í.",
     "spaceTitle": "O espaço",
     "spaceBody": {
-      "aratiri": "Madeira e tijolo de frente para o lago: dois quartos, varanda com churrasqueira e um deck onde o dia termina olhando o pôr do sol sobre a água. A Aratirí é a cabana mais ampla da casa, com cozinha completa, lareira a lenha para as noites frescas e acesso direto ao píer e à piscina — ideal para famílias ou dois casais que querem desconectar sem abrir mão do conforto.",
+      "aratiri": "Madeira e tijolo de frente para o lago: dois quartos, varanda com churrasqueira e um deck onde o dia termina olhando o pôr do sol sobre a água. A Aguaribay é a cabana mais ampla da casa, com cozinha completa, lareira a lenha para as noites frescas e acesso direto ao píer e à piscina — ideal para famílias ou dois casais que querem desconectar sem abrir mão do conforto.",
       "aguaribay": "Um apartamento luminoso: 1 quarto, banheiro completo, cozinha equipada, sala de estar e jantar. Com acesso à piscina, às margens do lago Urugua-í, entre Iguazú e Libertad."
     },
     "featuresTitle": "Características",

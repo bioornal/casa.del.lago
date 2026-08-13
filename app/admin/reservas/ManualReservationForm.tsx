@@ -135,8 +135,8 @@ export function ManualReservationForm({ disabledByUnit, availabilityHealthy }: P
 
           <label htmlFor="manual-unit" style={labelStyle}>Cabaña</label>
           <select id="manual-unit" value={unitId} onChange={(e) => changeUnit(e.target.value as UnitId)} style={inputStyle}>
-            <option value="aratiri">Aratirí · hasta 6 huéspedes</option>
-            <option value="aguaribay">Aguaribay · hasta 7 huéspedes</option>
+            <option value="aratiri">Aguaribay · hasta 6 huéspedes</option>
+            <option value="aguaribay">Aratirí · hasta 7 huéspedes</option>
           </select>
 
           <div className="admin-calendar mt-5 rounded-[6px] border border-borde-claro bg-white p-3 md:p-4">

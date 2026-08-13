@@ -51,7 +51,7 @@
     "total": "Total",
     "reserve": "Reservar",
     "reserveWhatsApp": "Reservar por WhatsApp",
-    "waMessage": "Hola! Quiero reservar {unit} del {checkIn} al {checkOut} para {guests, plural, one {# huésped} other {# huéspedes}}.",
+    "waMessage": "Hola! Vi la disponibilidad en la web de La Casa del Lago y quiero reservar {unit} del {checkIn} al {checkOut} para {guests, plural, one {# huésped} other {# huéspedes}}.",
     "waNote": "Confirmamos tu reserva al instante por WhatsApp",
     "unavailable": "No disponible para estas fechas",
     "weekendPackage": "Paquete fin de semana: 3 noches al valor de 2,5",
@@ -105,11 +105,11 @@
     "fromPrice": "Desde {price}",
     "perNight": "la noche",
     "aratiri": {
-      "name": "Cabaña Aratirí",
+      "name": "Cabaña Aguaribay",
       "sub": "Hasta 6 huéspedes · 2 dormitorios · galería con parrilla · vista al lago"
     },
     "aguaribay": {
-      "name": "Cabaña Aguaribay",
+      "name": "Cabaña Aratirí",
       "sub": "Hasta 7 huéspedes · 1 dormitorio · salamandra · deck al agua"
     },
     "note": "Cada cabaña tiene su pileta y su parrilla. Las dos incluyen ropa blanca, wifi, estacionamiento y acceso al muelle."
@@ -277,7 +277,7 @@
     "subtitle": "Diseño, confort y equipamiento de primera, a orillas del lago Urugua-í.",
     "spaceTitle": "El espacio",
     "spaceBody": {
-      "aratiri": "Madera y ladrillo frente al lago: dos dormitorios, galería con parrilla y un deck donde el día termina mirando el atardecer sobre el agua. La Aratirí es la cabaña más amplia de la casa, con cocina completa, salamandra para las noches frescas y acceso directo al muelle y la pileta — ideal para familias o dos parejas que quieren desconectar sin resignar comodidad.",
+      "aratiri": "Madera y ladrillo frente al lago: dos dormitorios, galería con parrilla y un deck donde el día termina mirando el atardecer sobre el agua. La Aguaribay es la cabaña más amplia de la casa, con cocina completa, salamandra para las noches frescas y acceso directo al muelle y la pileta — ideal para familias o dos parejas que quieren desconectar sin resignar comodidad.",
       "aguaribay": "Una cabaña luminosa: 1 dormitorio, baño completo, cocina equipada, living y comedor. Con acceso a la piscina, a orillas del lago Urugua-í, entre Iguazú y Libertad."
     },
     "featuresTitle": "Características",
