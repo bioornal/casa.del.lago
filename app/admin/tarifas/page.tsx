@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
-import { signOut } from "../login/actions";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { RateForm } from "./RateForm";
 
 export const metadata = { title: "Tarifas — Panel La Casa del Lago" };
@@ -12,26 +11,8 @@ export default async function AdminTarifasPage() {
   const settings = await getRateSettings();
 
   return (
-    <div style={{ maxWidth: 860, margin: "0 auto", padding: "32px 24px 80px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 30, margin: 0 }}>
-          Tarifas
-        </h1>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <Link href="/admin/reservas" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
-            Reservas
-          </Link>
-          <Link href="/admin/opiniones" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
-            Opiniones
-          </Link>
-          <form action={signOut}>
-            <button type="submit" style={{ background: "transparent", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: "#6b665d" }}>
-              Cerrar sesión
-            </button>
-          </form>
-        </div>
-      </div>
-
+    <div className="mx-auto max-w-[1200px] px-5 pb-24 pt-6 md:px-8 md:pt-10">
+      <AdminHeader current="tarifas" title="Tarifas" description="Configurá lo que recibe el alojamiento y revisá el precio final que ve cada huésped." />
       <RateForm settings={settings} />
     </div>
   );

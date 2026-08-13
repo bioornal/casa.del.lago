@@ -17,9 +17,10 @@ interface RangeCalendarProps {
   value: RangeValue;
   onChange: (next: RangeValue) => void;
   disabledDates?: Date[];
+  className?: string;
 }
 
-export function RangeCalendar({ value, onChange, disabledDates = [] }: RangeCalendarProps) {
+export function RangeCalendar({ value, onChange, disabledDates = [], className }: RangeCalendarProps) {
   const locale = useLocale();
   const dateFnsLocale =
     locale === "en" ? enUS : locale === "pt" ? ptBR : esLocale;
@@ -53,6 +54,7 @@ export function RangeCalendar({ value, onChange, disabledDates = [] }: RangeCale
   return (
     <DayPicker
       locale={dateFnsLocale}
+      className={className}
       defaultMonth={checkIn ?? new Date()}
       weekStartsOn={1}
       disabled={[

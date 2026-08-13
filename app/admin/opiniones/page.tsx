@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { listTestimonios, getReviewsAggregate } from "@/lib/reviews/testimonios.server";
 import { FICHA_URL } from "@/lib/reviews/testimonios";
-import { signOut } from "../login/actions";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { TestimonioForm } from "./TestimonioForm";
 import { TestimonioRow } from "./TestimonioRow";
 import { AgregadoForm } from "./AgregadoForm";
@@ -17,23 +16,8 @@ export default async function AdminOpinionesPage() {
   const publicados = testimonios.filter((t) => t.published).length;
 
   return (
-    <div style={{ maxWidth: 860, margin: "0 auto", padding: "32px 24px 80px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 30, margin: 0 }}>
-          Opiniones
-        </h1>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <Link href="/admin/reservas" style={navLink}>Reservas</Link>
-          <Link href="/admin/tarifas" style={navLink}>Tarifas</Link>
-          <Link href="/admin/configuracion" style={navLink}>Configuración</Link>
-          <form action={signOut}>
-            <button type="submit" style={{ ...navLink, background: "transparent", cursor: "pointer" }}>
-              Cerrar sesión
-            </button>
-          </form>
-        </div>
-      </div>
-
+    <div className="mx-auto max-w-[1200px] px-5 pb-24 pt-6 md:px-8 md:pt-10">
+      <AdminHeader current="opiniones" title="Opiniones" description="Publicá testimonios reales y mantené actualizada la prueba social de la casa." />
       <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
         <section style={card}>
           <h2 style={h2}>Puntaje de Google</h2>
@@ -91,12 +75,3 @@ export default async function AdminOpinionesPage() {
     </div>
   );
 }
-
-const navLink: React.CSSProperties = {
-  fontSize: 13,
-  color: "#6b665d",
-  border: "1px solid #E7E0D4",
-  borderRadius: 4,
-  padding: "8px 14px",
-  textDecoration: "none",
-};

@@ -1,8 +1,7 @@
-import Link from "next/link";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { listReservations, type ReservationStatus } from "@/lib/reservation/reservations.server";
 import { signComprobanteUrl } from "@/lib/reservation/comprobante.server";
 import { getAvailabilityServer } from "@/lib/reservation/availability.server";
-import { signOut } from "../login/actions";
 import { ReservationActions } from "./ReservationActions";
 import { ManualReservationForm } from "./ManualReservationForm";
 
@@ -42,48 +41,34 @@ export default async function AdminReservasPage({
     getAvailabilityServer("aratiri", { from: winFrom, to: winTo }),
     getAvailabilityServer("aguaribay", { from: winFrom, to: winTo }),
   ]);
+  const availabilityHealthy = avAra.source === "supabase" && avAgu.source === "supabase";
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px 80px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 30, margin: 0 }}>
-          Reservas
-        </h1>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <Link href="/admin/tarifas" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
-            Tarifas
-          </Link>
-          <Link href="/admin/opiniones" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
-            Opiniones
-          </Link>
-          <Link href="/admin/configuracion" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
-            Configuración
-          </Link>
-          <Link href="/admin/pago-prueba" style={{ fontSize: 13, color: "#6b665d", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", textDecoration: "none" }}>
-            Pago de prueba
-          </Link>
-          <form action={signOut}>
-            <button type="submit" style={{ background: "transparent", border: "1px solid #E7E0D4", borderRadius: 4, padding: "8px 14px", fontSize: 13, cursor: "pointer", color: "#6b665d" }}>
-              Cerrar sesión
-            </button>
-          </form>
-        </div>
-      </div>
+    <div className="mx-auto max-w-[1200px] px-5 pb-24 pt-6 md:px-8 md:pt-10">
+      <AdminHeader
+        current="reservas"
+        title="Reservas"
+        description="Disponibilidad, reservas directas y bloqueos manuales en un solo lugar."
+        status={{ label: availabilityHealthy ? "Disponibilidad sincronizada con Supabase" : "Disponibilidad requiere revisión", ok: availabilityHealthy }}
+      />
 
-      <ManualReservationForm disabledByUnit={{ aratiri: avAra.disabledDates, aguaribay: avAgu.disabledDates }} />
+      <ManualReservationForm disabledByUnit={{ aratiri: avAra.disabledDates, aguaribay: avAgu.disabledDates }} availabilityHealthy={availabilityHealthy} />
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
         {tabs.map((tb) => (
           <a key={tb} href={`/admin/reservas?filter=${tb}`}
             style={{
-              padding: "7px 14px", borderRadius: 20, fontSize: 13, textDecoration: "none",
-              border: "1px solid #E7E0D4",
+              padding: "9px 15px", borderRadius: 5, fontSize: 12, textDecoration: "none", letterSpacing: ".04em",
+              border: filter === tb ? "1px solid #23362B" : "1px solid #d8cfbf",
               background: filter === tb ? "#23362B" : "#fff",
               color: filter === tb ? "#F8F5F0" : "#6b665d",
             }}>
             {tb === "pending" ? "Pendientes" : tb === "confirmed" ? "Confirmadas" : tb === "released" ? "Liberadas" : "Todas"}
           </a>
         ))}
+        </div>
+        <span className="text-[12px] text-muted">{withUrls.length} {withUrls.length === 1 ? "reserva" : "reservas"}</span>
       </div>
 
       {dbError && (
@@ -97,18 +82,18 @@ export default async function AdminReservasPage({
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {withUrls.map(({ r, comprobanteUrl }) => (
-          <div key={r.id} style={{ background: "#fff", border: "1px solid #E7E0D4", borderRadius: 8, padding: 18, display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr auto", gap: 16, alignItems: "center" }}>
-            <div>
+          <div key={r.id} className="admin-reservation-card">
+            <div className="admin-reservation-person">
               <div style={{ fontWeight: 600 }}>{r.unit_name}</div>
               <div style={{ fontSize: 13, color: "#6b665d" }}>{r.first_name} {r.last_name} · {r.email}</div>
               <div style={{ fontSize: 13, color: "#6b665d" }}>{r.phone || "—"}</div>
             </div>
-            <div style={{ fontSize: 13 }}>
+            <div className="admin-reservation-stay" style={{ fontSize: 13 }}>
               <div>{r.check_in} → {r.check_out}</div>
               <div style={{ color: "#6b665d" }}>{r.nights} noches · {r.guests} huésp.</div>
               <div style={{ fontWeight: 600 }}>{money(r.total)}</div>
             </div>
-            <div style={{ fontSize: 13 }}>
+            <div className="admin-reservation-meta" style={{ fontSize: 13 }}>
               <div>
                 <span style={{ padding: "2px 8px", borderRadius: 4, fontSize: 12, background: r.payment_method === "transfer" ? "#eef3ee" : "#f3eee6" }}>
                   {r.payment_method === "transfer" ? "Transferencia" : "Tarjeta"}
@@ -125,7 +110,7 @@ export default async function AdminReservasPage({
                 </a>
               )}
             </div>
-            <div>
+            <div className="admin-reservation-actions">
               {r.status === "pending" && (
                 <ReservationActions id={r.id} canConfirm={r.payment_method === "transfer"} />
               )}

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getAdminUser } from "@/lib/admin/auth";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { TestPaymentBrick } from "./TestPaymentBrick";
 
 // Pago de PRUEBA de la integración productiva de MP ($1000, reembolsable).
@@ -10,21 +11,16 @@ export default async function PagoPruebaPage() {
   if (!admin) redirect("/admin/login");
 
   return (
-    <div style={{ maxWidth: 560, margin: "0 auto", padding: "32px 24px 80px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 30, margin: 0 }}>
-          Pago de prueba
-        </h1>
-        <a href="/admin/reservas" style={{ fontSize: 13, color: "#6b665d" }}>← Reservas</a>
-      </div>
+    <div className="mx-auto max-w-[1200px] px-5 pb-24 pt-6 md:px-8 md:pt-10">
+      <AdminHeader current="pago-prueba" title="Pago de prueba" description="Validá las credenciales productivas de Mercado Pago con un cobro controlado y reembolsable." />
 
-      <div style={{ padding: "14px 16px", borderRadius: 6, background: "#fef6e7",
+      <div style={{ maxWidth: 700, padding: "14px 16px", borderRadius: 6, background: "#fef6e7",
         border: "1px solid #e9d6a8", color: "#7a5a18", fontSize: 13, marginBottom: 8 }}>
         Este pago es <strong>REAL</strong>: cobra <strong>$1.000 ARS</strong> con las credenciales
         productivas para validar la integración (tokenización + cobro + webhook).
         No genera ninguna reserva ni toca el calendario.
       </div>
-      <p style={{ fontSize: 13, color: "#6b665d", margin: "0 0 24px" }}>
+      <p style={{ maxWidth: 700, fontSize: 13, color: "#6b665d", margin: "0 0 24px" }}>
         Después de probar, reembolsalo desde la{" "}
         <a href="https://www.mercadopago.com.ar/activities" target="_blank" rel="noreferrer">
           actividad de Mercado Pago
@@ -32,7 +28,7 @@ export default async function PagoPruebaPage() {
         (el cargo aparece como CASADELLAGO).
       </p>
 
-      <TestPaymentBrick adminEmail={admin.email} />
+      <div style={{ maxWidth: 700 }}><TestPaymentBrick adminEmail={admin.email} /></div>
     </div>
   );
 }

@@ -98,9 +98,17 @@ export default async function TarifasPage({
               </h2>
             </div>
             <div className="text-[12px] uppercase tracking-[.14em] text-muted">{t("accommodationsCount", { count: UNITS.length })}</div>
-          </div>
+           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+           <div className="mb-8 flex flex-col gap-2 rounded-[6px] border border-[#b9d6d5] bg-[#eaf5f3] px-5 py-4 md:flex-row md:items-center md:gap-6 md:px-6">
+             <div className="shrink-0 text-[10px] font-semibold uppercase tracking-[.2em] text-lago">{t("weekendPromoKicker")}</div>
+             <div>
+               <div className="font-display text-[24px] leading-none text-carbon">{t("weekendPromoTitle")}</div>
+               <div className="mt-1 text-[12.5px] leading-[1.5] text-cuerpo">{t("weekendPromoBody")}</div>
+             </div>
+           </div>
+
+           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {UNITS.map((unit) => {
               const rate = rates ? rates.find((r) => r.unit.slug === unit.slug)! : null;
               return <UnitRateCard key={unit.slug} unit={unit} rate={rate} query={query} prices={listPrices} bookingMode={bookingMode} />;

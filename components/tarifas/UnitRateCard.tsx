@@ -84,7 +84,9 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
                   {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} · {money(nightly)} {t("perNight")}
                 </div>
                 {rate.weekendPackage && (
-                  <div className="mt-2 text-[11.5px] font-medium text-[#2f6b46]">{t("weekendPackage")}</div>
+                  <div className="mt-3 rounded-[3px] border border-[#b9d6d5] bg-[#eaf5f3] px-3 py-2 text-[11.5px] font-semibold leading-[1.35] text-lago">
+                    {t("weekendPackage")}
+                  </div>
                 )}
                 {!whatsappMode && rate.savings > 0 && (
                   <div className="mt-2 text-[11.5px] font-medium text-[#2f6b46]">

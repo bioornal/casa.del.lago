@@ -11,8 +11,8 @@ function fromDateOnly(s: string): Date {
 }
 
 /**
- * Disponibilidad real: consulta el route handler server-side, que lee el iCal
- * de Google de la unidad. Fail-open: ante cualquier error devuelve el stub
+ * Disponibilidad real: consulta el route handler server-side, que lee las
+ * reservas activas de Supabase. Fail-open: ante cualquier error devuelve el stub
  * (sin fechas deshabilitadas) para no romper la UI de reserva.
  */
 export async function getAvailability(unitId: UnitId, range: DateRange): Promise<Availability> {
