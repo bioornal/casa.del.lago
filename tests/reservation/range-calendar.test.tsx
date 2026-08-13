@@ -33,8 +33,8 @@ describe("RangeCalendar", () => {
     // Las fechas tienen que ser FUTURAS: la regla `{ before: new Date() }` del
     // componente deshabilita todo el pasado, y un día pasado daría un falso
     // negativo (aparecería deshabilitado por viejo, no por el tope).
-    const checkIn = new Date(2026, 8, 20); // 20 sep 2026
-    const ocupadas = [new Date(2026, 8, 22), new Date(2026, 8, 23)];
+    const checkIn = new Date(2026, 8, 21); // 21 sep 2026, lunes
+    const ocupadas = [new Date(2026, 8, 24), new Date(2026, 8, 25)];
     const { container } = render(
       <RangeCalendar
         value={{ checkIn, checkOut: null }}
@@ -46,13 +46,13 @@ describe("RangeCalendar", () => {
     // La primera noche ocupada sigue elegible como salida: el check-out es
     // exclusivo, así que irse el 22 no ocupa la noche del 22 (turnover).
     // Excluirla perdería una noche vendible en cada borde.
-    const tope = container.querySelector('[data-day="2026-09-22"]');
+    const tope = container.querySelector('[data-day="2026-09-24"]');
     expect(tope).not.toBeNull();
     expect(tope?.className).not.toContain("rdp-disabled");
 
     // El 24 está libre, pero queda fuera por ser posterior al tope: si fuera
     // elegible, el huésped saltaría el bloque ocupado por encima.
-    const despues = container.querySelector('[data-day="2026-09-24"]');
+    const despues = container.querySelector('[data-day="2026-09-26"]');
     expect(despues).not.toBeNull();
     expect(despues?.className).toContain("rdp-disabled");
   });

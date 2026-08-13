@@ -8,6 +8,8 @@ import {
 import { getUnit } from "@/lib/units";
 import { notifyAdminNewReservation } from "@/lib/reservation/email/admin";
 import { computeNights } from "@/lib/reservation/pricing";
+import { meetsStayMinimum } from "@/lib/reservation/stay-rules";
+import { parseDateOnly } from "@/lib/reservation/booking";
 import { methodTotal } from "@/lib/reservation/method-pricing";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
@@ -87,11 +89,14 @@ export async function POST(req: Request) {
 
   const phone = typeof phoneRaw === "string" ? phoneRaw : "";
   const unit = getUnit(unitId)!;
+  const checkInDate = parseDateOnly(checkIn);
+  const checkOutDate = parseDateOnly(checkOut);
+  if (!meetsStayMinimum(checkInDate, checkOutDate)) return bad();
   if (guests > unit.specs.guests) return bad();
   const nights = computeNights(new Date(checkIn), new Date(checkOut));
   const settings = await getRateSettings();
   // Total del método TRANSFERENCIA (menor al precio de lista; ver method-pricing.ts)
-  const total = methodTotal(settings, "transfer", unit.slug, nights);
+  const total = methodTotal(settings, "transfer", unit.slug, nights, guests, checkInDate);
 
   // Contra la base, no a ciegas: generateBookingCode() sortea sobre 32^4 sin
   // mirar si el código ya existe, y el código es la clave del lookup, del email

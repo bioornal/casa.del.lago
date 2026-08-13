@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LangSwitcher } from "@/components/ui/LangSwitcher";
 import { Link as IntlLink } from "@/lib/i18n/navigation";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 export function SiteFooter() {
   const tf = useTranslations("footer");
@@ -88,10 +89,10 @@ export function SiteFooter() {
                 WhatsApp
               </a>
               <a
-                href="mailto:info@lacasadellago.com.ar"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
-                info@lacasadellago.com.ar
+                {CONTACT_EMAIL}
               </a>
               <a
                 href="#contacto"

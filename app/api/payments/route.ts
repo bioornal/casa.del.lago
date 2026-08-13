@@ -6,6 +6,8 @@ import {
   type PaymentOutcome,
 } from "@/lib/reservation/payments.server";
 import { computeNights } from "@/lib/reservation/pricing";
+import { meetsStayMinimum } from "@/lib/reservation/stay-rules";
+import { parseDateOnly } from "@/lib/reservation/booking";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
 import {
@@ -98,6 +100,11 @@ export async function POST(req: Request) {
   }
 
   const unit = resolveUnit(unitId);
+  const checkInDate = parseDateOnly(checkIn);
+  const checkOutDate = parseDateOnly(checkOut);
+  if (!isTestUnit(unitId) && !meetsStayMinimum(checkInDate, checkOutDate)) {
+    return NextResponse.json({ error: "minimum_nights" }, { status: 400 });
+  }
   if (guests > unit.specs.guests) {
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
@@ -114,7 +121,7 @@ export async function POST(req: Request) {
   // Precio de lista = método tarjeta (comisión MP incluida; ver method-pricing.ts).
   // checkoutTotal recalcula acá server-side, igual que el checkout muestra: la
   // unidad de prueba cobra el monto plano de TEST_UNIT_TOTAL, no un precio real.
-  const total = checkoutTotal(settings, "card", unit.slug, nights);
+  const total = checkoutTotal(settings, "card", unit.slug, nights, guests, checkInDate);
 
   // Contra la base, no a ciegas: generateBookingCode() sortea sobre 32^4 sin
   // mirar si el código ya existe, y el código es la clave del lookup, del email

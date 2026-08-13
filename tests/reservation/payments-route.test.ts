@@ -163,9 +163,9 @@ describe("POST /api/payments", () => {
   it("cobra el total recalculado server-side, ignorando lo que mande el cliente", async () => {
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
     await POST(post({ ...VALID, amount: 1, total: 1 }));
-    // aguaribay 3 noches, precio de lista (tarjeta): 95.000 ÷ 0,923 → $103.000/noche
-    // × 3 + limpieza al neto $30.000 (ya no se grossea, ver method-pricing.ts) = $339.000
-    expect(createCardPayment.mock.calls[0][0].amount).toBe(339000);
+    // VALID son 4 huéspedes: base $99.800 + $40.000 = $139.800 netos;
+    // tarjeta → $151.500/noche × 3 + limpieza $30.000 = $484.500.
+    expect(createCardPayment.mock.calls[0][0].amount).toBe(484500);
   });
 
   it("rejected → libera la retención por code, responde 200 rejected", async () => {

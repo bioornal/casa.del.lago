@@ -2,11 +2,13 @@ import { describe, it, expect } from "vitest";
 import { parseRateQuery, parseCheckoutQuery, buildTarifasUrl, buildCheckoutUrl } from "@/lib/reservation/search";
 
 describe("parseRateQuery", () => {
-  it("acepta fechas válidas y guests en [1,6]", () => {
+  it("acepta fechas válidas y guests en [1,7]", () => {
     expect(parseRateQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "4" }))
       .toEqual({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 4 });
     expect(parseRateQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "6" }))
       .toEqual({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 6 });
+    expect(parseRateQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "7" }))
+      .toEqual({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: 7 });
   });
   it("rechaza formato de fecha inválido", () => {
     expect(parseRateQuery({ checkIn: "02-07-2026", checkOut: "2026-07-05", guests: "2" })).toBeNull();
@@ -17,7 +19,6 @@ describe("parseRateQuery", () => {
   });
   it("rechaza guests fuera de rango o no entero", () => {
     expect(parseRateQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "0" })).toBeNull();
-    expect(parseRateQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "7" })).toBeNull();
     expect(parseRateQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "8" })).toBeNull();
     expect(parseRateQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "9" })).toBeNull();
     expect(parseRateQuery({ checkIn: "2026-07-02", checkOut: "2026-07-05", guests: "2.5" })).toBeNull();

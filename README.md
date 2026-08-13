@@ -125,7 +125,7 @@ Los siguientes puntos están implementados como stubs funcionales en la UI pero 
   (libera fechas).
 - **Config (`.env.local`, ver `.env.example`):** `NEXT_PUBLIC_SUPABASE_URL`,
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (publishable), `SUPABASE_SERVICE_ROLE_KEY` (secreto, sólo server),
-  `NEXT_PUBLIC_CDL_BANK_ALIAS/CBU/HOLDER` (datos de transferencia), `ADMIN_EMAILS`.
+  `NEXT_PUBLIC_CDL_BRUBANK_ALIAS/HOLDER` (datos de transferencia), `ADMIN_EMAILS`.
 
 ### Consulta de reserva del huésped (subsistema C) — ✅ resuelto (`/mi-reserva`)
 
@@ -190,7 +190,7 @@ nueva y pago aprobado sin fechas disponibles), `lib/reservation/reservations.ser
 - **Archivos:** `components/layout/SiteFooter.tsx`, `components/layout/WhatsAppFab.tsx`, `components/home/Contacto.tsx`, `components/home/CtaReserva.tsx`
 - **Datos:** centralizados en `lib/contact.ts` (`WHATSAPP_NUMBER`, `CONTACT_EMAIL`, `CONTACT_PHONE_HREF`, `waLink`).
   - WhatsApp: `5493757419667` (+54 9 3757 419667)
-  - Email: `info@lacasadellago.com.ar`
+  - Email: `lacasadellagouruguay@gmail.com`
 
 ### Traducciones EN/PT
 - **Archivos:** `messages/en.json`, `messages/pt.json`

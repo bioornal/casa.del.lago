@@ -1,6 +1,7 @@
 import type { UnitSlug } from "@/lib/units";
 import type { RateSettings } from "./rate-settings";
 import { computeTotal } from "./pricing";
+import { billedNights as getBilledNights } from "./stay-rules";
 
 // Precios por método de pago. El dueño configura en /admin/tarifas lo que quiere
 // RECIBIR NETO; el público ve/paga el precio con el costo del canal incluido:
@@ -41,27 +42,45 @@ function pctFor(s: RateSettings, method: PaymentMethod): number {
 
 export type MethodRates = { nightly: Record<UnitSlug, number>; cleaningFee: number };
 
-/** Tarifas públicas (por noche + limpieza) del método. Lineal: el desglose suma el total. */
-export function methodRates(s: RateSettings, method: PaymentMethod): MethodRates {
+/** Neto por noche según la cantidad de huéspedes elegida. */
+export function netNightly(s: RateSettings, slug: UnitSlug, guests = s.baseGuests): number {
+  return s.nightly[slug] + Math.max(0, guests - s.baseGuests) * s.extraGuestFee;
+}
+
+/** Tarifas públicas (por noche + limpieza) del método. */
+export function methodRates(s: RateSettings, method: PaymentMethod, guests = s.baseGuests): MethodRates {
   const pct = pctFor(s, method);
   return {
     nightly: {
-      aratiri: grossUp(s.nightly.aratiri, pct),
-      aguaribay: grossUp(s.nightly.aguaribay, pct),
+      aratiri: grossUp(netNightly(s, "aratiri", guests), pct),
+      aguaribay: grossUp(netNightly(s, "aguaribay", guests), pct),
     },
     // Sin gross-up, a propósito: ver el comentario de cabecera.
     cleaningFee: s.cleaningFee,
   };
 }
 
-export function methodTotal(s: RateSettings, method: PaymentMethod, slug: UnitSlug, nights: number): number {
-  const r = methodRates(s, method);
-  return computeTotal(r.nightly[slug], nights, r.cleaningFee);
+export function methodTotal(
+  s: RateSettings,
+  method: PaymentMethod,
+  slug: UnitSlug,
+  nights: number,
+  guests = s.baseGuests,
+  checkIn: Date | null = null,
+): number {
+  const r = methodRates(s, method, guests);
+  return computeTotal(r.nightly[slug], getBilledNights(checkIn, nights), r.cleaningFee);
 }
 
 /** Ahorro en pesos pagando por transferencia vs tarjeta (piso 0). */
-export function transferSavings(s: RateSettings, slug: UnitSlug, nights: number): number {
-  return Math.max(0, methodTotal(s, "card", slug, nights) - methodTotal(s, "transfer", slug, nights));
+export function transferSavings(
+  s: RateSettings,
+  slug: UnitSlug,
+  nights: number,
+  guests = s.baseGuests,
+  checkIn: Date | null = null,
+): number {
+  return Math.max(0, methodTotal(s, "card", slug, nights, guests, checkIn) - methodTotal(s, "transfer", slug, nights, guests, checkIn));
 }
 
 /**
@@ -76,7 +95,8 @@ export function transferSavings(s: RateSettings, slug: UnitSlug, nights: number)
 export type PriceBreakdown = {
   nightly: number;      // precio de lista por noche (tarjeta), igual en ambos métodos
   nights: number;
-  lodging: number;      // nightly × nights
+  billedNights: number;
+  lodging: number;      // nightly × noches cobradas
   cleaningFee: number;  // el neto configurado, sin gross-up; 0 si nights <= 0 (no hay estadía que limpiar)
   listTotal: number;    // lodging + cleaningFee (precio de lista), siempre — incluso con nights <= 0
   discount: number;     // 0 con tarjeta; el ahorro con transferencia
@@ -88,19 +108,23 @@ export function priceBreakdown(
   method: PaymentMethod,
   slug: UnitSlug,
   nights: number,
+  guests = s.baseGuests,
+  checkIn: Date | null = null,
 ): PriceBreakdown {
-  const list = methodRates(s, "card");
+  const list = methodRates(s, "card", guests);
   const nightly = list.nightly[slug];
-  const lodging = nightly * Math.max(0, nights);
+  const billed = getBilledNights(checkIn, nights);
+  const lodging = nightly * Math.max(0, billed);
   // Sin noches no hay estadía, así que tampoco hay línea de limpieza: si no,
   // listTotal (computeTotal, que devuelve 0 con nights <= 0) dejaría de ser
   // lodging + cleaningFee y el tipo de arriba mentiría.
   const cleaningFee = nights > 0 ? list.cleaningFee : 0;
-  const listTotal = computeTotal(nightly, nights, list.cleaningFee);
-  const total = methodTotal(s, method, slug, nights);
+  const listTotal = computeTotal(nightly, billed, list.cleaningFee);
+  const total = methodTotal(s, method, slug, nights, guests, checkIn);
   return {
     nightly,
     nights,
+    billedNights: billed,
     lodging,
     cleaningFee,
     listTotal,

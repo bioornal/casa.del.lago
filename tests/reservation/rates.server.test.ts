@@ -31,29 +31,29 @@ describe("getRatesForRange", () => {
     const aratiri = rates.find((r) => r.unit.slug === "aratiri")!;
     expect(aratiri.nights).toBe(3);
     expect(aratiri.available).toBe(true);
-    expect(aratiri.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aratiri", 3));
-    expect(aratiri.transferTotal).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "transfer", "aratiri", 3));
-    expect(aratiri.savings).toBe(transferSavings(DEFAULT_RATE_SETTINGS, "aratiri", 3));
+    expect(aratiri.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aratiri", 3, 4));
+    expect(aratiri.transferTotal).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "transfer", "aratiri", 3, 4));
+    expect(aratiri.savings).toBe(transferSavings(DEFAULT_RATE_SETTINGS, "aratiri", 3, 4));
     expect(aratiri.savings).toBeGreaterThan(0);
     // El precio de lista es MAYOR al neto configurado (la comisión va adentro)
     expect(aratiri.nightly).toBeGreaterThan(DEFAULT_RATE_SETTINGS.nightly.aratiri);
   });
 
-  it("tarifa plana: mismo precio sin importar el número de huéspedes", async () => {
+  it("suma $20.000 por huésped adicional", async () => {
     mocked.mockResolvedValue({ disabledDates: [], source: "supabase" });
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 6);
     const aratiri = rates.find((r) => r.unit.slug === "aratiri")!;
-    expect(aratiri.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aratiri", 3));
-    expect(pricePerNight("aratiri", 6)).toBe(130000);
-    expect(pricePerNight("aguaribay", 6)).toBe(95000);
+    expect(aratiri.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aratiri", 3, 6));
+    expect(pricePerNight("aratiri", 6)).toBe(179800);
+    expect(pricePerNight("aguaribay", 6)).toBe(179800);
   });
 
   it("aguaribay: total de lista consistente con method-pricing", async () => {
     mocked.mockResolvedValue({ disabledDates: [], source: "supabase" });
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     const aguaribay = rates.find((r) => r.unit.slug === "aguaribay")!;
-    expect(aguaribay.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aguaribay", 3));
-    expect(pricePerNight("aguaribay", 4)).toBe(95000);
+    expect(aguaribay.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aguaribay", 3, 4));
+    expect(pricePerNight("aguaribay", 4)).toBe(139800);
   });
 
   it("no disponible si alguna noche del rango está ocupada", async () => {

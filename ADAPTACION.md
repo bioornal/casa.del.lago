@@ -4,26 +4,28 @@ El primer pase de rebranding ya cambió nombre, marca, ubicación e identificado
 Falta cargar los **datos reales del alojamiento**. Cada punto indica el archivo exacto.
 
 ## 1. Datos de contacto (`lib/contact.ts`)
-- [ ] `WHATSAPP_NUMBER` — número real (formato `549XXXXXXXXXX`, sin `+`)
-- [ ] `CONTACT_EMAIL` — email real
-- [ ] `CONTACT_PHONE_HREF` — teléfono real
+- [x] `WHATSAPP_NUMBER` — `+54 9 3757 446156`
+- [x] `CONTACT_EMAIL` — `lacasadellagouruguay@gmail.com`
+- [x] `CONTACT_PHONE_HREF` — `tel:+5493757446156`
 
 ## 2. SEO / mapa / ficha del negocio (`app/[locale]/page.tsx`)
 - [ ] `geo` — latitud/longitud reales del lago (placeholder actual: -25.90, -54.58)
 - [ ] `streetAddress` / `addressLocality` — acceso/dirección reales
-- [ ] `telephone`, `email` — reales
+   - [x] `telephone` — `+54 9 3757 446156`
+   - [x] `email` — `lacasadellagouruguay@gmail.com`
 - [ ] Imagen OG (`url` de Cloudinary) — foto real
 
 ## 3. Distancias, banco y condiciones (`lib/site.ts`)
 - [ ] `DISTANCES` — km reales: aeropuerto IGR, Cataratas, Puerto Libertad (hoy en 0)
 - [ ] `CHECK_IN` / `CHECK_OUT` / `PETS_ALLOWED` — confirmar
-- [ ] `BANK_DETAILS` — alias, CBU y titular reales (o vía env `NEXT_PUBLIC_CDL_BANK_*`)
+- [x] Transferencias manuales — sólo Brubank: alias `jmhbank`, titular Juan Manuel Hambley; sin CBU informado. Mercado Pago queda reservado para la pasarela de pago.
 
 ## 4. Contenido visible — i18n (`messages/es.json`, `en.json`, `pt.json`)
 - [ ] Dirección exacta en `contacto.address` (hoy: "Costa del lago Urugua-í…")
-- [ ] **Unidades** (`units`, `departamento.spaceBody`, `reservas.units`, `tarifas`): las 3
-      unidades heredadas de Aruma (Yvyrá / Mberú / Tatú, con piscina/jacuzzi) son **plantilla**.
-      Reemplazar por las cabañas reales: cantidad, nombres, capacidad, ambientes, servicios.
+- [x] **Unidades**: Aratirí hasta 6 huéspedes y Aguaribay hasta 7. Temporada baja:
+      base de $99.800 para 2 huéspedes + $20.000 por huésped adicional.
+- [x] **Condiciones de temporada baja**: mínimo 2 noches lunes a jueves; paquete de fin de
+      semana de 3 noches al valor de 2,5.
 - [ ] Sección "Experiencias" y "Galería": ajustar textos al entorno del lago.
 
 ## 5. Imágenes y logo

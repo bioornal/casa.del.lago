@@ -25,7 +25,7 @@ describe("DEFAULT_RATE_SETTINGS", () => {
     }
     expect(DEFAULT_RATE_SETTINGS.cleaningFee).toBe(CLEANING_FEE);
     expect(DEFAULT_RATE_SETTINGS.baseGuests).toBe(BASE_GUESTS);
-    expect(DEFAULT_RATE_SETTINGS.extraGuestFee).toBe(0);
+    expect(DEFAULT_RATE_SETTINGS.extraGuestFee).toBe(20000);
     expect(DEFAULT_RATE_SETTINGS.cardFeePct).toBe(7.7);
     expect(DEFAULT_RATE_SETTINGS.transferFeePct).toBe(5);
   });

@@ -19,8 +19,6 @@ export const PETS_ALLOWED = false;
 export type ServiceKey = "wifi" | "ac" | "kitchen" | "reception" | "parking" | "linens";
 export const SERVICES: ServiceKey[] = ["wifi", "ac", "kitchen", "reception", "parking", "linens"];
 
-const PLACEHOLDER_CBU = "0000000000000000000000";
-
 function envPresent(raw: string | undefined): boolean {
   return (raw ?? "").trim() !== "";
 }
@@ -29,19 +27,10 @@ function envOrDefault(raw: string | undefined, fallback: string): string {
   return envPresent(raw) ? (raw as string).trim() : fallback;
 }
 
-export const BANK_DETAILS = {
-  alias: envOrDefault(process.env.NEXT_PUBLIC_CDL_BANK_ALIAS, "CASA.LAGO.URUGUAI"),
-  cbu: envOrDefault(process.env.NEXT_PUBLIC_CDL_BANK_CBU, PLACEHOLDER_CBU),
-  holder: envOrDefault(process.env.NEXT_PUBLIC_CDL_BANK_HOLDER, "La Casa del Lago Urugua-í"),
+// Única cuenta para transferencias manuales. No se muestra CBU porque no fue
+// informado; el alias alcanza para operar la transferencia.
+export const BRUBANK_DETAILS = {
+  bank: "Brubank",
+  alias: envOrDefault(process.env.NEXT_PUBLIC_CDL_BRUBANK_ALIAS, "jmhbank"),
+  holder: envOrDefault(process.env.NEXT_PUBLIC_CDL_BRUBANK_HOLDER, "Juan Manuel Hambley"),
 };
-
-/**
- * true solo si las tres env vars de datos bancarios fueron seteadas (no vacías).
- */
-export function bankDetailsConfigured(): boolean {
-  return (
-    envPresent(process.env.NEXT_PUBLIC_CDL_BANK_ALIAS) &&
-    envPresent(process.env.NEXT_PUBLIC_CDL_BANK_CBU) &&
-    envPresent(process.env.NEXT_PUBLIC_CDL_BANK_HOLDER)
-  );
-}

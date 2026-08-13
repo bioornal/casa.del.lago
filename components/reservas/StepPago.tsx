@@ -33,7 +33,7 @@ export function StepPago({ state, settings, method, onMethodChange, onApproved, 
   const nights = computeNights(state.checkIn, state.checkOut);
   // Total del método TARJETA (precio de lista): es lo que muestra este paso y
   // lo que cobra el Brick. El de transferencia lo muestra StepTransferencia.
-  const total = checkoutTotal(settings, "card", state.unitId, nights);
+  const total = checkoutTotal(settings, "card", state.unitId, nights, state.guests, state.checkIn);
 
   useEffect(() => {
     if (!MOCK && PUBLIC_KEY) initMercadoPago(PUBLIC_KEY, { locale: "es-AR" });

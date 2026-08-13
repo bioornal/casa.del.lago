@@ -8,7 +8,7 @@ import { formatDateOnly } from "@/lib/reservation/booking";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 import { computeNights } from "@/lib/reservation/pricing";
 import { checkoutTotal, checkoutSavings } from "@/lib/reservation/test-unit";
-import { BANK_DETAILS } from "@/lib/site";
+import { BRUBANK_DETAILS } from "@/lib/site";
 import { ACCEPT_ATTR, MAX_BYTES, isAllowedMime, formatBytes } from "@/lib/reservation/comprobante";
 
 interface Props {
@@ -37,8 +37,8 @@ export function StepTransferencia({ state, settings, onPending }: Props) {
 
   const nights = computeNights(state.checkIn!, state.checkOut!);
   // Total del método TRANSFERENCIA (más barato que el precio de lista).
-  const total = checkoutTotal(settings, "transfer", state.unitId, nights);
-  const savings = checkoutSavings(settings, state.unitId, nights);
+  const total = checkoutTotal(settings, "transfer", state.unitId, nights, state.guests, state.checkIn);
+  const savings = checkoutSavings(settings, state.unitId, nights, state.guests, state.checkIn);
   const money = (n: number) => `$${new Intl.NumberFormat("es-AR").format(n)}`;
 
   const submit = async () => {
@@ -76,10 +76,10 @@ export function StepTransferencia({ state, settings, onPending }: Props) {
         {t("transferIntro")}
       </p>
 
+      <div style={{ marginBottom: 12 }}>
+        <AccountCard title={t("transferBrubank")} alias={BRUBANK_DETAILS.alias} holder={BRUBANK_DETAILS.holder} row={row} t={t} />
+      </div>
       <div style={{ background: "#fbf8f2", border: "1px solid #ece5d8", borderRadius: 6, padding: "6px 18px", marginBottom: 22 }}>
-        <div style={row}><span style={{ color: "#6b665d" }}>{t("transferAlias")}</span><strong>{BANK_DETAILS.alias}</strong></div>
-        <div style={row}><span style={{ color: "#6b665d" }}>{t("transferCbu")}</span><strong>{BANK_DETAILS.cbu}</strong></div>
-        <div style={row}><span style={{ color: "#6b665d" }}>{t("transferHolder")}</span><strong>{BANK_DETAILS.holder}</strong></div>
         <div style={{ ...row, borderBottom: "none" }}><span style={{ color: "#6b665d" }}>{t("transferAmount")}</span><strong>{money(total)}</strong></div>
       </div>
 
@@ -159,6 +159,31 @@ export function StepTransferencia({ state, settings, onPending }: Props) {
           {error}
         </div>
       )}
+    </div>
+  );
+}
+
+function AccountCard({
+  title,
+  alias,
+  cbu,
+  holder,
+  row,
+  t,
+}: {
+  title: string;
+  alias: string;
+  cbu?: string;
+  holder: string;
+  row: React.CSSProperties;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  return (
+    <div style={{ background: "#fbf8f2", border: "1px solid #ece5d8", borderRadius: 6, padding: "6px 18px" }}>
+      <strong style={{ display: "block", padding: "10px 0 4px", fontSize: 14 }}>{title}</strong>
+      <div style={row}><span style={{ color: "#6b665d" }}>{t("transferAlias")}</span><strong>{alias}</strong></div>
+      {cbu && <div style={row}><span style={{ color: "#6b665d" }}>{t("transferCbu")}</span><strong>{cbu}</strong></div>}
+      <div style={{ ...row, borderBottom: "none" }}><span style={{ color: "#6b665d" }}>{t("transferHolder")}</span><strong>{holder}</strong></div>
     </div>
   );
 }

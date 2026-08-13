@@ -56,6 +56,10 @@ export function InfoSections() {
             <span>{t("conditions.payment")}</span>
             <span>{t("conditions.paymentCard")}</span>
           </div>
+          <div className={rowClass}>
+            <span>{t("conditions.stay")}</span>
+            <span>{t("conditions.stayValue")}</span>
+          </div>
         </div>
       </div>
     </section>

@@ -1,9 +1,9 @@
 // Datos de contacto reales del alojamiento — único lugar donde viven.
-// TODO(adaptación): reemplazar por el WhatsApp y email reales de La Casa del Lago Urugua-í.
+// Datos públicos de contacto de La Casa del Lago Urugua-í.
 
-export const WHATSAPP_NUMBER = "549XXXXXXXXXX"; // TODO: número real (formato wa.me, sin +)
-export const CONTACT_EMAIL = "info@lacasadellago.com.ar"; // TODO: email real
-export const CONTACT_PHONE_HREF = "tel:+549XXXXXXXXXX"; // TODO: teléfono real
+export const WHATSAPP_NUMBER = "5493757446156";
+export const CONTACT_EMAIL = "lacasadellagouruguay@gmail.com";
+export const CONTACT_PHONE_HREF = "tel:+5493757446156";
 
 /** Link a WhatsApp, opcionalmente con mensaje prellenado. */
 export function waLink(message?: string): string {

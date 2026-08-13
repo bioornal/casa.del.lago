@@ -83,15 +83,23 @@ export function checkoutTotal(
   method: PaymentMethod,
   unitId: BookableUnitId,
   nights: number,
+  guests = s.baseGuests,
+  checkIn: Date | null = null,
 ): number {
   // Precio plano: no depende del método ni de las noches, a propósito — es
   // un cobro de prueba, no una estadía real que facturar por noche.
   if (isTestUnit(unitId)) return TEST_UNIT_TOTAL;
-  return methodTotal(s, method, unitId, nights);
+  return methodTotal(s, method, unitId, nights, guests, checkIn);
 }
 
-export function checkoutSavings(s: RateSettings, unitId: BookableUnitId, nights: number): number {
+export function checkoutSavings(
+  s: RateSettings,
+  unitId: BookableUnitId,
+  nights: number,
+  guests = s.baseGuests,
+  checkIn: Date | null = null,
+): number {
   // Sin ahorro por transferencia: la unidad de prueba es solo tarjeta.
   if (isTestUnit(unitId)) return 0;
-  return transferSavings(s, unitId, nights);
+  return transferSavings(s, unitId, nights, guests, checkIn);
 }

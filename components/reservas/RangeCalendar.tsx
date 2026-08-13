@@ -3,6 +3,7 @@
 import { useLocale } from "next-intl";
 import { es as esLocale, enUS, ptBR } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
+import { addDays } from "date-fns";
 import "react-day-picker/style.css";
 import {
   pickDay,
@@ -10,6 +11,7 @@ import {
   firstBlockedAfter,
   type RangeValue,
 } from "@/lib/reservation/range";
+import { minimumNights } from "@/lib/reservation/stay-rules";
 
 interface RangeCalendarProps {
   value: RangeValue;
@@ -40,6 +42,7 @@ export function RangeCalendar({ value, onChange, disabledDates = [] }: RangeCale
   // que deshabilitar solo los días ocupados no alcanza).
   const pickingDeparture = checkIn !== null && checkOut === null;
   const maxCheckOut = pickingDeparture ? firstBlockedAfter(checkIn, disabledDates) : null;
+  const minCheckOut = pickingDeparture ? addDays(checkIn, minimumNights(checkIn)) : null;
 
   // Esa noche tope sigue siendo elegible como salida: el check-out es exclusivo
   // (turnover), y el servidor acepta ese rango.
@@ -54,6 +57,7 @@ export function RangeCalendar({ value, onChange, disabledDates = [] }: RangeCale
       weekStartsOn={1}
       disabled={[
         { before: new Date() },
+        ...(minCheckOut ? [{ before: minCheckOut }] : []),
         ...(maxCheckOut ? [{ after: maxCheckOut }] : []),
         ...blocked,
       ]}
@@ -61,6 +65,7 @@ export function RangeCalendar({ value, onChange, disabledDates = [] }: RangeCale
       modifiersClassNames={modifiersClassNames}
       onDayClick={(day) => {
         // Guarda de último recurso, por si la disponibilidad llegó tarde.
+        if (pickingDeparture && minCheckOut && day < minCheckOut) return;
         if (pickingDeparture && day > checkIn && rangeHasBlocked(checkIn, day, disabledDates)) return;
         onChange(pickDay(value, day));
       }}

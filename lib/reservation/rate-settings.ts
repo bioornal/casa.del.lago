@@ -1,11 +1,10 @@
-import { UNITS, CLEANING_FEE, BASE_GUESTS, type UnitSlug } from "@/lib/units";
+import { UNITS, CLEANING_FEE, BASE_GUESTS, EXTRA_GUEST_FEE, type UnitSlug } from "@/lib/units";
 
 // Tarifas editables desde /admin/tarifas. Viven en Supabase (tabla rate_settings);
 // este módulo es la forma compartida (server + cliente + tests, sin imports de server).
 //
-// IMPORTANTE: el precio sigue siendo TARIFA PLANA por unidad. `baseGuests` y
-// `extraGuestFee` se guardan para un futuro recargo por huésped, pero hoy NO
-// entran en el cálculo del total (ver pricing.ts).
+// El precio configurado es la tarifa neta base para `baseGuests`; `extraGuestFee`
+// se suma por cada huésped adicional.
 export type RateSettings = {
   nightly: Record<UnitSlug, number>;
   cleaningFee: number;
@@ -17,8 +16,8 @@ export type RateSettings = {
   transferFeePct: number;
 };
 
-// Fallback si la DB no responde o aún no se corrió el SQL: los mismos valores
-// que siempre estuvieron hardcodeados en lib/units.ts → el sitio nunca rompe.
+// Fallback si la DB no responde o aún no se corrió el SQL: valores de temporada
+// baja → el sitio nunca rompe.
 export const DEFAULT_RATE_SETTINGS: RateSettings = {
   nightly: {
     aratiri: UNITS.find((u) => u.slug === "aratiri")!.price,
@@ -26,7 +25,7 @@ export const DEFAULT_RATE_SETTINGS: RateSettings = {
   },
   cleaningFee: CLEANING_FEE,
   baseGuests: BASE_GUESTS,
-  extraGuestFee: 0,
+  extraGuestFee: EXTRA_GUEST_FEE,
   cardFeePct: 7.7,
   transferFeePct: 5,
 };

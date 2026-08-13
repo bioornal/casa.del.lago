@@ -6,20 +6,19 @@ export type Unit = {
   specs: { guests: number; bedrooms: number; baths: number; area: number };
 };
 export const UNITS: Unit[] = [
-  { slug: "aratiri",    name: "Cabaña Aratirí",    price: 130000, specs: { guests: 6, bedrooms: 2, baths: 1, area: 65 } },
-  { slug: "aguaribay",  name: "Cabaña Aguaribay",  price: 95000,  specs: { guests: 4, bedrooms: 1, baths: 1, area: 45 } },
+  { slug: "aratiri",    name: "Cabaña Aratirí",    price: 99800, specs: { guests: 6, bedrooms: 2, baths: 1, area: 65 } },
+  { slug: "aguaribay",  name: "Cabaña Aguaribay",  price: 99800, specs: { guests: 7, bedrooms: 1, baths: 1, area: 45 } },
 ];
 export const CLEANING_FEE = 30000;
 export const BASE_GUESTS = 2;
-export const ARATIRI_PRICE = 130000;
-export const AGUARIBAY_PRICE = 95000;
+export const EXTRA_GUEST_FEE = 20000;
+export const ARATIRI_PRICE = 99800;
+export const AGUARIBAY_PRICE = 99800;
 
-/** Precio por noche según unidad (tarifa plana por unidad, sin importar huéspedes). */
-export function pricePerNight(slug: UnitSlug, _guests: number): number {
-  switch (slug) {
-    case "aratiri":    return ARATIRI_PRICE;
-    case "aguaribay":  return AGUARIBAY_PRICE;
-  }
+/** Tarifa de temporada baja: base para 2 huéspedes + $20.000 por adicional. */
+export function pricePerNight(slug: UnitSlug, guests: number): number {
+  const base = slug === "aratiri" ? ARATIRI_PRICE : AGUARIBAY_PRICE;
+  return base + Math.max(0, guests - BASE_GUESTS) * EXTRA_GUEST_FEE;
 }
 export function getUnit(slug: string): Unit | undefined {
   return UNITS.find((u) => u.slug === slug);

@@ -21,9 +21,9 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
   const nights = computeNights(state.checkIn, state.checkOut);
   // Con la unidad de prueba no hay desglose por noche que mostrar (precio
   // plano): bd queda null y el render cae a la fila de "Estadía de prueba".
-  const bd = isTestUnit(state.unitId) ? null : priceBreakdown(settings, method, state.unitId, nights);
-  const total = checkoutTotal(settings, method, state.unitId, nights);
-  const savings = checkoutSavings(settings, state.unitId, nights);
+  const bd = isTestUnit(state.unitId) ? null : priceBreakdown(settings, method, state.unitId, nights, state.guests, state.checkIn);
+  const total = checkoutTotal(settings, method, state.unitId, nights, state.guests, state.checkIn);
+  const savings = checkoutSavings(settings, state.unitId, nights, state.guests, state.checkIn);
 
   // Format date range
   const formatDate = (d: Date) => format(d, "d MMM");
@@ -94,7 +94,7 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
           <>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
               <span className="text-muted">
-                {money(bd.nightly)} × {nights || 0}
+                {money(bd.nightly)} × {bd.billedNights || 0}
               </span>
               <span style={{ color: "var(--color-carbon)" }}>
                 {nights > 0 ? money(bd.lodging) : "—"}
@@ -111,6 +111,9 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
                 <span style={{ color: "#2f6b46" }}>{t("transferDiscount")}</span>
                 <span style={{ color: "#2f6b46" }}>−{money(bd.discount)}</span>
               </div>
+            )}
+            {nights > 0 && bd.billedNights !== nights && (
+              <div style={{ fontSize: 12, color: "#2f6b46" }}>{t("weekendPackage")}</div>
             )}
           </>
         ) : (

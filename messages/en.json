@@ -54,6 +54,7 @@
     "waMessage": "Hi! I would like to book {unit} from {checkIn} to {checkOut} for {guests, plural, one {# guest} other {# guests}}.",
     "waNote": "We confirm your booking instantly via WhatsApp",
     "unavailable": "Not available for these dates",
+    "weekendPackage": "Weekend package: 3 nights for the price of 2.5",
     "capacity": "Max. {n} guests",
     "pickDatesCta": "Choose dates",
     "specs": "{guests} guests · {bedrooms} rooms · {baths, plural, one {# bath} other {# baths}} · {area} m²",
@@ -83,7 +84,9 @@
       "petsNo": "Pets not allowed",
       "petsYes": "Pets allowed",
       "payment": "Payment methods",
-      "paymentCard": "Credit/debit card"
+      "paymentCard": "Credit/debit card",
+      "stay": "Minimum stay",
+      "stayValue": "2 nights Mon-Thu · weekend 3 for 2.5"
     }
   },
   "manifiesto": {
@@ -104,7 +107,7 @@
     },
     "aguaribay": {
       "name": "Cabaña Aguaribay",
-      "sub": "Up to 4 guests · 1 bedroom · wood stove · deck on the water"
+      "sub": "Up to 7 guests · 1 bedroom · wood stove · deck on the water"
     },
     "note": "Every cabin has its own pool and its own grill. Both include linens, wifi, parking and dock access."
   },
@@ -390,6 +393,7 @@
     "transferTitle": "Bank transfer",
     "transferIntro": "Transfer the total to the account below and upload your receipt. We confirm your booking once the payment is verified.",
     "transferAlias": "Alias",
+    "transferBrubank": "Brubank",
     "transferCbu": "CBU",
     "transferHolder": "Account holder",
     "transferAmount": "Amount to transfer",
@@ -464,10 +468,10 @@
     "privacyH4": "How long we keep it",
     "privacyP4": "Booking data is kept as long as we need it to meet our accounting and tax obligations. Transfer receipts are stored in a private space that isn't publicly accessible.",
     "privacyH5": "Your rights",
-    "privacyP5": "You can ask us at any time to access, correct or delete your data by writing to info@lacasadellago.com.ar. We reply within 10 calendar days.",
+    "privacyP5": "You can ask us at any time to access, correct or delete your data by writing to lacasadellagouruguay@gmail.com. We reply within 10 calendar days.",
     "privacyH6": "Cookies and analytics",
     "privacyP6": "We use Google Analytics to understand how the site is browsed (page views, where visitors come from). This is aggregate data and doesn't identify you personally. You can block it from your browser settings.",
     "privacyH7": "Contact",
-    "privacyP7": "For any question about your data: info@lacasadellago.com.ar or WhatsApp."
+    "privacyP7": "For any question about your data: lacasadellagouruguay@gmail.com or WhatsApp."
   }
 }

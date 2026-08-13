@@ -9,6 +9,8 @@ import "react-day-picker/style.css";
 import { useRouter } from "@/lib/i18n/navigation";
 import { formatDateOnly, parseDateOnly } from "@/lib/reservation/booking";
 import { buildTarifasUrl } from "@/lib/reservation/search";
+import { minimumNights } from "@/lib/reservation/stay-rules";
+import { addDays } from "date-fns";
 
 interface SearchWidgetProps {
   variant: "hero" | "bar";
@@ -49,7 +51,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
   }
 
   function pickDeparture(day: Date) {
-    if (checkIn && day > checkIn) {
+    if (checkIn && day >= addDays(checkIn, minimumNights(checkIn))) {
       setCheckOut(day);
       setOpen(null);
     }
@@ -197,7 +199,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
                     locale={dateFnsLocale}
                     defaultMonth={checkIn}
                     weekStartsOn={1}
-                    disabled={{ before: checkIn }}
+                    disabled={{ before: addDays(checkIn, minimumNights(checkIn)) }}
                     modifiers={{ picked: checkOut ? [checkOut] : [] }}
                     modifiersClassNames={{ picked: "rdp-lago-end" }}
                     onDayClick={pickDeparture}
@@ -241,7 +243,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
                 <button
                   type="button"
                   aria-label="+"
-                  onClick={() => setGuests((g) => Math.min(6, g + 1))}
+                    onClick={() => setGuests((g) => Math.min(7, g + 1))}
                   style={variant === "hero" ? roundBtnGlass : roundBtnLight}
                 >
                   +

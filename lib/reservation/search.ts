@@ -12,7 +12,7 @@ type Raw = { checkIn?: string; checkOut?: string; guests?: string; unit?: string
 function parseGuests(v: string | undefined): number | null {
   if (v === undefined) return null;
   const n = Number(v);
-  return Number.isInteger(n) && n >= 1 && n <= 6 ? n : null;
+  return Number.isInteger(n) && n >= 1 && n <= 7 ? n : null;
 }
 
 export function parseRateQuery(sp: Raw): RateQuery | null {

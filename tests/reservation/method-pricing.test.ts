@@ -5,6 +5,7 @@ import {
   methodTotal,
   transferSavings,
   priceBreakdown,
+  netNightly,
 } from "@/lib/reservation/method-pricing";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 
@@ -12,7 +13,7 @@ const SETTINGS: RateSettings = {
   nightly: { aratiri: 130000, aguaribay: 95000 },
   cleaningFee: 30000,
   baseGuests: 2,
-  extraGuestFee: 0,
+  extraGuestFee: 20000,
   cardFeePct: 7.7,
   transferFeePct: 5,
 };
@@ -62,6 +63,12 @@ describe("methodRates", () => {
     // según la pestaña, sin nada en pantalla que lo explicara.
     expect(methodRates(SETTINGS, "card").cleaningFee).toBe(SETTINGS.cleaningFee);
     expect(methodRates(SETTINGS, "transfer").cleaningFee).toBe(SETTINGS.cleaningFee);
+  });
+
+  it("suma el cargo por huésped adicional antes de calcular el costo del canal", () => {
+    const net = SETTINGS.nightly.aguaribay + 5 * SETTINGS.extraGuestFee;
+    expect(netNightly(SETTINGS, "aguaribay", 7)).toBe(net);
+    expect(methodRates(SETTINGS, "card", 7).nightly.aguaribay).toBe(grossUp(net, SETTINGS.cardFeePct));
   });
 });
 
@@ -137,5 +144,13 @@ describe("priceBreakdown", () => {
     expect(bd.lodging).toBe(0);
     expect(bd.total).toBe(0);
     expect(bd.discount).toBe(0);
+  });
+
+  it("aplica el paquete de viernes: 3 noches cobradas como 2,5", () => {
+    const friday = new Date(2026, 8, 25);
+    const bd = priceBreakdown(SETTINGS, "card", "aguaribay", 3, 2, friday);
+    expect(bd.billedNights).toBe(2.5);
+    expect(bd.lodging).toBe(bd.nightly * 2.5);
+    expect(bd.total).toBe(methodTotal(SETTINGS, "card", "aguaribay", 3, 2, friday));
   });
 });

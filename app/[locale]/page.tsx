@@ -17,6 +17,7 @@ import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { getBookingMode } from "@/lib/site-settings.server";
 import { getPublishedTestimonios, getReviewsAggregate } from "@/lib/reviews/testimonios.server";
 import { bucketSrc } from "@/components/ui/ImageSlot";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 const LODGING_JSONLD = {
   "@context": "https://schema.org",
@@ -36,8 +37,8 @@ const LODGING_JSONLD = {
   },
   // Coordenadas reales, tomadas de la ficha de Google Maps del lodge.
   geo: { "@type": "GeoCoordinates", latitude: -25.842811, longitude: -54.538968 },
-  telephone: "+54 9 XXX XXXXXX", // TODO: teléfono real
-  email: "info@lacasadellago.com.ar", // TODO: email real
+  telephone: "+54 9 3757 446156",
+  email: CONTACT_EMAIL,
   priceRange: "$$",
   aggregateRating: undefined,
   amenityFeature: [

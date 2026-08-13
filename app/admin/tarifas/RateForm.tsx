@@ -3,8 +3,13 @@
 import { useActionState, useState } from "react";
 import { saveRates } from "./actions";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
-import { grossUp } from "@/lib/reservation/method-pricing";
+import { grossUp, netNightly } from "@/lib/reservation/method-pricing";
 import { UNITS, type UnitSlug } from "@/lib/units";
+import {
+  LOW_SEASON_WEEKDAY_MIN_NIGHTS,
+  WEEKEND_PACKAGE_BILLED_NIGHTS,
+  WEEKEND_PACKAGE_NIGHTS,
+} from "@/lib/reservation/stay-rules";
 
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
 
@@ -41,10 +46,27 @@ export function RateForm({ settings }: { settings: RateSettings }) {
     aratiri: String(settings.nightly.aratiri),
     aguaribay: String(settings.nightly.aguaribay),
   });
+  const [baseGuests, setBaseGuests] = useState(String(settings.baseGuests));
+  const [extraGuestFee, setExtraGuestFee] = useState(String(settings.extraGuestFee));
   const [cardPct, setCardPct] = useState(String(settings.cardFeePct).replace(".", ","));
   const [transferPct, setTransferPct] = useState(String(settings.transferFeePct).replace(".", ","));
   const cardPctNum = pctOf(cardPct) ?? settings.cardFeePct;
   const transferPctNum = pctOf(transferPct) ?? settings.transferFeePct;
+  const baseGuestsNum = Number.isInteger(Number(baseGuests)) && Number(baseGuests) >= 1 && Number(baseGuests) <= 20
+    ? Number(baseGuests)
+    : settings.baseGuests;
+  const extraGuestFeeNum = extraGuestFee.trim() !== "" && Number.isInteger(Number(extraGuestFee)) && Number(extraGuestFee) >= 0
+    ? Number(extraGuestFee)
+    : settings.extraGuestFee;
+  const previewSettings = {
+    ...settings,
+    nightly: {
+      aratiri: Number(nightly.aratiri) || settings.nightly.aratiri,
+      aguaribay: Number(nightly.aguaribay) || settings.nightly.aguaribay,
+    },
+    baseGuests: baseGuestsNum,
+    extraGuestFee: extraGuestFeeNum,
+  };
 
   return (
     <form action={action} style={{ display: "flex", flexDirection: "column", gap: 28 }}>
@@ -52,8 +74,8 @@ export function RateForm({ settings }: { settings: RateSettings }) {
       <section style={card}>
         <h2 style={h2}>Precio por noche</h2>
         <p style={hint}>
-          Tarifa plana por unidad, sin importar la cantidad de huéspedes. Cuando cambia la
-          temporada, actualizá estos valores.
+           Precio neto base para los huéspedes incluidos. Por cada huésped adicional se suma el
+           importe configurado en la sección de tasas.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
           {UNITS.map((u) => {
@@ -62,7 +84,7 @@ export function RateForm({ settings }: { settings: RateSettings }) {
             return (
               <div key={u.slug}>
                 <label htmlFor={`nightly_${u.slug}`} style={label}>
-                  {u.name} (hasta {u.specs.guests} huésp.)
+                   {u.name} (base, hasta {u.specs.guests} huésp.)
                 </label>
                 <input
                   id={`nightly_${u.slug}`}
@@ -77,7 +99,7 @@ export function RateForm({ settings }: { settings: RateSettings }) {
                 />
                 {valid && (
                   <p style={preview}>
-                    Público: {money(grossUp(net, cardPctNum))} tarjeta · {money(grossUp(net, transferPctNum))} transferencia
+                    Público para {baseGuestsNum} huésp.: {money(grossUp(net, cardPctNum))} tarjeta · {money(grossUp(net, transferPctNum))} transferencia
                   </p>
                 )}
               </div>
@@ -117,7 +139,8 @@ export function RateForm({ settings }: { settings: RateSettings }) {
               max={20}
               step={1}
               required
-              defaultValue={settings.baseGuests}
+               value={baseGuests}
+               onChange={(e) => setBaseGuests(e.target.value)}
               style={input}
             />
           </div>
@@ -132,15 +155,61 @@ export function RateForm({ settings }: { settings: RateSettings }) {
               min={0}
               step={1}
               required
-              defaultValue={settings.extraGuestFee}
+               value={extraGuestFee}
+               onChange={(e) => setExtraGuestFee(e.target.value)}
               style={input}
             />
           </div>
         </div>
         <p style={hint}>
-          El cargo por huésped extra se guarda pero todavía no se aplica al cálculo: hoy el
-          precio es tarifa plana por unidad. Queda listo para activarlo a futuro.
+           El cargo por huésped extra se aplica a cada noche por encima de la cantidad incluida.
         </p>
+      </section>
+
+      <section style={card}>
+        <h2 style={h2}>Precios efectivos por huéspedes</h2>
+        <p style={hint}>
+          Vista previa de lo que calcula la web. Los importes netos son lo que recibe el alojamiento;
+          los importes públicos ya incluyen el costo de cada canal.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+          {UNITS.map((u) => {
+            const guests = Array.from(
+              { length: Math.max(0, u.specs.guests - baseGuestsNum + 1) },
+              (_, i) => baseGuestsNum + i,
+            );
+            return (
+              <div key={u.slug} style={{ border: "1px solid #E7E0D4", borderRadius: 5, overflow: "hidden" }}>
+                <div style={{ padding: "12px 14px", background: "#fbf8f2", fontSize: 13, fontWeight: 700 }}>
+                  {u.name} · máximo {u.specs.guests}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, padding: "10px 14px", fontSize: 11, color: "#6b665d", borderTop: "1px solid #E7E0D4" }}>
+                  <strong>Personas</strong><strong>Neto</strong><strong>Tarjeta</strong><strong>Transf.</strong>
+                  {guests.map((count) => {
+                    const net = netNightly(previewSettings, u.slug, count);
+                    return (
+                      <span key={count} style={{ display: "contents" }}>
+                        <span>{count}</span>
+                        <span>{money(net)}</span>
+                        <span>{money(grossUp(net, cardPctNum))}</span>
+                        <span>{money(grossUp(net, transferPctNum))}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section style={{ ...card, background: "#fbf8f2" }}>
+        <h2 style={h2}>Condiciones de temporada baja</h2>
+        <ul style={{ margin: 0, paddingLeft: 20, color: "#6b665d", fontSize: 13, lineHeight: 1.8 }}>
+          <li>Lunes a jueves: estadía mínima de {LOW_SEASON_WEEKDAY_MIN_NIGHTS} noches.</li>
+          <li>Fin de semana: paquete de {WEEKEND_PACKAGE_NIGHTS} noches al valor de {WEEKEND_PACKAGE_BILLED_NIGHTS}.</li>
+          <li>Aratirí admite hasta 6 huéspedes; Aguaribay admite hasta 7.</li>
+        </ul>
       </section>
 
       {/* Costo por canal de cobro */}

@@ -48,7 +48,11 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
   return (
     <article className="group overflow-hidden rounded-[8px] border border-borde-medio bg-white transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(.16,.84,.44,1)] hover:-translate-y-1 hover:shadow-card">
       <div className="relative h-[270px] overflow-hidden bg-slot sm:h-[310px]">
-        <ImageSlot label={unit.name} className="h-full w-full transition-transform duration-700 group-hover:scale-[1.035]" />
+         <ImageSlot
+           label={unit.name}
+           position={unit.slug === "aratiri" ? "50% 85%" : undefined}
+           className="h-full w-full transition-transform duration-700 group-hover:scale-[1.035]"
+         />
         <div className="absolute inset-0 bg-gradient-to-t from-carbon/55 via-transparent to-transparent" />
         <div className="absolute bottom-5 left-6 text-[10px] font-medium uppercase tracking-[.26em] text-marfil/80">
           {t("unitLabel")}
@@ -79,6 +83,9 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
                 <div className="mt-2 text-[11.5px] text-muted">
                   {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} · {money(nightly)} {t("perNight")}
                 </div>
+                {rate.weekendPackage && (
+                  <div className="mt-2 text-[11.5px] font-medium text-[#2f6b46]">{t("weekendPackage")}</div>
+                )}
                 {!whatsappMode && rate.savings > 0 && (
                   <div className="mt-2 text-[11.5px] font-medium text-[#2f6b46]">
                     {t("transferNote", { total: money(rate.transferTotal), savings: money(rate.savings) })}

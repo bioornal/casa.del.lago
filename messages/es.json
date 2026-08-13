@@ -54,6 +54,7 @@
     "waMessage": "Hola! Quiero reservar {unit} del {checkIn} al {checkOut} para {guests, plural, one {# huésped} other {# huéspedes}}.",
     "waNote": "Confirmamos tu reserva al instante por WhatsApp",
     "unavailable": "No disponible para estas fechas",
+    "weekendPackage": "Paquete fin de semana: 3 noches al valor de 2,5",
     "capacity": "Capacidad máx. {n} huéspedes",
     "pickDatesCta": "Elegí fechas",
     "specs": "{guests} huéspedes · {bedrooms} amb · {baths, plural, one {# baño} other {# baños}} · {area} m²",
@@ -83,7 +84,9 @@
       "petsNo": "No se admiten mascotas",
       "petsYes": "Se admiten mascotas",
       "payment": "Medios de pago",
-      "paymentCard": "Tarjeta de crédito/débito"
+      "paymentCard": "Tarjeta de crédito/débito",
+      "stay": "Estadía mínima",
+      "stayValue": "2 noches lun-jue · finde 3 por 2,5"
     }
   },
   "manifiesto": {
@@ -104,7 +107,7 @@
     },
     "aguaribay": {
       "name": "Cabaña Aguaribay",
-      "sub": "Hasta 4 huéspedes · 1 dormitorio · salamandra · deck al agua"
+      "sub": "Hasta 7 huéspedes · 1 dormitorio · salamandra · deck al agua"
     },
     "note": "Cada cabaña tiene su pileta y su parrilla. Las dos incluyen ropa blanca, wifi, estacionamiento y acceso al muelle."
   },
@@ -390,6 +393,7 @@
     "transferTitle": "Transferencia bancaria",
     "transferIntro": "Transferí el total a la siguiente cuenta y subí el comprobante. Confirmamos tu reserva al verificar el pago.",
     "transferAlias": "Alias",
+    "transferBrubank": "Brubank",
     "transferCbu": "CBU",
     "transferHolder": "Titular",
     "transferAmount": "Monto a transferir",
@@ -464,10 +468,10 @@
     "privacyH4": "Cuánto tiempo los guardamos",
     "privacyP4": "Los datos de la reserva se conservan mientras sean necesarios para cumplir con nuestras obligaciones contables e impositivas. Los comprobantes de transferencia se guardan en un espacio privado, no accesible públicamente.",
     "privacyH5": "Tus derechos",
-    "privacyP5": "Podés pedirnos en cualquier momento acceder a tus datos, corregirlos o que los borremos, escribiendo a info@lacasadellago.com.ar. Te respondemos dentro de los 10 días corridos.",
+    "privacyP5": "Podés pedirnos en cualquier momento acceder a tus datos, corregirlos o que los borremos, escribiendo a lacasadellagouruguay@gmail.com. Te respondemos dentro de los 10 días corridos.",
     "privacyH6": "Cookies y métricas",
     "privacyP6": "Usamos Google Analytics para entender cómo se navega el sitio (páginas vistas, de dónde llega la gente). Son datos agregados, no te identifican personalmente. Podés bloquearlos desde la configuración de tu navegador.",
     "privacyH7": "Contacto",
-    "privacyP7": "Por cualquier consulta sobre tus datos: info@lacasadellago.com.ar o por WhatsApp."
+    "privacyP7": "Por cualquier consulta sobre tus datos: lacasadellagouruguay@gmail.com o por WhatsApp."
   }
 }

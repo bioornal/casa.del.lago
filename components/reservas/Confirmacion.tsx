@@ -23,7 +23,7 @@ export function Confirmacion({ state, settings, method = "card", code, pending }
   const tCta = useTranslations("cta");
   const unit = resolveUnit(state.unitId);
   const nights = computeNights(state.checkIn, state.checkOut);
-  const total = checkoutTotal(settings, method, state.unitId, nights);
+  const total = checkoutTotal(settings, method, state.unitId, nights, state.guests, state.checkIn);
 
   const formatDate = (d: Date) => format(d, "d MMM");
   const rangeLabel =

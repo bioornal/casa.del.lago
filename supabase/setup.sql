@@ -65,19 +65,30 @@ values ('comprobantes', 'comprobantes', false)
 on conflict (id) do nothing;
 
 -- Tarifas editables desde /admin/tarifas (fila única id=1).
--- extra_guest_fee se guarda pero AÚN no se aplica al cálculo (tarifa plana).
+-- extra_guest_fee se suma por huésped adicional a partir de base_guests.
 create table if not exists public.rate_settings (
   id               smallint primary key default 1 check (id = 1),
-  nightly_aratiri    integer not null default 130000,
-  nightly_aguaribay  integer not null default 95000,
+  nightly_aratiri    integer not null default 99800,
+  nightly_aguaribay  integer not null default 99800,
   cleaning_fee     integer not null default 30000,
   base_guests      integer not null default 2,
-  extra_guest_fee  integer not null default 0,
+  extra_guest_fee  integer not null default 20000,
   updated_at       timestamptz not null default now()
 );
 
 -- Fila inicial con los mismos valores que lib/units.ts
 insert into public.rate_settings (id) values (1) on conflict (id) do nothing;
+
+-- Migración de la plantilla inicial: sólo cambia la fila si todavía conserva
+-- los valores anteriores, sin pisar una tarifa que el admin ya haya editado.
+update public.rate_settings
+set nightly_aratiri = 99800,
+    nightly_aguaribay = 99800,
+    extra_guest_fee = 20000
+where id = 1
+  and nightly_aratiri = 130000
+  and nightly_aguaribay = 95000
+  and extra_guest_fee = 0;
 
 -- Mismo criterio que reservations: RLS sin policies, solo service role.
 alter table public.rate_settings enable row level security;
