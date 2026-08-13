@@ -39,7 +39,9 @@ export type PaymentOutcome = {
 };
 
 export function isMockMode(): boolean {
-  return process.env.PAYMENTS_MOCK === "1";
+  // Nunca permitir que una variable heredada convierta producción en un
+  // checkout gratuito.
+  return process.env.NODE_ENV !== "production" && process.env.PAYMENTS_MOCK === "1";
 }
 
 export type MockOutcome = "approved" | "pending" | "rejected";

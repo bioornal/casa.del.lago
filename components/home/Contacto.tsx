@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { ContactForm } from "./ContactForm";
-import { waLink, CONTACT_EMAIL, CONTACT_PHONE_HREF } from "@/lib/contact";
+import { waLink, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_HREF } from "@/lib/contact";
 
 const WA_HREF = waLink();
 // Ficha de Google Maps del lodge. La anterior era la de Aruma (Obispo Angelelli
@@ -145,7 +145,7 @@ export function Contacto() {
                     className="no-underline transition-colors duration-[250ms] hover:text-terracota"
                     style={{ color: "#4a463f" }}
                   >
-                    +54 9 3757 419667
+                    {CONTACT_PHONE_DISPLAY}
                   </a>
                   <span style={{ color: "#6b665d" }}>{t("checkInOut")}</span>
                 </div>

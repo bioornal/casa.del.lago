@@ -20,12 +20,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/api", "/mi-reserva"],
+         disallow: ["/admin", "/api", "/mi-reserva", "/reservas"],
       },
       {
         userAgent: AI_CRAWLERS,
         allow: "/",
-        disallow: ["/admin", "/api", "/mi-reserva"],
+         disallow: ["/admin", "/api", "/mi-reserva", "/reservas"],
       },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),

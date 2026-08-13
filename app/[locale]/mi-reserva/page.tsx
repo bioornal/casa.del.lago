@@ -14,7 +14,10 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "miReserva" });
-  return { title: `${t("title")} — La Casa del Lago Urugua-í` };
+  return {
+    title: `${t("title")} — La Casa del Lago Urugua-í`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function MiReservaPage({

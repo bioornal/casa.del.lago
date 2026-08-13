@@ -1,4 +1,5 @@
 import { getServiceClient } from "@/lib/supabase/server";
+import { releaseExpiredPendingReservations } from "./reservations.server";
 import type { Availability, DateRange } from "./availability";
 import type { UnitId } from "./reducer";
 
@@ -38,6 +39,11 @@ export async function getAvailabilityServer(
   range: DateRange,
 ): Promise<Availability> {
   try {
+    try {
+      await releaseExpiredPendingReservations();
+    } catch (err) {
+      console.error("[availability] cleanup de holds falló:", err instanceof Error ? err.message : err);
+    }
     const fromYmd = toDateOnly(range.from);
     const toYmd = toDateOnly(range.to);
     const { data, error } = await getServiceClient()

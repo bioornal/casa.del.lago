@@ -44,7 +44,7 @@ Falta cargar los **datos reales del alojamiento**. Cada punto indica el archivo 
       → correr `supabase/setup.sql` en el proyecto nuevo y crear el bucket `imagenes`.
 - [ ] Mercado Pago (cuenta propia): `MERCADOPAGO_ACCESS_TOKEN`, `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`
 - [ ] Resend: `RESEND_API_KEY`, `CDL_EMAIL_FROM` (remitente verificado)
-- [ ] Google Calendar (1 por cabaña): `CDL_ICS_*` (lectura), `CDL_CAL_*` + `GOOGLE_SERVICE_ACCOUNT_JSON` (escritura)
+- [x] Disponibilidad desde Supabase: tabla `reservations` y constraint `reservations_no_overlap`.
 - [ ] `ADMIN_EMAILS` — emails del panel admin
 - [ ] `NEXT_PUBLIC_BOOKING_MODE` — vacío = checkout online; `whatsapp` = deriva a WhatsApp
 

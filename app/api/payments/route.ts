@@ -7,7 +7,7 @@ import {
 } from "@/lib/reservation/payments.server";
 import { computeNights } from "@/lib/reservation/pricing";
 import { meetsStayMinimum } from "@/lib/reservation/stay-rules";
-import { parseDateOnly } from "@/lib/reservation/booking";
+import { parseDateOnly, validBookingRange } from "@/lib/reservation/booking";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
 import {
@@ -15,6 +15,7 @@ import {
   generateUniqueBookingCode,
   upsertConfirmedByCode,
   setReservationStatusByCode,
+  releaseExpiredPendingReservations,
   OverlapError,
 } from "@/lib/reservation/reservations.server";
 import { isWhatsAppBookingMode } from "@/lib/booking-mode";
@@ -90,12 +91,14 @@ export async function POST(req: Request) {
     !isUnitId(unitId, testUnitOn) ||
     typeof checkIn !== "string" || !DATE_RE.test(checkIn) ||
     typeof checkOut !== "string" || !DATE_RE.test(checkOut) ||
-    checkOut <= checkIn ||
     typeof guests !== "number" || !Number.isInteger(guests) || guests < 1 ||
     typeof firstName !== "string" || !firstName.trim() ||
     typeof lastName !== "string" || !lastName.trim() ||
     typeof email !== "string" || !isValidEmail(email)
   ) {
+    return NextResponse.json({ error: "validation" }, { status: 400 });
+  }
+  if (!validBookingRange(checkIn, checkOut)) {
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 
@@ -122,6 +125,11 @@ export async function POST(req: Request) {
   // checkoutTotal recalcula acá server-side, igual que el checkout muestra: la
   // unidad de prueba cobra el monto plano de TEST_UNIT_TOTAL, no un precio real.
   const total = checkoutTotal(settings, "card", unit.slug, nights, guests, checkInDate);
+  try {
+    await releaseExpiredPendingReservations();
+  } catch (err) {
+    console.error("[payments] cleanup de holds falló:", err instanceof Error ? err.message : err);
+  }
 
   // Contra la base, no a ciegas: generateBookingCode() sortea sobre 32^4 sin
   // mirar si el código ya existe, y el código es la clave del lookup, del email
@@ -141,6 +149,7 @@ export async function POST(req: Request) {
       code, unitId, unitName: unit.name, checkIn, checkOut, nights,
       guests, firstName, lastName, email: email as string, phone: phoneStr, total,
       paymentMethod: "card", status: "pending", locale,
+      expiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
     });
   } catch (err) {
     if (err instanceof OverlapError) {
@@ -217,6 +226,9 @@ export async function POST(req: Request) {
       });
     } catch (err) {
       console.error("[payments] confirmar supabase fallo:", err instanceof Error ? err.message : err);
+      // El cobro ya ocurrió. No fingir éxito al navegador: el webhook debe
+      // poder reintentar la persistencia y el hold queda visible para operar.
+      return NextResponse.json({ error: "persistence", code }, { status: 502 });
     }
     try { await sendConfirmationEmailOnce(code); }
     catch (err) { console.error("[payments] email fallo:", err instanceof Error ? err.message : err); }

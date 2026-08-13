@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import crypto from "node:crypto";
 import { verifyWebhookSignature, isMockMode, mockPayment, createCardPayment } from "@/lib/reservation/payments.server";
 
@@ -50,6 +50,15 @@ describe("isMockMode", () => {
     expect(isMockMode()).toBe(false);
     delete process.env.PAYMENTS_MOCK;
     expect(isMockMode()).toBe(false);
+  });
+
+  it("nunca activa el mock en producción aunque la variable esté puesta", () => {
+    process.env.PAYMENTS_MOCK = "1";
+    const previous = process.env.NODE_ENV;
+    vi.stubEnv("NODE_ENV", "production");
+    expect(isMockMode()).toBe(false);
+    if (previous === undefined) vi.unstubAllEnvs();
+    else vi.stubEnv("NODE_ENV", previous);
   });
 });
 

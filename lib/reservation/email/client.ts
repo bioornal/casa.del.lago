@@ -12,6 +12,8 @@ export type SendEmailInput = {
   subject: string;
   html: string;
   text: string;
+  /** Reemplaza el reply-to global para formularios de contacto. */
+  replyTo?: string;
   attachments?: EmailAttachment[];
 };
 
@@ -32,7 +34,7 @@ export async function sendEmail(input: SendEmailInput): Promise<boolean> {
   }
 
   try {
-    const replyTo = process.env.CDL_EMAIL_REPLY_TO;
+     const replyTo = input.replyTo ?? process.env.CDL_EMAIL_REPLY_TO;
     const { error } = await new Resend(apiKey).emails.send({
       from: process.env.CDL_EMAIL_FROM ?? DEFAULT_FROM,
       to: input.to,

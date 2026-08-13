@@ -19,11 +19,13 @@ const insertReservation = vi.fn();
 const upsertConfirmedByCode = vi.fn();
 const setReservationStatusByCode = vi.fn();
 const generateUniqueBookingCode = vi.fn();
+const releaseExpiredPendingReservations = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
   upsertConfirmedByCode: (...a: unknown[]) => upsertConfirmedByCode(...a),
   setReservationStatusByCode: (...a: unknown[]) => setReservationStatusByCode(...a),
   generateUniqueBookingCode: (...a: unknown[]) => generateUniqueBookingCode(...a),
+  releaseExpiredPendingReservations: (...a: unknown[]) => releaseExpiredPendingReservations(...a),
   OverlapError,
 }));
 
@@ -63,8 +65,8 @@ const mockedIsTestUnitEnabled = vi.mocked(isTestUnitEnabled);
 const CARD = { token: "tok-1", paymentMethodId: "visa", installments: 1 };
 const VALID = {
   unitId: "aguaribay",
-  checkIn: "2026-07-02",
-  checkOut: "2026-07-05",
+  checkIn: "2027-07-02",
+  checkOut: "2027-07-05",
   guests: 4,
   firstName: "Juan",
   lastName: "Pérez",
@@ -105,6 +107,8 @@ beforeEach(() => {
   setReservationStatusByCode.mockResolvedValue(undefined);
   sendConfirmationEmailOnce.mockReset();
   generateUniqueBookingCode.mockReset();
+  releaseExpiredPendingReservations.mockReset();
+  releaseExpiredPendingReservations.mockResolvedValue(undefined);
   // Alfabeto sin 0/O ni 1/I (ver lib/reservation/code.ts): "AB23" respeta el
   // regex /^CDL-\d{4}-[A-Z2-9]{4}$/ que ya verifican los tests de forma.
   generateUniqueBookingCode.mockResolvedValue("CDL-2026-AB23");
@@ -164,8 +168,9 @@ describe("POST /api/payments", () => {
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
     await POST(post({ ...VALID, amount: 1, total: 1 }));
     // VALID son 4 huéspedes: base $99.800 + $40.000 = $139.800 netos;
-    // tarjeta → $151.500/noche × 3 + limpieza $30.000 = $484.500.
-    expect(createCardPayment.mock.calls[0][0].amount).toBe(484500);
+    // Es un viernes: el paquete cobra 2,5 noches → $151.500 × 2,5 +
+    // limpieza $30.000 = $408.750.
+    expect(createCardPayment.mock.calls[0][0].amount).toBe(408750);
   });
 
   it("rejected → libera la retención por code, responde 200 rejected", async () => {
@@ -236,12 +241,12 @@ describe("POST /api/payments", () => {
     expect(res.status).toBe(400);
   });
 
-  it("approved sigue 200 aunque la confirmación en Supabase falle (best-effort)", async () => {
+  it("502 si la confirmación en Supabase falla después del cobro", async () => {
     createCardPayment.mockResolvedValue({ id: "pay-1", status: "approved" });
     upsertConfirmedByCode.mockRejectedValue(new Error("db down"));
     const res = await POST(post(VALID));
-    expect(res.status).toBe(200);
-    expect((await res.json()).status).toBe("approved");
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("persistence");
   });
 
   it("pending → la fila de retención queda con paymentMethod card / status pending", async () => {

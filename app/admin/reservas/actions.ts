@@ -7,6 +7,7 @@ import {
   OverlapError,
 } from "@/lib/reservation/reservations.server";
 import { computeNights } from "@/lib/reservation/pricing";
+import { validBookingRange } from "@/lib/reservation/booking";
 import { getUnit } from "@/lib/units";
 import { isValidEmail } from "@/lib/reservation/validation";
 import type { UnitId } from "@/lib/reservation/reducer";
@@ -37,14 +38,16 @@ export async function createManualReservation(
   if (!admin) return { ok: false, error: "validation" };
 
   const { unitId, checkIn, checkOut, guests, firstName, lastName, email } = input;
+  const totalValid = input.total === undefined || (Number.isInteger(input.total) && input.total >= 0);
   if (
     !(VALID_UNITS as string[]).includes(unitId) ||
-    !DATE_RE.test(checkIn) || !DATE_RE.test(checkOut) || checkOut <= checkIn ||
+    !DATE_RE.test(checkIn) || !DATE_RE.test(checkOut) ||
     !Number.isInteger(guests) || guests < 1 ||
-    !firstName?.trim() || !lastName?.trim() || !isValidEmail(email)
+    !firstName?.trim() || !lastName?.trim() || !isValidEmail(email) || !totalValid
   ) {
     return { ok: false, error: "validation" };
   }
+  if (!validBookingRange(checkIn, checkOut)) return { ok: false, error: "validation" };
 
   const unit = getUnit(unitId as UnitId)!;
   if (guests > unit.specs.guests) return { ok: false, error: "validation" };

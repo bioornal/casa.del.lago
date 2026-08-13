@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 
 const inputCls =
@@ -15,18 +15,37 @@ const inputStyle = {
 export function ContactForm() {
   const t = useTranslations("contacto");
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSent(true);
+    setBusy(true);
+    setSent(false);
+    setError(false);
+    const form = e.currentTarget;
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      if (!res.ok) throw new Error("contact failed");
+      form.reset();
+      setSent(true);
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
     <form
       onSubmit={handleSubmit}
       style={{ display: "flex", flexDirection: "column", gap: 14 }}
-      noValidate
     >
+      <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
       {/* Row 1: Nombre + Email */}
       <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 14 }}>
         <label className="flex flex-col gap-1">
@@ -34,6 +53,7 @@ export function ContactForm() {
           <input
             type="text"
             placeholder={t("form.name")}
+            name="name"
             required
             aria-label={t("form.name")}
             className={inputCls}
@@ -45,6 +65,7 @@ export function ContactForm() {
           <input
             type="email"
             placeholder={t("form.email")}
+            name="email"
             required
             aria-label={t("form.email")}
             className={inputCls}
@@ -60,6 +81,7 @@ export function ContactForm() {
           <input
             type="tel"
             placeholder={t("form.phone")}
+            name="phone"
             aria-label={t("form.phone")}
             className={inputCls}
             style={inputStyle}
@@ -70,6 +92,7 @@ export function ContactForm() {
           <input
             type="text"
             placeholder={t("form.dates")}
+            name="dates"
             aria-label={t("form.dates")}
             className={inputCls}
             style={inputStyle}
@@ -83,6 +106,7 @@ export function ContactForm() {
         <textarea
           rows={4}
           placeholder={t("form.message")}
+          name="message"
           required
           aria-label={t("form.message")}
           className={inputCls}
@@ -102,7 +126,7 @@ export function ContactForm() {
             padding: "15px 38px",
           }}
         >
-          {sent ? t("form.sent") : t("form.submit")}
+          {busy ? "Enviando…" : sent ? t("form.sent") : t("form.submit")}
         </button>
       </div>
 
@@ -116,6 +140,11 @@ export function ContactForm() {
           }}
         >
           {t("form.sentMsg")}
+        </div>
+      )}
+      {error && (
+        <div role="alert" style={{ fontSize: 13, color: "#8a3b1d", letterSpacing: "0.02em" }}>
+          No pudimos enviar el mensaje. Escribinos por WhatsApp o email.
         </div>
       )}
     </form>

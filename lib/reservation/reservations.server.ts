@@ -37,6 +37,7 @@ export type ReservationRow = {
   created_at: string;
   confirmed_at: string | null;
   updated_at: string;
+  expires_at: string | null;
 };
 
 export type InsertReservationInput = {
@@ -57,6 +58,7 @@ export type InsertReservationInput = {
   comprobantePath?: string;
   paymentId?: string;
   locale?: Locale;
+  expiresAt?: string;
 };
 
 function toRow(i: InsertReservationInput) {
@@ -78,6 +80,7 @@ function toRow(i: InsertReservationInput) {
     status: i.status,
     comprobante_path: i.comprobantePath ?? null,
     payment_id: i.paymentId ?? null,
+    expires_at: i.expiresAt ?? null,
   };
 }
 
@@ -160,7 +163,7 @@ export async function setReservationStatus(
   const patch: Record<string, unknown> = { status };
   if (status === "confirmed") patch.confirmed_at = new Date().toISOString();
   const { error } = await getServiceClient()
-    .from("reservations").update(patch).eq("id", id);
+    .from("reservations").update(patch).eq("id", id).eq("status", "pending");
   if (error) throw new Error(`setReservationStatus: ${error.message}`);
 }
 
@@ -202,4 +205,24 @@ export async function markConfirmationEmailSent(
   if (error) throw new Error(`markConfirmationEmailSent: ${error.message}`);
   const rows = (data ?? []) as ReservationRow[];
   return rows.length > 0 ? rows[0] : null;
+}
+
+/** Libera holds de tarjeta abandonados para que no bloqueen fechas. */
+export async function releaseExpiredPendingReservations(now = new Date()): Promise<void> {
+  const { error } = await getServiceClient()
+    .from("reservations")
+    .update({ status: "released" })
+    .eq("status", "pending")
+    .lt("expires_at", now.toISOString());
+  if (error) throw new Error(`releaseExpiredPendingReservations: ${error.message}`);
+}
+
+/** Permite reintentar si el proveedor de email rechazó el envío. */
+export async function unmarkConfirmationEmailSent(code: string, sentAt: string): Promise<void> {
+  const { error } = await getServiceClient()
+    .from("reservations")
+    .update({ confirmation_email_sent_at: null })
+    .eq("code", code)
+    .eq("confirmation_email_sent_at", sentAt);
+  if (error) throw new Error(`unmarkConfirmationEmailSent: ${error.message}`);
 }

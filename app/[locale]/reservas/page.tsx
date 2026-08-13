@@ -21,6 +21,7 @@ export async function generateMetadata({
   return {
     title: `Reservas — La Casa del Lago Urugua-í`,
     description: t("description"),
+    robots: { index: false, follow: false },
     alternates: {
       languages: {
         es: "/es/reservas",

@@ -14,6 +14,7 @@ export function accommodationJsonLd({
   locale: string;
   nightlyPrice: number;
 }) {
+  const guestLabel = locale === "en" ? "guests" : locale === "pt" ? "hóspedes" : "huéspedes";
   return {
     "@context": "https://schema.org",
     "@type": "Accommodation",
@@ -22,7 +23,7 @@ export function accommodationJsonLd({
     numberOfRooms: unit.specs.bedrooms,
     numberOfBathroomsTotal: unit.specs.baths,
     floorSize: { "@type": "QuantitativeValue", value: unit.specs.area, unitCode: "MTK" },
-    occupancy: { "@type": "QuantitativeValue", maxValue: unit.specs.guests, unitText: "huéspedes" },
+    occupancy: { "@type": "QuantitativeValue", maxValue: unit.specs.guests, unitText: guestLabel },
     amenityFeature: [
       { "@type": "LocationFeatureSpecification", name: "Wi-Fi", value: true },
       { "@type": "LocationFeatureSpecification", name: "Aire acondicionado", value: true },
@@ -45,12 +46,13 @@ export function accommodationJsonLd({
 }
 
 export function breadcrumbJsonLd({ locale, unit }: { locale: string; unit: Unit }) {
+  const ratesLabel = locale === "en" ? "Rates" : locale === "pt" ? "Tarifas" : "Tarifas";
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "La Casa del Lago Urugua-í", item: absoluteUrl(`/${locale}`) },
-      { "@type": "ListItem", position: 2, name: "Tarifas", item: absoluteUrl(`/${locale}/tarifas`) },
+       { "@type": "ListItem", position: 2, name: ratesLabel, item: absoluteUrl(`/${locale}/tarifas`) },
       {
         "@type": "ListItem",
         position: 3,

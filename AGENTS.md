@@ -9,7 +9,7 @@ Cabañas a orillas del **lago Urugua-í**, entre Puerto Iguazú y Puerto Liberta
 
 ## Stack
 - Next.js 16 App Router · TypeScript · Tailwind v4 · next-intl (es/en/pt) · GSAP + Lenis · react-day-picker v10 · Vitest
-- Backend: Supabase, Mercado Pago (MP), Resend (emails), Google Calendar (disponibilidad)
+- Backend: Supabase, Mercado Pago (MP) y Resend (emails). La disponibilidad sale de Supabase.
 - Deploy: Netlify (`netlify.toml` usa `node ./node_modules/next/dist/bin/next build`)
 
 ## Qué se cambió respecto de Aruma (primer pase)

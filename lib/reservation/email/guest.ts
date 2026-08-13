@@ -1,4 +1,4 @@
-import { markConfirmationEmailSent } from "@/lib/reservation/reservations.server";
+import { markConfirmationEmailSent, unmarkConfirmationEmailSent } from "@/lib/reservation/reservations.server";
 import type { ReservationRow } from "@/lib/reservation/reservations.server";
 import { buildConfirmationEmail, buildReleaseEmail, type EmailLocale } from "./guest-templates";
 import { sendEmail } from "./client";
@@ -50,7 +50,7 @@ export async function sendConfirmationEmailOnce(code: string): Promise<void> {
       checkOut: row.check_out,
     });
 
-    await sendEmail({
+    const sent = await sendEmail({
       to: row.email,
       subject,
       html,
@@ -63,6 +63,9 @@ export async function sendConfirmationEmailOnce(code: string): Promise<void> {
         },
       ],
     });
+    if (!sent && row.confirmation_email_sent_at) {
+      await unmarkConfirmationEmailSent(code, row.confirmation_email_sent_at);
+    }
 
     // El aviso al dueño va acá y no en las rutas: este bloque ya corre una sola
     // vez por reserva (flip atómico de markConfirmationEmailSent) y la fila ya

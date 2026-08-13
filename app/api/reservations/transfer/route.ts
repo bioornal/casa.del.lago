@@ -9,7 +9,7 @@ import { getUnit } from "@/lib/units";
 import { notifyAdminNewReservation } from "@/lib/reservation/email/admin";
 import { computeNights } from "@/lib/reservation/pricing";
 import { meetsStayMinimum } from "@/lib/reservation/stay-rules";
-import { parseDateOnly } from "@/lib/reservation/booking";
+import { parseDateOnly, validBookingRange } from "@/lib/reservation/booking";
 import { methodTotal } from "@/lib/reservation/method-pricing";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { isValidEmail } from "@/lib/reservation/validation";
@@ -74,7 +74,6 @@ export async function POST(req: Request) {
     !isUnitId(unitId) ||
     typeof checkIn !== "string" || !DATE_RE.test(checkIn) ||
     typeof checkOut !== "string" || !DATE_RE.test(checkOut) ||
-    checkOut <= checkIn ||
     !Number.isInteger(guests) || guests < 1 ||
     typeof firstName !== "string" || !firstName.trim() ||
     typeof lastName !== "string" || !lastName.trim() ||
@@ -82,6 +81,7 @@ export async function POST(req: Request) {
   ) {
     return bad();
   }
+  if (!validBookingRange(checkIn, checkOut)) return bad();
 
   if (!isFileLike(file) || file.size === 0) return bad();
   if (!isAllowedMime(file.type)) return bad();

@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const insert = vi.fn();
 const update = vi.fn();
 const eq = vi.fn();
+const eq2 = vi.fn();
 const order = vi.fn();
 const select = vi.fn();
 const upsert = vi.fn();
@@ -30,7 +31,8 @@ beforeEach(() => {
   insert.mockResolvedValue({ error: null });
   upsert.mockResolvedValue({ error: null });
   update.mockReturnValue({ eq });
-  eq.mockResolvedValue({ error: null });
+  eq.mockReturnValue({ eq: eq2 });
+  eq2.mockResolvedValue({ error: null });
   select.mockReturnValue({ order });
   order.mockResolvedValue({ data: [], error: null });
 });
@@ -88,6 +90,7 @@ describe("reservations.server", () => {
     expect(patch.status).toBe("confirmed");
     expect(patch.confirmed_at).toBeTypeOf("string");
     expect(eq).toHaveBeenCalledWith("id", "id-1");
+    expect(eq2).toHaveBeenCalledWith("status", "pending");
   });
 
   it("insertReservation lanza OverlapError si la DB devuelve 23P01", async () => {

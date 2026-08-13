@@ -8,6 +8,9 @@ const eq = vi.fn(() => ({ neq }));
 const select = vi.fn(() => ({ eq }));
 const from = vi.fn(() => ({ select }));
 vi.mock("@/lib/supabase/server", () => ({ getServiceClient: () => ({ from }) }));
+vi.mock("@/lib/reservation/reservations.server", () => ({
+  releaseExpiredPendingReservations: vi.fn(() => Promise.resolve()),
+}));
 
 import { getAvailabilityServer } from "@/lib/reservation/availability.server";
 import { GET } from "@/app/api/availability/[unitId]/route";

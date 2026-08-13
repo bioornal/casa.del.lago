@@ -2,6 +2,7 @@
 // Datos públicos de contacto de La Casa del Lago Urugua-í.
 
 export const WHATSAPP_NUMBER = "5493757446156";
+export const CONTACT_PHONE_DISPLAY = "+54 9 3757 446156";
 export const CONTACT_EMAIL = "lacasadellagouruguay@gmail.com";
 export const CONTACT_PHONE_HREF = "tel:+5493757446156";
 

@@ -119,7 +119,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
     console.error("[webhook] persist supabase fallo:", err instanceof Error ? err.message : err);
-    return NextResponse.json({ ok: true });
+    // Un 5xx permite que Mercado Pago reintente la notificación y evita perder
+    // una confirmación por una caída transitoria de Supabase.
+    return NextResponse.json({ error: "persist" }, { status: 502 });
   }
 
   try { await sendConfirmationEmailOnce(code); }

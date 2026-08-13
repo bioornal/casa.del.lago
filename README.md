@@ -164,17 +164,14 @@ nueva y pago aprobado sin fechas disponibles), `lib/reservation/reservations.ser
 
 ### Disponibilidad (`getAvailability`) — ✅ resuelto
 
-- **Implementación:** lee los calendarios de Google vía iCal secret URL (una por unidad).
-- **Archivos:** `lib/reservation/ics.ts` (parser), `lib/reservation/availability.server.ts`
-  (fetch + parse), `app/api/availability/[unitId]/route.ts` (endpoint),
-  `lib/reservation/availability.ts` (wrapper cliente).
-- **Config:** definir `CDL_ICS_YVYRA`, `CDL_ICS_MBERU`, `CDL_ICS_TATU` en `.env.local`
-  (ver `.env.example`). En Google Calendar: Configuración del calendario > "Dirección secreta en formato iCal".
-- **Comportamiento:** fail-open — ante env faltante o error de red devuelve disponibilidad
-  total (`source: "stub"`) y loguea server-side; en operación normal `source: "google-calendar"`.
-  Las fechas viajan como `YYYY-MM-DD` (sin corrimiento de zona horaria).
-- **Limitación conocida:** los eventos con hora usan la porción de fecha sin convertir TZ
-  (las reservas reales son eventos all-day, donde no aplica). Ver JSDoc en `ics.ts`.
+- **Implementación:** consulta directamente las reservas activas de Supabase en
+  `public.reservations`; no depende de Google Calendar.
+- **Archivos:** `lib/reservation/availability.server.ts`,
+  `app/api/availability/[unitId]/route.ts` y `lib/reservation/availability.ts`.
+- **Seguridad:** la constraint PostgreSQL `reservations_no_overlap` es la fuente final
+  contra dobles reservas; el calendario sólo informa las noches ocupadas a la UI.
+- **Comportamiento:** ante un error de Supabase devuelve `source: "stub"` para no romper
+  la interfaz, pero el panel admin lo advierte y la inserción sigue protegida por la DB.
 
 ### Fotos reales
 - **Componente:** `components/ui/ImageSlot.tsx`
@@ -189,7 +186,7 @@ nueva y pago aprobado sin fechas disponibles), `lib/reservation/reservations.ser
 ### Datos de contacto reales
 - **Archivos:** `components/layout/SiteFooter.tsx`, `components/layout/WhatsAppFab.tsx`, `components/home/Contacto.tsx`, `components/home/CtaReserva.tsx`
 - **Datos:** centralizados en `lib/contact.ts` (`WHATSAPP_NUMBER`, `CONTACT_EMAIL`, `CONTACT_PHONE_HREF`, `waLink`).
-  - WhatsApp: `5493757419667` (+54 9 3757 419667)
+  - WhatsApp: `5493757446156` (+54 9 3757 446156)
   - Email: `lacasadellagouruguay@gmail.com`
 
 ### Traducciones EN/PT

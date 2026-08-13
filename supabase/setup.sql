@@ -42,8 +42,18 @@ create table if not exists public.reservations (
   calendar_event_id           text,
   created_at                  timestamptz not null default now(),
   confirmed_at                timestamptz,
-  updated_at                  timestamptz not null default now()
+  updated_at                  timestamptz not null default now(),
+  expires_at                  timestamptz
 );
+
+alter table public.reservations
+  add column if not exists expires_at timestamptz;
+update public.reservations
+set expires_at = created_at + interval '15 minutes'
+where status = 'pending' and payment_method = 'card' and expires_at is null;
+create index if not exists reservations_pending_expiry_idx
+  on public.reservations (expires_at)
+  where status = 'pending' and expires_at is not null;
 
 -- Índice para el listado del panel admin (filtro por status + orden por fecha)
 create index if not exists reservations_status_idx
@@ -63,6 +73,7 @@ create trigger reservations_set_updated_at
 insert into storage.buckets (id, name, public)
 values ('comprobantes', 'comprobantes', false)
 on conflict (id) do nothing;
+update storage.buckets set public = false where id = 'comprobantes';
 
 -- Tarifas editables desde /admin/tarifas (fila única id=1).
 -- extra_guest_fee se suma por huésped adicional a partir de base_guests.

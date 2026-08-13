@@ -6,8 +6,10 @@ vi.mock("resend", () => ({
 }));
 
 const markConfirmationEmailSent = vi.fn();
+const unmarkConfirmationEmailSent = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   markConfirmationEmailSent: (...a: unknown[]) => markConfirmationEmailSent(...a),
+  unmarkConfirmationEmailSent: (...a: unknown[]) => unmarkConfirmationEmailSent(...a),
 }));
 
 const notifyAdminNewReservation = vi.fn();
@@ -23,6 +25,7 @@ const ROW = {
   email: "juan@test.com",
   check_in: "2026-07-02", check_out: "2026-07-05", nights: 3, guests: 4,
   total: 480000, locale: "es",
+  confirmation_email_sent_at: "2026-08-13T12:00:00.000Z",
 };
 
 beforeEach(() => {
@@ -54,6 +57,7 @@ describe("sendConfirmationEmailOnce", () => {
     markConfirmationEmailSent.mockResolvedValue(ROW);
     send.mockRejectedValue(new Error("resend down"));
     await expect(sendConfirmationEmailOnce("CDL-2026-AB12")).resolves.toBeUndefined();
+    expect(unmarkConfirmationEmailSent).toHaveBeenCalledWith("CDL-2026-AB12", ROW.confirmation_email_sent_at);
   });
 
   it("sin RESEND_API_KEY → no envía ni marca, no lanza", async () => {

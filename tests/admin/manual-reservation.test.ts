@@ -15,7 +15,7 @@ vi.mock("@/lib/reservation/reservations.server", () => ({
 import { createManualReservation } from "@/app/admin/reservas/actions";
 
 const VALID = {
-  unitId: "aratiri", checkIn: "2026-08-01", checkOut: "2026-08-04",
+  unitId: "aratiri", checkIn: "2027-08-01", checkOut: "2027-08-04",
   guests: 2, firstName: "Ana", lastName: "Gómez", email: "ana@t.com", phone: "+54",
 };
 
@@ -57,7 +57,7 @@ describe("createManualReservation", () => {
   });
 
   it("valida fechas invertidas", async () => {
-    const res = await createManualReservation({ ...VALID, checkOut: "2026-07-30" });
+    const res = await createManualReservation({ ...VALID, checkOut: "2027-07-30" });
     expect(res).toEqual({ ok: false, error: "validation" });
     expect(insertReservation).not.toHaveBeenCalled();
   });

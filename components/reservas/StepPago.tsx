@@ -12,7 +12,7 @@ import type { PaymentMethod } from "@/lib/reservation/method-pricing";
 import { checkoutTotal, isTestUnit } from "@/lib/reservation/test-unit";
 import { StepTransferencia } from "./StepTransferencia";
 
-const MOCK = process.env.NEXT_PUBLIC_PAYMENTS_MOCK === "1";
+const MOCK = process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_PAYMENTS_MOCK === "1";
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY ?? "";
 
 interface StepPagoProps {

@@ -384,8 +384,8 @@ export function UnitDetail({
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-[30px]">
-            {others.map((other, i) => (
-              <div>
+            {others.map((other) => (
+              <div key={other.slug}>
                 <Link
                   href={`/departamentos/${other.slug}`}
                   className="block text-inherit no-underline transition-transform duration-500 ease-[cubic-bezier(.16,.84,.44,1)] hover:-translate-y-2"

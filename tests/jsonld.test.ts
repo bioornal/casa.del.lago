@@ -5,7 +5,7 @@ import { getUnit } from "@/lib/units";
 const unit = getUnit("aratiri")!;
 
 describe("accommodationJsonLd", () => {
-  const ld = accommodationJsonLd({ unit, locale: "es", nightlyPrice: 140900 }) as Record<string, any>;
+  const ld = accommodationJsonLd({ unit, locale: "es", nightlyPrice: 140900 });
 
   it("es un Accommodation con el nombre de la unidad", () => {
     expect(ld["@type"]).toBe("Accommodation");
@@ -33,7 +33,7 @@ describe("accommodationJsonLd", () => {
 });
 
 describe("breadcrumbJsonLd", () => {
-  const ld = breadcrumbJsonLd({ locale: "es", unit }) as Record<string, any>;
+  const ld = breadcrumbJsonLd({ locale: "es", unit });
 
   it("tiene 3 niveles: inicio, alojamientoss, unidad", () => {
     expect(ld["@type"]).toBe("BreadcrumbList");
@@ -42,6 +42,6 @@ describe("breadcrumbJsonLd", () => {
   });
 
   it("las posiciones van de 1 a 3 en orden", () => {
-    expect(ld.itemListElement.map((i: any) => i.position)).toEqual([1, 2, 3]);
+    expect(ld.itemListElement.map((i) => i.position)).toEqual([1, 2, 3]);
   });
 });
