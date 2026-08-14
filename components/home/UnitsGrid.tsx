@@ -63,7 +63,7 @@ export function UnitsGrid({ prices }: { prices: Record<UnitSlug, number> }) {
                   <ImageSlot
                     label={name}
                     photo={UNIT_COVER_PHOTOS[slug]}
-                    position={slug === "aratiri" ? "50% 85%" : undefined}
+                    position={slug === "aratiri" ? "50% 100%" : undefined}
                     className="h-full w-full transition-transform duration-[900ms] ease-[cubic-bezier(.16,.84,.44,1)] group-hover:scale-[1.04]"
                   />
                 </div>

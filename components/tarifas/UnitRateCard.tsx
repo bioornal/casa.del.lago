@@ -51,7 +51,7 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
          <ImageSlot
            label={unit.name}
            photo={UNIT_COVER_PHOTOS[unit.slug]}
-           position={unit.slug === "aratiri" ? "50% 85%" : undefined}
+           position={unit.slug === "aratiri" ? "50% 100%" : undefined}
            className="h-full w-full transition-transform duration-700 group-hover:scale-[1.035]"
          />
         <div className="absolute inset-0 bg-gradient-to-t from-carbon/55 via-transparent to-transparent" />
