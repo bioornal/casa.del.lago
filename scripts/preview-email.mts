@@ -23,7 +23,7 @@ const outDir = process.argv[2] ?? ".preview-emails";
 mkdirSync(outDir, { recursive: true });
 
 const code = "CDL-2026-PP2P";
-const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lacasadellago.com.ar";
+const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lacasadellagouruguai.com";
 // El mismo mensaje prellenado que arma guest.ts, para que el preview muestre el
 // link que sale de verdad y no uno inventado.
 const whatsappUrl = waLink(`Hola, escribo por la reserva ${code}`);

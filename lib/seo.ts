@@ -4,7 +4,7 @@
 // pasa por acá. El día que se conecte un dominio propio es cambiar
 // NEXT_PUBLIC_SITE_URL en Netlify y redeployar: cero cambios de código.
 
-const FALLBACK = "https://la-casa-del-lago.netlify.app";
+const FALLBACK = "https://lacasadellagouruguai.com";
 
 function normalize(raw: string | undefined): string {
   const v = (raw ?? "").trim();

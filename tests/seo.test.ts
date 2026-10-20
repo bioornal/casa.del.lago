@@ -25,12 +25,12 @@ describe("SITE_URL", () => {
   it("cae al dominio de Netlify si la env var falta o está vacía", async () => {
     delete process.env.NEXT_PUBLIC_SITE_URL;
     const a = await import("@/lib/seo");
-    expect(a.SITE_URL).toBe("https://la-casa-del-lago.netlify.app");
+    expect(a.SITE_URL).toBe("https://lacasadellagouruguai.com");
 
     vi.resetModules();
     process.env.NEXT_PUBLIC_SITE_URL = "   ";
     const b = await import("@/lib/seo");
-    expect(b.SITE_URL).toBe("https://la-casa-del-lago.netlify.app");
+    expect(b.SITE_URL).toBe("https://lacasadellagouruguai.com");
   });
 });
 
