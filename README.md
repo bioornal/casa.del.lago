@@ -187,7 +187,7 @@ nueva y pago aprobado sin fechas disponibles), `lib/reservation/reservations.ser
 - **Archivos:** `components/layout/SiteFooter.tsx`, `components/layout/WhatsAppFab.tsx`, `components/home/Contacto.tsx`, `components/home/CtaReserva.tsx`
 - **Datos:** centralizados en `lib/contact.ts` (`WHATSAPP_NUMBER`, `CONTACT_EMAIL`, `CONTACT_PHONE_HREF`, `waLink`).
   - WhatsApp: `5493757446156` (+54 9 3757 446156)
-  - Email: `lacasadellagourugua-i@gmail.com`
+  - Email: `lacasadellagouruguai2026@gmail.com`
 
 ### Traducciones EN/PT
 - **Archivos:** `messages/en.json`, `messages/pt.json`

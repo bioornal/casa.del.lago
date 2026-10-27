@@ -5,14 +5,14 @@ Falta cargar los **datos reales del alojamiento**. Cada punto indica el archivo 
 
 ## 1. Datos de contacto (`lib/contact.ts`)
 - [x] `WHATSAPP_NUMBER` — `+54 9 3757 446156`
-- [x] `CONTACT_EMAIL` — `lacasadellagourugua-i@gmail.com`
+- [x] `CONTACT_EMAIL` — `lacasadellagouruguai2026@gmail.com`
 - [x] `CONTACT_PHONE_HREF` — `tel:+5493757446156`
 
 ## 2. SEO / mapa / ficha del negocio (`app/[locale]/page.tsx`)
 - [ ] `geo` — latitud/longitud reales del lago (placeholder actual: -25.90, -54.58)
 - [ ] `streetAddress` / `addressLocality` — acceso/dirección reales
    - [x] `telephone` — `+54 9 3757 446156`
-   - [x] `email` — `lacasadellagourugua-i@gmail.com`
+   - [x] `email` — `lacasadellagouruguai2026@gmail.com`
 - [ ] Imagen OG (`url` de Cloudinary) — foto real
 
 ## 3. Distancias, banco y condiciones (`lib/site.ts`)

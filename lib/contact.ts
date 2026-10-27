@@ -3,7 +3,7 @@
 
 export const WHATSAPP_NUMBER = "5493757446156";
 export const CONTACT_PHONE_DISPLAY = "+54 9 3757 446156";
-export const CONTACT_EMAIL = "lacasadellagourugua-i@gmail.com";
+export const CONTACT_EMAIL = "lacasadellagouruguai2026@gmail.com";
 export const CONTACT_PHONE_HREF = "tel:+5493757446156";
 
 /** Link a WhatsApp, opcionalmente con mensaje prellenado. */
