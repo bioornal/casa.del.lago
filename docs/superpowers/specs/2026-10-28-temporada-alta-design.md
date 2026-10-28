@@ -57,26 +57,29 @@ Columnas nuevas en la fila única de `public.rate_settings`:
     `YYYY-MM-DD`, `from <= to`, sin superposición, máximo 24 rangos; devuelve los
     rangos ordenados por `from`. `null` si es inválido.
 - **`lib/reservation/rate-settings.ts`**:
-  - `RateSettings` suma `high: { nightly: Record<UnitSlug, number>; minNights: number; ranges: SeasonRange[] }`.
-  - `rowToSettings` tolera columnas ausentes o JSON inválido → `high` con
-    precios = los de baja, `minNights` 4 y `ranges: []` (el sitio se comporta
-    exactamente como hoy hasta que se corra la migración).
+  - `RateSettings` suma `high?: { nightly: Record<UnitSlug, number>; minNights: number; ranges: SeasonRange[] }`,
+    **opcional**: ausente = sin temporada alta.
+  - `rowToSettings` tolera columnas ausentes (→ sin `high`, el sitio se
+    comporta exactamente como hoy hasta que se corra la migración) y JSON de
+    rangos inválido (→ `ranges: []`).
   - `settingsToRow` y `parseRateSettingsInput` incorporan los campos nuevos.
     Validación: precios de alta enteros > 0, mínimo entero 1–30, rangos vía
     `parseSeasonRanges`.
 - **`lib/reservation/stay-rules.ts`**:
-  - `minimumNights(checkIn, settings)` aplica la regla 4.
-  - `isWeekendPackage(checkIn, nights, ranges)` aplica la regla 3.
-  - `meetsStayMinimum(checkIn, checkOut, settings)`.
+  - `type StaySettings = { high?: HighSeason }` (`RateSettings` lo cumple).
+  - `minimumNights(checkIn, settings?)` aplica la regla 4.
+  - `isWeekendPackage(checkIn, nights, settings?)` aplica la regla 3.
+  - `meetsStayMinimum(checkIn, checkOut, settings?)`.
 - **`lib/reservation/method-pricing.ts`**:
   - `netNightly(s, slug, guests, season)`.
   - Nuevo `stayLines(s, method, slug, nights, guests, checkIn)` →
     `{ season, nights, billed, nightly }[]`, agrupando noches consecutivas de la
     misma temporada. Con promo, una sola línea de baja con `billed = 2.5`.
   - `methodTotal` = Σ `nightly × billed` + limpieza (0 si no hay noches).
-  - `PriceBreakdown` reemplaza `nightly`/`billedNights` por `lines` (precio de
-    lista = tarjeta, como hoy) y mantiene `lodging`, `cleaningFee`,
-    `listTotal`, `discount`, `total`, más `weekendPackage: boolean`.
+  - `PriceBreakdown` suma `lines` (precio de lista = tarjeta, como hoy) y
+    `weekendPackage: boolean`; conserva `nightly` (precio de la primera línea),
+    `billedNights` (suma de noches cobradas), `lodging`, `cleaningFee`,
+    `listTotal`, `discount` y `total`.
   - `methodRates` sigue devolviendo las tarifas de **baja**: alimentan los
     "desde $X por noche" de home, ficha de cabaña y tarjetas de tarifas.
 - **`lib/reservation/rates.server.ts`**: `UnitRate` suma `lines` y calcula
