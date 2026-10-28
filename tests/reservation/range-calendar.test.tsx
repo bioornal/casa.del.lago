@@ -1,9 +1,20 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
 import { RangeCalendar } from "@/components/reservas/RangeCalendar";
 
 vi.mock("next-intl", () => ({ useLocale: () => "es" }));
+
+// Las fechas de los tests son fijas (jul/sep 2026) y el componente deshabilita
+// todo lo anterior a hoy: sin fijar el reloj, los tests caducan solos. Solo se
+// falsea Date, no los timers, para no frenar el render de React.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date(2026, 6, 1)); // 1 jul 2026
+});
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 describe("RangeCalendar", () => {
   it("marca como deshabilitado un día ocupado provisto en disabledDates", () => {
