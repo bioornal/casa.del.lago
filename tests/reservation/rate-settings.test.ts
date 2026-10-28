@@ -173,3 +173,91 @@ describe("parseRateSettingsInput", () => {
     expect(r.ok).toBe(true);
   });
 });
+
+describe("temporada alta en rate_settings", () => {
+  const BASE_ROW = {
+    nightly_aratiri: 99800,
+    nightly_aguaribay: 99800,
+    cleaning_fee: 30000,
+    base_guests: 2,
+    extra_guest_fee: 20000,
+    card_fee_pct: 7.7,
+    transfer_fee_pct: 5,
+  };
+
+  it("sin columnas de alta → sin bloque high (comportamiento actual)", () => {
+    expect(rowToSettings(BASE_ROW).high).toBeUndefined();
+  });
+
+  it("lee precios, mínimo y rangos de alta", () => {
+    const s = rowToSettings({
+      ...BASE_ROW,
+      high_nightly_aratiri: 149800,
+      high_nightly_aguaribay: 139800,
+      high_min_nights: 4,
+      high_season_ranges: [{ from: "2026-12-15", to: "2027-02-28" }],
+    });
+    expect(s.high).toEqual({
+      nightly: { aratiri: 149800, aguaribay: 139800 },
+      minNights: 4,
+      ranges: [{ from: "2026-12-15", to: "2027-02-28" }],
+    });
+  });
+
+  it("rangos inválidos en la fila → lista vacía, no rompe", () => {
+    const s = rowToSettings({
+      ...BASE_ROW,
+      high_nightly_aratiri: 149800,
+      high_nightly_aguaribay: 149800,
+      high_min_nights: 4,
+      high_season_ranges: "basura",
+    });
+    expect(s.high?.ranges).toEqual([]);
+  });
+
+  it("settingsToRow escribe las columnas de alta", () => {
+    const s = rowToSettings({
+      ...BASE_ROW,
+      high_nightly_aratiri: 149800,
+      high_nightly_aguaribay: 149800,
+      high_min_nights: 4,
+      high_season_ranges: [],
+    });
+    expect(settingsToRow(s)).toMatchObject({
+      high_nightly_aratiri: 149800,
+      high_nightly_aguaribay: 149800,
+      high_min_nights: 4,
+      high_season_ranges: [],
+    });
+  });
+
+  const HIGH_INPUT = {
+    ...VALID,
+    high_nightly_aratiri: "149800",
+    high_nightly_aguaribay: "149800",
+    high_min_nights: "4",
+    high_season_ranges: JSON.stringify([{ from: "2026-12-15", to: "2027-02-28" }]),
+  };
+
+  it("parseRateSettingsInput acepta el bloque de alta", () => {
+    const r = parseRateSettingsInput(HIGH_INPUT);
+    expect(r.ok && r.value.high).toEqual({
+      nightly: { aratiri: 149800, aguaribay: 149800 },
+      minNights: 4,
+      ranges: [{ from: "2026-12-15", to: "2027-02-28" }],
+    });
+  });
+
+  it("parseRateSettingsInput rechaza cada campo de alta inválido", () => {
+    expect(parseRateSettingsInput({ ...HIGH_INPUT, high_nightly_aratiri: "0" }).ok).toBe(false);
+    expect(parseRateSettingsInput({ ...HIGH_INPUT, high_min_nights: "0" }).ok).toBe(false);
+    expect(parseRateSettingsInput({ ...HIGH_INPUT, high_min_nights: "31" }).ok).toBe(false);
+    expect(parseRateSettingsInput({ ...HIGH_INPUT, high_season_ranges: "{" }).ok).toBe(false);
+    expect(
+      parseRateSettingsInput({
+        ...HIGH_INPUT,
+        high_season_ranges: JSON.stringify([{ from: "2027-01-10", to: "2027-01-01" }]),
+      }).ok,
+    ).toBe(false);
+  });
+});

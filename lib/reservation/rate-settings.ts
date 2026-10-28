@@ -1,4 +1,12 @@
 import { UNITS, CLEANING_FEE, BASE_GUESTS, EXTRA_GUEST_FEE, type UnitSlug } from "@/lib/units";
+import { parseSeasonRanges, type SeasonRange } from "./seasons";
+
+/** Temporada alta: precio neto por noche propio, mínimo propio y rangos de fechas. */
+export type HighSeason = {
+  nightly: Record<UnitSlug, number>;
+  minNights: number;
+  ranges: SeasonRange[];
+};
 
 // Tarifas editables desde /admin/tarifas. Viven en Supabase (tabla rate_settings);
 // este módulo es la forma compartida (server + cliente + tests, sin imports de server).
@@ -14,6 +22,8 @@ export type RateSettings = {
   cardFeePct: number;
   /** Costo % del cobro por transferencia (retención IIBB). */
   transferFeePct: number;
+  /** Ausente = no hay temporada alta configurada: todo se cobra como baja. */
+  high?: HighSeason;
 };
 
 // Fallback si la DB no responde o aún no se corrió el SQL: valores de temporada
@@ -41,12 +51,30 @@ export type RateSettingsRow = {
   // Pueden faltar si aún no se corrió el ALTER de setup.sql en Supabase.
   card_fee_pct?: number | string | null;
   transfer_fee_pct?: number | string | null;
+  // Temporada alta. Pueden faltar si aún no se corrió el ALTER de setup.sql.
+  high_nightly_aratiri?: number | null;
+  high_nightly_aguaribay?: number | null;
+  high_min_nights?: number | null;
+  high_season_ranges?: unknown;
 };
 
 /** numeric de Postgres puede llegar como string; ausente/int inválido → default. */
 function parsePct(v: number | string | null | undefined, fallback: number): number {
   const n = typeof v === "string" ? Number(v) : v;
   return typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 30 ? n : fallback;
+}
+
+const isPosInt = (v: unknown): v is number => typeof v === "number" && Number.isInteger(v) && v > 0;
+
+function rowHigh(row: RateSettingsRow): HighSeason | undefined {
+  const { high_nightly_aratiri: a, high_nightly_aguaribay: b, high_min_nights: m } = row;
+  if (!isPosInt(a) || !isPosInt(b) || !isPosInt(m) || m > 30) return undefined;
+  return {
+    nightly: { aratiri: a, aguaribay: b },
+    minNights: m,
+    // Un JSON roto en la fila no tumba el sitio: se ignora y todo queda en baja.
+    ranges: parseSeasonRanges(row.high_season_ranges) ?? [],
+  };
 }
 
 export function rowToSettings(row: RateSettingsRow): RateSettings {
@@ -65,6 +93,7 @@ export function rowToSettings(row: RateSettingsRow): RateSettings {
     parsePct(row.transfer_fee_pct, DEFAULT_RATE_SETTINGS.transferFeePct),
     cardFeePct,
   );
+  const high = rowHigh(row);
   return {
     nightly: {
       aratiri: row.nightly_aratiri,
@@ -75,6 +104,7 @@ export function rowToSettings(row: RateSettingsRow): RateSettings {
     extraGuestFee: row.extra_guest_fee,
     cardFeePct,
     transferFeePct,
+    ...(high ? { high } : {}),
   };
 }
 
@@ -87,6 +117,14 @@ export function settingsToRow(s: RateSettings): RateSettingsRow {
     extra_guest_fee: s.extraGuestFee,
     card_fee_pct: s.cardFeePct,
     transfer_fee_pct: s.transferFeePct,
+    ...(s.high
+      ? {
+          high_nightly_aratiri: s.high.nightly.aratiri,
+          high_nightly_aguaribay: s.high.nightly.aguaribay,
+          high_min_nights: s.high.minNights,
+          high_season_ranges: s.high.ranges,
+        }
+      : {}),
   };
 }
 
@@ -100,7 +138,24 @@ function parseMoney(raw: string): number | null {
   return n;
 }
 
-export type RateSettingsInput = Record<keyof RateSettingsRow, string>;
+type BaseInputKey =
+  | "nightly_aratiri"
+  | "nightly_aguaribay"
+  | "cleaning_fee"
+  | "base_guests"
+  | "extra_guest_fee"
+  | "card_fee_pct"
+  | "transfer_fee_pct";
+const HIGH_INPUT_KEYS = [
+  "high_nightly_aratiri",
+  "high_nightly_aguaribay",
+  "high_min_nights",
+  "high_season_ranges",
+] as const;
+type HighInputKey = (typeof HIGH_INPUT_KEYS)[number];
+
+/** Campos del form de /admin/tarifas. Los de alta son opcionales: sin ellos no se toca la temporada alta. */
+export type RateSettingsInput = Record<BaseInputKey, string> & Partial<Record<HighInputKey, string>>;
 
 /** % con hasta 2 decimales entre 0 y 30 (acepta coma o punto). */
 function parsePctInput(raw: string): number | null {
@@ -144,5 +199,36 @@ export function parseRateSettingsInput(
       error: "El costo de transferencia no puede ser mayor que la comisión de tarjeta: la transferencia tiene que seguir siendo la opción más barata.",
     };
   }
-  return { ok: true, value: { nightly, cleaningFee, baseGuests, extraGuestFee, cardFeePct, transferFeePct } };
+  const value: RateSettings = { nightly, cleaningFee, baseGuests, extraGuestFee, cardFeePct, transferFeePct };
+
+  if (HIGH_INPUT_KEYS.some((k) => raw[k] !== undefined)) {
+    const highNightly: Record<UnitSlug, number> = { aratiri: 0, aguaribay: 0 };
+    for (const slug of ["aratiri", "aguaribay"] as const) {
+      const n = parseMoney(raw[`high_nightly_${slug}`] ?? "");
+      if (n === null || n === 0) {
+        return { ok: false, error: "El precio por noche de temporada alta debe ser un entero mayor a 0." };
+      }
+      highNightly[slug] = n;
+    }
+    const minNights = Number((raw.high_min_nights ?? "").trim());
+    if (!Number.isInteger(minNights) || minNights < 1 || minNights > 30) {
+      return { ok: false, error: "La estadía mínima de temporada alta debe ser un entero entre 1 y 30." };
+    }
+    let json: unknown;
+    try {
+      json = JSON.parse(raw.high_season_ranges ?? "[]");
+    } catch {
+      return { ok: false, error: "No se pudieron leer las fechas de temporada alta." };
+    }
+    const ranges = parseSeasonRanges(json);
+    if (!ranges) {
+      return {
+        ok: false,
+        error: "Las fechas de temporada alta son inválidas: cada rango necesita desde ≤ hasta y no pueden superponerse.",
+      };
+    }
+    value.high = { nightly: highNightly, minNights, ranges };
+  }
+
+  return { ok: true, value };
 }

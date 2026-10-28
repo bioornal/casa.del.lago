@@ -252,3 +252,17 @@ alter table public.site_settings
 -- =============================================================
 alter table public.site_settings
   add column if not exists test_unit_enabled boolean not null default false;
+
+-- =============================================================
+-- 2026-10-28 — Temporada alta (ver lib/reservation/seasons.ts).
+-- Rangos [{ "from": "YYYY-MM-DD", "to": "YYYY-MM-DD" }], ambos inclusive.
+-- Lista vacía = sin temporada alta: todo se cobra como baja.
+-- =============================================================
+alter table public.rate_settings
+  add column if not exists high_nightly_aratiri integer not null default 149800
+    check (high_nightly_aratiri > 0),
+  add column if not exists high_nightly_aguaribay integer not null default 149800
+    check (high_nightly_aguaribay > 0),
+  add column if not exists high_min_nights integer not null default 4
+    check (high_min_nights between 1 and 30),
+  add column if not exists high_season_ranges jsonb not null default '[]'::jsonb;
