@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { saveRates } from "./actions";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
+import type { SeasonRange } from "@/lib/reservation/seasons";
 import { grossUp, netNightly } from "@/lib/reservation/method-pricing";
 import { UNITS, type UnitSlug } from "@/lib/units";
 import {
@@ -58,6 +59,16 @@ export function RateForm({ settings }: { settings: RateSettings }) {
   const extraGuestFeeNum = extraGuestFee.trim() !== "" && Number.isInteger(Number(extraGuestFee)) && Number(extraGuestFee) >= 0
     ? Number(extraGuestFee)
     : settings.extraGuestFee;
+  // Temporada alta. Sin bloque guardado arranca con los precios de baja y mínimo 4.
+  const [highNightly, setHighNightly] = useState<Record<UnitSlug, string>>({
+    aratiri: String(settings.high?.nightly.aratiri ?? settings.nightly.aratiri),
+    aguaribay: String(settings.high?.nightly.aguaribay ?? settings.nightly.aguaribay),
+  });
+  const [highMin, setHighMin] = useState(String(settings.high?.minNights ?? 4));
+  const [ranges, setRanges] = useState<SeasonRange[]>(settings.high?.ranges ?? []);
+  const setRange = (i: number, patch: Partial<SeasonRange>) =>
+    setRanges((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+
   const previewSettings = {
     ...settings,
     nightly: {
@@ -203,11 +214,114 @@ export function RateForm({ settings }: { settings: RateSettings }) {
         </div>
       </section>
 
+      {/* Temporada alta */}
+      <section style={card}>
+        <h2 style={h2}>Temporada alta</h2>
+        <p style={hint}>
+          Las noches que caen dentro de un rango se cobran con estos precios netos. Limpieza, huésped
+          extra y comisiones son los mismos que en baja. En alta no aplica el paquete de fin de semana.
+          Si una estadía cruza el cambio de temporada, cada noche se cobra con su tarifa.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
+          {UNITS.map((u) => {
+            const net = Number(highNightly[u.slug]);
+            const valid = Number.isInteger(net) && net > 0;
+            return (
+              <div key={u.slug}>
+                <label htmlFor={`high_nightly_${u.slug}`} style={label}>
+                  {u.name} · noche en alta (base)
+                </label>
+                <input
+                  id={`high_nightly_${u.slug}`}
+                  name={`high_nightly_${u.slug}`}
+                  type="number"
+                  min={1}
+                  step={1}
+                  required
+                  value={highNightly[u.slug]}
+                  onChange={(e) => setHighNightly((v) => ({ ...v, [u.slug]: e.target.value }))}
+                  style={input}
+                />
+                {valid && (
+                  <p style={preview}>
+                    Público para {baseGuestsNum} huésp.: {money(grossUp(net, cardPctNum))} tarjeta · {money(grossUp(net, transferPctNum))} transferencia
+                  </p>
+                )}
+              </div>
+            );
+          })}
+          <div>
+            <label htmlFor="high_min_nights" style={label}>
+              Estadía mínima en alta (noches)
+            </label>
+            <input
+              id="high_min_nights"
+              name="high_min_nights"
+              type="number"
+              min={1}
+              max={30}
+              step={1}
+              required
+              value={highMin}
+              onChange={(e) => setHighMin(e.target.value)}
+              style={input}
+            />
+          </div>
+        </div>
+
+        <h3 style={{ fontSize: 13, fontWeight: 700, margin: "22px 0 8px" }}>Fechas de temporada alta</h3>
+        <p style={hint}>
+          Desde y hasta son inclusive: es la fecha de cada noche. Ejemplo: del 15/12 al 28/02 hace de
+          alta la noche del 28/02; el check-out del 01/03 no cuenta. Sin rangos, todo se cobra como baja.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {ranges.map((r, i) => (
+            <div key={i} style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 12 }}>
+              <div>
+                <label htmlFor={`range_from_${i}`} style={label}>Desde</label>
+                <input
+                  id={`range_from_${i}`}
+                  type="date"
+                  value={r.from}
+                  onChange={(e) => setRange(i, { from: e.target.value })}
+                  style={{ ...input, width: 180 }}
+                />
+              </div>
+              <div>
+                <label htmlFor={`range_to_${i}`} style={label}>Hasta</label>
+                <input
+                  id={`range_to_${i}`}
+                  type="date"
+                  value={r.to}
+                  onChange={(e) => setRange(i, { to: e.target.value })}
+                  style={{ ...input, width: 180 }}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setRanges((rs) => rs.filter((_, j) => j !== i))}
+                style={secondaryButton}
+              >
+                Quitar
+              </button>
+            </div>
+          ))}
+          <div>
+            <button type="button" onClick={() => setRanges((rs) => [...rs, { from: "", to: "" }])} style={secondaryButton}>
+              Agregar rango
+            </button>
+          </div>
+        </div>
+        {/* Las filas a medio completar no viajan: el server valida el resto. */}
+        <input type="hidden" name="high_season_ranges" value={JSON.stringify(ranges.filter((r) => r.from && r.to))} />
+      </section>
+
       <section style={{ ...card, background: "#fbf8f2" }}>
         <h2 style={h2}>Condiciones de temporada baja</h2>
         <ul style={{ margin: 0, paddingLeft: 20, color: "#6b665d", fontSize: 13, lineHeight: 1.8 }}>
           <li>Lunes a jueves: estadía mínima de {LOW_SEASON_WEEKDAY_MIN_NIGHTS} noches.</li>
           <li>Fin de semana: paquete de {WEEKEND_PACKAGE_NIGHTS} noches al valor de {WEEKEND_PACKAGE_BILLED_NIGHTS}.</li>
+          <li>En temporada alta no aplica el paquete de fin de semana.</li>
           <li>Aguaribay admite hasta 6 huéspedes; Aratirí admite hasta 7.</li>
         </ul>
       </section>
@@ -317,6 +431,16 @@ const hint: React.CSSProperties = {
   color: "#6b665d",
   lineHeight: 1.6,
   margin: "0 0 16px",
+};
+
+const secondaryButton: React.CSSProperties = {
+  padding: "10px 16px",
+  background: "#fff",
+  color: "#23362B",
+  border: "1px solid #d8cfbf",
+  borderRadius: 4,
+  cursor: "pointer",
+  fontSize: 12.5,
 };
 
 const preview: React.CSSProperties = {
