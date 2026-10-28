@@ -1,7 +1,7 @@
 import type { UnitSlug } from "@/lib/units";
 import type { RateSettings } from "./rate-settings";
-import { computeTotal } from "./pricing";
-import { billedNights as getBilledNights } from "./stay-rules";
+import { nightSeasons, type Season } from "./seasons";
+import { isWeekendPackage, WEEKEND_PACKAGE_BILLED_NIGHTS } from "./stay-rules";
 
 // Precios por método de pago. El dueño configura en /admin/tarifas lo que quiere
 // RECIBIR NETO; el público ve/paga el precio con el costo del canal incluido:
@@ -42,9 +42,10 @@ function pctFor(s: RateSettings, method: PaymentMethod): number {
 
 export type MethodRates = { nightly: Record<UnitSlug, number>; cleaningFee: number };
 
-/** Neto por noche según la cantidad de huéspedes elegida. */
-export function netNightly(s: RateSettings, slug: UnitSlug, guests = s.baseGuests): number {
-  return s.nightly[slug] + Math.max(0, guests - s.baseGuests) * s.extraGuestFee;
+/** Neto por noche según huéspedes y temporada. Sin bloque high, "high" cae al precio de baja. */
+export function netNightly(s: RateSettings, slug: UnitSlug, guests = s.baseGuests, season: Season = "low"): number {
+  const base = season === "high" && s.high ? s.high.nightly[slug] : s.nightly[slug];
+  return base + Math.max(0, guests - s.baseGuests) * s.extraGuestFee;
 }
 
 /** Tarifas públicas (por noche + limpieza) del método. */
@@ -60,6 +61,41 @@ export function methodRates(s: RateSettings, method: PaymentMethod, guests = s.b
   };
 }
 
+/** Un tramo de noches consecutivas de la misma temporada. `billed` < `nights` solo con la promo. */
+export type StayLine = { season: Season; nights: number; billed: number; nightly: number };
+
+/** Tramos de la estadía con el precio por noche del método. Sin checkIn no hay fechas: todo baja. */
+export function stayLines(
+  s: RateSettings,
+  method: PaymentMethod,
+  slug: UnitSlug,
+  nights: number,
+  guests = s.baseGuests,
+  checkIn: Date | null = null,
+): StayLine[] {
+  if (nights <= 0) return [];
+  const pct = pctFor(s, method);
+  const price = (season: Season) => grossUp(netNightly(s, slug, guests, season), pct);
+  const seasons: Season[] = checkIn
+    ? nightSeasons(checkIn, nights, s.high?.ranges ?? [])
+    : Array.from({ length: nights }, () => "low" as const);
+  const lines: StayLine[] = [];
+  for (const season of seasons) {
+    const last = lines[lines.length - 1];
+    if (last && last.season === season) {
+      last.nights++;
+      last.billed++;
+    } else {
+      lines.push({ season, nights: 1, billed: 1, nightly: price(season) });
+    }
+  }
+  // La promo exige las 3 noches en baja, así que siempre es una sola línea.
+  if (checkIn && isWeekendPackage(checkIn, nights, s)) lines[0].billed = WEEKEND_PACKAGE_BILLED_NIGHTS;
+  return lines;
+}
+
+const lodgingOf = (lines: StayLine[]) => lines.reduce((sum, l) => sum + l.nightly * l.billed, 0);
+
 export function methodTotal(
   s: RateSettings,
   method: PaymentMethod,
@@ -68,8 +104,9 @@ export function methodTotal(
   guests = s.baseGuests,
   checkIn: Date | null = null,
 ): number {
-  const r = methodRates(s, method, guests);
-  return computeTotal(r.nightly[slug], getBilledNights(checkIn, nights), r.cleaningFee);
+  if (nights <= 0) return 0;
+  // Limpieza al neto, sin gross-up (ver cabecera).
+  return lodgingOf(stayLines(s, method, slug, nights, guests, checkIn)) + s.cleaningFee;
 }
 
 /** Ahorro en pesos pagando por transferencia vs tarjeta (piso 0). */
@@ -93,14 +130,16 @@ export function transferSavings(
  * es lo que recalculan /api/payments y /api/reservations/transfer.
  */
 export type PriceBreakdown = {
-  nightly: number;      // precio de lista por noche (tarjeta), igual en ambos métodos
+  nightly: number;      // precio de lista por noche de la primera línea (tarjeta), igual en ambos métodos
   nights: number;
-  billedNights: number;
-  lodging: number;      // nightly × noches cobradas
+  billedNights: number; // suma de noches cobradas (2,5 con la promo)
+  lines: StayLine[];    // tramos por temporada, precio de lista (tarjeta)
+  lodging: number;      // Σ nightly × billed de las líneas
   cleaningFee: number;  // el neto configurado, sin gross-up; 0 si nights <= 0 (no hay estadía que limpiar)
-  listTotal: number;    // lodging + cleaningFee (precio de lista), siempre — incluso con nights <= 0
+  listTotal: number;    // lodging + cleaningFee (precio de lista); 0 si nights <= 0
   discount: number;     // 0 con tarjeta; el ahorro con transferencia
   total: number;        // listTotal − discount = lo que se cobra
+  weekendPackage: boolean;
 };
 
 export function priceBreakdown(
@@ -111,24 +150,22 @@ export function priceBreakdown(
   guests = s.baseGuests,
   checkIn: Date | null = null,
 ): PriceBreakdown {
-  const list = methodRates(s, "card", guests);
-  const nightly = list.nightly[slug];
-  const billed = getBilledNights(checkIn, nights);
-  const lodging = nightly * Math.max(0, billed);
-  // Sin noches no hay estadía, así que tampoco hay línea de limpieza: si no,
-  // listTotal (computeTotal, que devuelve 0 con nights <= 0) dejaría de ser
-  // lodging + cleaningFee y el tipo de arriba mentiría.
-  const cleaningFee = nights > 0 ? list.cleaningFee : 0;
-  const listTotal = computeTotal(nightly, billed, list.cleaningFee);
+  const lines = stayLines(s, "card", slug, nights, guests, checkIn);
+  const lodging = lodgingOf(lines);
+  // Sin noches no hay estadía, así que tampoco hay línea de limpieza.
+  const cleaningFee = nights > 0 ? s.cleaningFee : 0;
+  const listTotal = nights > 0 ? lodging + cleaningFee : 0;
   const total = methodTotal(s, method, slug, nights, guests, checkIn);
   return {
-    nightly,
+    nightly: lines[0]?.nightly ?? methodRates(s, "card", guests).nightly[slug],
     nights,
-    billedNights: billed,
+    billedNights: lines.reduce((n, l) => n + l.billed, 0),
+    lines,
     lodging,
     cleaningFee,
     listTotal,
     discount: Math.max(0, listTotal - total),
     total,
+    weekendPackage: !!checkIn && isWeekendPackage(checkIn, nights, s),
   };
 }

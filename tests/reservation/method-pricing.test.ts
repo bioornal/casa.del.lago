@@ -6,6 +6,7 @@ import {
   transferSavings,
   priceBreakdown,
   netNightly,
+  stayLines,
 } from "@/lib/reservation/method-pricing";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 
@@ -152,5 +153,69 @@ describe("priceBreakdown", () => {
     expect(bd.billedNights).toBe(2.5);
     expect(bd.lodging).toBe(bd.nightly * 2.5);
     expect(bd.total).toBe(methodTotal(SETTINGS, "card", "aguaribay", 3, 2, friday));
+  });
+});
+
+describe("temporada alta", () => {
+  const WITH_HIGH: RateSettings = {
+    ...SETTINGS,
+    high: {
+      nightly: { aratiri: 150000, aguaribay: 150000 },
+      minNights: 4,
+      ranges: [{ from: "2026-12-15", to: "2027-02-28" }],
+    },
+  };
+  const lowNight = grossUp(SETTINGS.nightly.aguaribay, SETTINGS.cardFeePct);
+  const highNight = grossUp(150000, SETTINGS.cardFeePct);
+
+  it("estadía toda en alta: noches al precio de alta", () => {
+    const checkIn = new Date(2027, 0, 11);
+    expect(methodTotal(WITH_HIGH, "card", "aguaribay", 4, 2, checkIn)).toBe(highNight * 4 + SETTINGS.cleaningFee);
+  });
+
+  it("estadía que cruza: cada noche con su temporada, en dos líneas", () => {
+    const checkIn = new Date(2026, 11, 13); // 13 y 14 baja, 15 y 16 alta
+    const lines = stayLines(WITH_HIGH, "card", "aguaribay", 4, 2, checkIn);
+    expect(lines).toEqual([
+      { season: "low", nights: 2, billed: 2, nightly: lowNight },
+      { season: "high", nights: 2, billed: 2, nightly: highNight },
+    ]);
+    expect(methodTotal(WITH_HIGH, "card", "aguaribay", 4, 2, checkIn)).toBe(
+      lowNight * 2 + highNight * 2 + SETTINGS.cleaningFee,
+    );
+  });
+
+  it("huésped extra se suma también en alta", () => {
+    expect(netNightly(WITH_HIGH, "aratiri", 4, "high")).toBe(150000 + 2 * SETTINGS.extraGuestFee);
+  });
+
+  it("viernes con 3 noches en alta: sin promo", () => {
+    const friday = new Date(2027, 0, 15);
+    const bd = priceBreakdown(WITH_HIGH, "card", "aguaribay", 3, 2, friday);
+    expect(bd.weekendPackage).toBe(false);
+    expect(bd.billedNights).toBe(3);
+    expect(bd.total).toBe(highNight * 3 + SETTINGS.cleaningFee);
+  });
+
+  it("viernes con 3 noches en baja: la promo sigue", () => {
+    const friday = new Date(2026, 8, 25);
+    const bd = priceBreakdown(WITH_HIGH, "card", "aguaribay", 3, 2, friday);
+    expect(bd.weekendPackage).toBe(true);
+    expect(bd.billedNights).toBe(2.5);
+  });
+
+  it("el desglose suma el total en cruces, por los dos métodos", () => {
+    const checkIn = new Date(2026, 11, 13);
+    for (const method of ["card", "transfer"] as const) {
+      const bd = priceBreakdown(WITH_HIGH, method, "aguaribay", 4, 2, checkIn);
+      expect(bd.lodging).toBe(bd.lines.reduce((n, l) => n + l.nightly * l.billed, 0));
+      expect(bd.listTotal - bd.discount).toBe(bd.total);
+      expect(bd.total).toBe(methodTotal(WITH_HIGH, method, "aguaribay", 4, 2, checkIn));
+    }
+  });
+
+  it("sin bloque high, nada cambia", () => {
+    const checkIn = new Date(2027, 0, 11);
+    expect(methodTotal(SETTINGS, "card", "aguaribay", 4, 2, checkIn)).toBe(lowNight * 4 + SETTINGS.cleaningFee);
   });
 });
