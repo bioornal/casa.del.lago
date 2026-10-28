@@ -1,7 +1,8 @@
 import { useTranslations } from "next-intl";
 import { SERVICES, DISTANCES, CHECK_IN, CHECK_OUT, PETS_ALLOWED } from "@/lib/site";
 
-export function InfoSections() {
+/** highMinNights: mínimo de temporada alta; solo se muestra si hay rangos de alta cargados. */
+export function InfoSections({ highMinNights }: { highMinNights?: number } = {}) {
   const t = useTranslations("tarifas");
 
   const kickerClass = "mb-5 text-[10px] font-medium uppercase tracking-[.24em] text-lago";
@@ -60,6 +61,12 @@ export function InfoSections() {
             <span>{t("conditions.stay")}</span>
             <span>{t("conditions.stayValue")}</span>
           </div>
+          {highMinNights !== undefined && (
+            <div className={rowClass}>
+              <span>{t("conditions.stayHigh")}</span>
+              <span>{t("conditions.stayHighValue", { n: highMinNights })}</span>
+            </div>
+          )}
         </div>
       </div>
     </section>

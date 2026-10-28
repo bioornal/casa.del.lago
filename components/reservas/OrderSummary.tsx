@@ -24,6 +24,9 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
   const bd = isTestUnit(state.unitId) ? null : priceBreakdown(settings, method, state.unitId, nights, state.guests, state.checkIn);
   const total = checkoutTotal(settings, method, state.unitId, nights, state.guests, state.checkIn);
   const savings = checkoutSavings(settings, state.unitId, nights, state.guests, state.checkIn);
+  // La etiqueta de temporada solo aparece si hay alguna noche de alta: en baja
+  // pura el desglose se ve igual que siempre.
+  const showSeason = !!bd && bd.lines.some((l) => l.season === "high");
 
   // Format date range
   const formatDate = (d: Date) => format(d, "d MMM");
@@ -92,14 +95,17 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {bd ? (
           <>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
-              <span className="text-muted">
-                {money(bd.nightly)} × {bd.billedNights || 0}
-              </span>
-              <span style={{ color: "var(--color-carbon)" }}>
-                {nights > 0 ? money(bd.lodging) : "—"}
-              </span>
-            </div>
+            {(bd.lines.length > 0 ? bd.lines : [{ season: "low" as const, nights: 0, billed: 0, nightly: bd.nightly }]).map((l, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
+                <span className="text-muted">
+                  {showSeason && `${t(l.season === "high" ? "seasonHigh" : "seasonLow")} · `}
+                  {money(l.nightly)} × {l.billed}
+                </span>
+                <span style={{ color: "var(--color-carbon)" }}>
+                  {nights > 0 ? money(l.nightly * l.billed) : "—"}
+                </span>
+              </div>
+            ))}
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
               <span className="text-muted">{t("cleaning")}</span>
               <span style={{ color: "var(--color-carbon)" }}>
@@ -112,7 +118,7 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
                 <span style={{ color: "#2f6b46" }}>−{money(bd.discount)}</span>
               </div>
             )}
-            {nights > 0 && bd.billedNights !== nights && (
+            {nights > 0 && bd.weekendPackage && (
               <div style={{ fontSize: 12, color: "#2f6b46" }}>{t("weekendPackage")}</div>
             )}
           </>

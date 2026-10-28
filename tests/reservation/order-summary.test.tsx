@@ -122,3 +122,38 @@ describe("OrderSummary", () => {
     expect(screen.queryByText("$30.000")).not.toBeInTheDocument();
   });
 });
+
+describe("OrderSummary con temporada alta", () => {
+  const WITH_HIGH = {
+    ...DEFAULT_RATE_SETTINGS,
+    high: {
+      nightly: { aratiri: 149800, aguaribay: 149800 },
+      minNights: 4,
+      ranges: [{ from: "2026-12-15", to: "2027-02-28" }],
+    },
+  };
+  const CROSSING: State = { ...STATE, checkIn: new Date(2026, 11, 13), checkOut: new Date(2026, 11, 17) };
+
+  it("separa las noches de baja y de alta en dos líneas", () => {
+    const { container } = render(
+      <NextIntlClientProvider locale="es" messages={messages}>
+        <OrderSummary state={CROSSING} settings={WITH_HIGH} method="card" />
+      </NextIntlClientProvider>,
+    );
+    const bd = priceBreakdown(WITH_HIGH, "card", REAL_UNIT_ID, 4, 2, CROSSING.checkIn);
+    expect(bd.lines).toHaveLength(2);
+    const text = container.textContent ?? "";
+    expect(text).toContain(`Temporada baja · ${money(bd.lines[0].nightly)} × 2`);
+    expect(text).toContain(`Temporada alta · ${money(bd.lines[1].nightly)} × 2`);
+    expect(screen.getByText(money(bd.total))).toBeTruthy();
+  });
+
+  it("sin noches de alta no muestra la etiqueta de temporada", () => {
+    render(
+      <NextIntlClientProvider locale="es" messages={messages}>
+        <OrderSummary state={STATE} settings={WITH_HIGH} method="card" />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.queryByText(/Temporada (baja|alta)/)).toBeNull();
+  });
+});

@@ -57,7 +57,7 @@
     "weekendPackage": "Pacote de fim de semana: 3 noites pelo valor de 2,5",
     "weekendPromoKicker": "Promoção de baixa temporada",
     "weekendPromoTitle": "Fim de semana: 3 noites pelo valor de 2,5",
-    "weekendPromoBody": "Reserve de sexta a segunda e aproveite três noites pagando apenas duas e meia.",
+    "weekendPromoBody": "Reserve de sexta a segunda e aproveite três noites pagando apenas duas e meia. Válido só na baixa temporada.",
     "capacity": "Máx. {n} hóspedes",
     "pickDatesCta": "Escolha as datas",
     "specs": "{guests} hóspedes · {bedrooms} amb · {baths, plural, one {# banheiro} other {# banheiros}} · {area} m²",
@@ -89,8 +89,12 @@
       "payment": "Formas de pagamento",
       "paymentCard": "Cartão de crédito/débito",
       "stay": "Estadia mínima",
-      "stayValue": "2 noites seg-qui · fim de semana 3 por 2,5"
-    }
+      "stayValue": "2 noites seg-qui · fim de semana 3 por 2,5",
+      "stayHigh": "Estadia mínima alta temporada",
+      "stayHighValue": "{n} noites"
+    },
+    "seasonLow": "Baixa temporada",
+    "seasonHigh": "Alta temporada"
   },
   "manifiesto": {
     "kicker": "A casa",
@@ -413,7 +417,9 @@
     "transferSaves": "Pagando por transferência você economiza {amount}",
     "transferDiscount": "Desconto por transferência",
     "transferTotalLabel": "Total por transferência",
-    "checkStatus": "Consulte o status da sua reserva"
+    "checkStatus": "Consulte o status da sua reserva",
+    "seasonLow": "Baixa temporada",
+    "seasonHigh": "Alta temporada"
   },
   "miReserva": {
     "title": "Consulte sua reserva",

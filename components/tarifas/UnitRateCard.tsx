@@ -81,9 +81,18 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
             {rate && rate.available && rate.nights > 0 ? (
               <>
                 <div className="font-display text-[32px] leading-none text-carbon">{money(rate.total)}</div>
-                <div className="mt-2 text-[11.5px] text-muted">
-                  {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} · {money(nightly)} {t("perNight")}
-                </div>
+                {rate.lines.length > 1 ? (
+                  rate.lines.map((l, i) => (
+                    <div key={i} className="mt-2 text-[11.5px] text-muted">
+                      {l.nights} {l.nights === 1 ? t("night") : t("nights")} · {t(l.season === "high" ? "seasonHigh" : "seasonLow")} · {money(l.nightly)} {t("perNight")}
+                    </div>
+                  ))
+                ) : (
+                  <div className="mt-2 text-[11.5px] text-muted">
+                    {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} · {money(nightly)} {t("perNight")}
+                    {rate.lines[0]?.season === "high" && ` · ${t("seasonHigh")}`}
+                  </div>
+                )}
                 {rate.weekendPackage && (
                   <div className="mt-3 rounded-[3px] border border-[#b9d6d5] bg-[#eaf5f3] px-3 py-2 text-[11.5px] font-semibold leading-[1.35] text-lago">
                     {t("weekendPackage")}

@@ -117,7 +117,7 @@ export default async function HomePage({
         {/* El buscador vive dentro de la columna de texto del hero, debajo del
             subtítulo — ya no dockeado por fuera al borde inferior. */}
         <Hero>
-          <SearchWidget variant="hero" />
+          <SearchWidget variant="hero" stay={{ high: rateSettings.high }} />
         </Hero>
         <Manifiesto />
         <UnitsGrid prices={listPrices} />

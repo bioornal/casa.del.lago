@@ -57,7 +57,7 @@
     "weekendPackage": "Weekend package: 3 nights for the price of 2.5",
     "weekendPromoKicker": "Low-season offer",
     "weekendPromoTitle": "Weekend: 3 nights for the price of 2.5",
-    "weekendPromoBody": "Book from Friday to Monday and enjoy three nights while paying for only two and a half.",
+    "weekendPromoBody": "Book from Friday to Monday and enjoy three nights while paying for only two and a half. Low season only.",
     "capacity": "Max. {n} guests",
     "pickDatesCta": "Choose dates",
     "specs": "{guests} guests · {bedrooms} rooms · {baths, plural, one {# bath} other {# baths}} · {area} m²",
@@ -89,8 +89,12 @@
       "payment": "Payment methods",
       "paymentCard": "Credit/debit card",
       "stay": "Minimum stay",
-      "stayValue": "2 nights Mon-Thu · weekend 3 for 2.5"
-    }
+      "stayValue": "2 nights Mon-Thu · weekend 3 for 2.5",
+      "stayHigh": "Minimum stay, high season",
+      "stayHighValue": "{n} nights"
+    },
+    "seasonLow": "Low season",
+    "seasonHigh": "High season"
   },
   "manifiesto": {
     "kicker": "The house",
@@ -413,7 +417,9 @@
     "transferSaves": "Pay by bank transfer and save {amount}",
     "transferDiscount": "Bank transfer discount",
     "transferTotalLabel": "Total by bank transfer",
-    "checkStatus": "Check your reservation status"
+    "checkStatus": "Check your reservation status",
+    "seasonLow": "Low season",
+    "seasonHigh": "High season"
   },
   "miReserva": {
     "title": "Check your reservation",

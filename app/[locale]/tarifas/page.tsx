@@ -85,7 +85,7 @@ export default async function TarifasPage({
           </div>
 
           <div className="absolute inset-x-0 bottom-[-52px] z-20">
-            <SearchWidget variant="bar" initial={query ?? undefined} />
+            <SearchWidget variant="bar" initial={query ?? undefined} stay={{ high: settings.high }} />
           </div>
         </section>
 
@@ -115,7 +115,7 @@ export default async function TarifasPage({
             })}
           </div>
 
-          <InfoSections />
+          <InfoSections highMinNights={settings.high && settings.high.ranges.length > 0 ? settings.high.minNights : undefined} />
         </div>
       </main>
       <SiteFooter />

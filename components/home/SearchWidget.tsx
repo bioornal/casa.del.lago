@@ -9,15 +9,17 @@ import "react-day-picker/style.css";
 import { useRouter } from "@/lib/i18n/navigation";
 import { formatDateOnly, parseDateOnly } from "@/lib/reservation/booking";
 import { buildTarifasUrl } from "@/lib/reservation/search";
-import { minimumNights } from "@/lib/reservation/stay-rules";
+import { minimumNights, type StaySettings } from "@/lib/reservation/stay-rules";
 import { addDays } from "date-fns";
 
 interface SearchWidgetProps {
   variant: "hero" | "bar";
   initial?: { checkIn: string; checkOut: string; guests: number };
+  /** Temporada alta (rangos + mínimo): sin esto rige solo la regla de baja. */
+  stay?: StaySettings;
 }
 
-export function SearchWidget({ variant, initial }: SearchWidgetProps) {
+export function SearchWidget({ variant, initial, stay }: SearchWidgetProps) {
   const t = useTranslations("searchWidget");
   const locale = useLocale();
   const router = useRouter();
@@ -51,7 +53,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
   }
 
   function pickDeparture(day: Date) {
-    if (checkIn && day >= addDays(checkIn, minimumNights(checkIn))) {
+    if (checkIn && day >= addDays(checkIn, minimumNights(checkIn, stay))) {
       setCheckOut(day);
       setOpen(null);
     }
@@ -199,7 +201,7 @@ export function SearchWidget({ variant, initial }: SearchWidgetProps) {
                     locale={dateFnsLocale}
                     defaultMonth={checkIn}
                     weekStartsOn={1}
-                    disabled={{ before: addDays(checkIn, minimumNights(checkIn)) }}
+                    disabled={{ before: addDays(checkIn, minimumNights(checkIn, stay)) }}
                     modifiers={{ picked: checkOut ? [checkOut] : [] }}
                     modifiersClassNames={{ picked: "rdp-lago-end" }}
                     onDayClick={pickDeparture}
