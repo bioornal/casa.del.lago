@@ -266,3 +266,18 @@ alter table public.rate_settings
   add column if not exists high_min_nights integer not null default 4
     check (high_min_nights between 1 and 30),
   add column if not exists high_season_ranges jsonb not null default '[]'::jsonb;
+
+-- =============================================================
+-- 2026-10-28 — Reglas de estadía de temporada baja (ver lib/reservation/stay-rules.ts).
+-- Los defaults reproducen las reglas que antes estaban fijas en el código.
+-- =============================================================
+alter table public.rate_settings
+  add column if not exists low_weekday_min_nights integer not null default 2
+    check (low_weekday_min_nights between 1 and 30),
+  add column if not exists low_weekend_min_nights integer not null default 3
+    check (low_weekend_min_nights between 1 and 30),
+  add column if not exists weekend_package_enabled boolean not null default true,
+  add column if not exists weekend_package_nights integer not null default 3
+    check (weekend_package_nights between 1 and 30),
+  add column if not exists weekend_package_billed numeric(4,1) not null default 2.5
+    check (weekend_package_billed > 0 and weekend_package_billed <= weekend_package_nights);

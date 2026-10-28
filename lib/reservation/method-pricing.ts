@@ -1,7 +1,7 @@
 import type { UnitSlug } from "@/lib/units";
 import type { RateSettings } from "./rate-settings";
 import { nightSeasons, type Season } from "./seasons";
-import { isWeekendPackage, WEEKEND_PACKAGE_BILLED_NIGHTS } from "./stay-rules";
+import { isWeekendPackage, lowRules } from "./stay-rules";
 
 // Precios por método de pago. El dueño configura en /admin/tarifas lo que quiere
 // RECIBIR NETO; el público ve/paga el precio con el costo del canal incluido:
@@ -89,8 +89,8 @@ export function stayLines(
       lines.push({ season, nights: 1, billed: 1, nightly: price(season) });
     }
   }
-  // La promo exige las 3 noches en baja, así que siempre es una sola línea.
-  if (checkIn && isWeekendPackage(checkIn, nights, s)) lines[0].billed = WEEKEND_PACKAGE_BILLED_NIGHTS;
+  // La promo exige todas las noches en baja, así que siempre es una sola línea.
+  if (checkIn && isWeekendPackage(checkIn, nights, s)) lines[0].billed = lowRules(s).packageBilledNights;
   return lines;
 }
 

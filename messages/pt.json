@@ -54,10 +54,10 @@
     "waMessage": "Olá! Vi a disponibilidade no site da La Casa del Lago e quero reservar {unit} de {checkIn} a {checkOut} para {guests, plural, one {# hóspede} other {# hóspedes}}.",
     "waNote": "Confirmamos sua reserva na hora pelo WhatsApp",
     "unavailable": "Indisponível para estas datas",
-    "weekendPackage": "Pacote de fim de semana: 3 noites pelo valor de 2,5",
+    "weekendPackage": "Pacote de fim de semana: {nights} noites pelo valor de {billed}",
     "weekendPromoKicker": "Promoção de baixa temporada",
-    "weekendPromoTitle": "Fim de semana: 3 noites pelo valor de 2,5",
-    "weekendPromoBody": "Reserve de sexta a segunda e aproveite três noites pagando apenas duas e meia. Válido só na baixa temporada.",
+    "weekendPromoTitle": "Fim de semana: {nights} noites pelo valor de {billed}",
+    "weekendPromoBody": "Chegando numa sexta, aproveite {nights} noites pagando apenas {billed}. Válido só na baixa temporada.",
     "capacity": "Máx. {n} hóspedes",
     "pickDatesCta": "Escolha as datas",
     "specs": "{guests} hóspedes · {bedrooms} amb · {baths, plural, one {# banheiro} other {# banheiros}} · {area} m²",
@@ -89,7 +89,7 @@
       "payment": "Formas de pagamento",
       "paymentCard": "Cartão de crédito/débito",
       "stay": "Estadia mínima",
-      "stayValue": "2 noites seg-qui · fim de semana 3 por 2,5",
+      "stayValue": "{weekday} noites seg-qui · fim de semana {weekend} noites",
       "stayHigh": "Estadia mínima alta temporada",
       "stayHighValue": "{n} noites"
     },
@@ -419,7 +419,8 @@
     "transferTotalLabel": "Total por transferência",
     "checkStatus": "Consulte o status da sua reserva",
     "seasonLow": "Baixa temporada",
-    "seasonHigh": "Alta temporada"
+    "seasonHigh": "Alta temporada",
+    "weekendPackage": "Pacote de fim de semana: {nights} noites pelo valor de {billed}"
   },
   "miReserva": {
     "title": "Consulte sua reserva",

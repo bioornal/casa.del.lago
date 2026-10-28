@@ -1,27 +1,28 @@
 import { differenceInCalendarDays, getDay } from "date-fns";
 import { nightSeasons, seasonOf } from "./seasons";
-import type { HighSeason } from "./rate-settings";
-
-export const LOW_SEASON_WEEKDAY_MIN_NIGHTS = 2;
-export const WEEKEND_PACKAGE_NIGHTS = 3;
-export const WEEKEND_PACKAGE_BILLED_NIGHTS = 2.5;
+import { DEFAULT_LOW_RULES, type HighSeason, type LowSeasonRules } from "./rate-settings";
 
 /** Lo único de las tarifas que necesitan las reglas de estadía. RateSettings lo cumple. */
-export type StaySettings = { high?: HighSeason };
+export type StaySettings = { high?: HighSeason; low?: LowSeasonRules };
+
+/** Reglas de baja vigentes: las configuradas en /admin/tarifas o las de fábrica. */
+export const lowRules = (s: StaySettings = {}): LowSeasonRules => s.low ?? DEFAULT_LOW_RULES;
 
 /**
  * Mínimo de noches según la temporada del día de LLEGADA.
- * Baja: lunes a jueves 2 noches; viernes a domingo 3. Alta: el mínimo configurado.
+ * Baja: uno para lunes a jueves y otro para viernes a domingo. Alta: el mínimo configurado.
  */
 export function minimumNights(checkIn: Date, s: StaySettings = {}): number {
   if (s.high && seasonOf(checkIn, s.high.ranges) === "high") return s.high.minNights;
+  const low = lowRules(s);
   const day = getDay(checkIn); // 0 domingo ... 6 sábado
-  return day >= 5 || day === 0 ? WEEKEND_PACKAGE_NIGHTS : LOW_SEASON_WEEKDAY_MIN_NIGHTS;
+  return day >= 5 || day === 0 ? low.weekendMinNights : low.weekdayMinNights;
 }
 
-/** Paquete de fin de semana: llegada viernes, exactamente 3 noches, todas de temporada baja. */
+/** Paquete de fin de semana: activo, llegada viernes, exactamente las noches del paquete, todas de baja. */
 export function isWeekendPackage(checkIn: Date, nights: number, s: StaySettings = {}): boolean {
-  if (getDay(checkIn) !== 5 || nights !== WEEKEND_PACKAGE_NIGHTS) return false;
+  const low = lowRules(s);
+  if (!low.packageEnabled || getDay(checkIn) !== 5 || nights !== low.packageNights) return false;
   return nightSeasons(checkIn, nights, s.high?.ranges ?? []).every((season) => season === "low");
 }
 

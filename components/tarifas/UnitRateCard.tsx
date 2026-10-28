@@ -95,7 +95,10 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
                 )}
                 {rate.weekendPackage && (
                   <div className="mt-3 rounded-[3px] border border-[#b9d6d5] bg-[#eaf5f3] px-3 py-2 text-[11.5px] font-semibold leading-[1.35] text-lago">
-                    {t("weekendPackage")}
+                    {t("weekendPackage", {
+                      nights: rate.nights,
+                      billed: new Intl.NumberFormat(locale).format(rate.lines[0]?.billed ?? rate.nights),
+                    })}
                   </div>
                 )}
                 {!whatsappMode && rate.savings > 0 && (

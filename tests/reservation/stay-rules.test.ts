@@ -17,6 +17,29 @@ describe("stay rules", () => {
   });
 });
 
+describe("stay rules con reglas de baja configuradas", () => {
+  const LOW = {
+    low: { weekdayMinNights: 3, weekendMinNights: 2, packageEnabled: true, packageNights: 4, packageBilledNights: 3 },
+  };
+
+  it("usa los mínimos configurados según el día de llegada", () => {
+    expect(minimumNights(new Date(2026, 8, 21), LOW)).toBe(3); // lunes
+    expect(minimumNights(new Date(2026, 8, 25), LOW)).toBe(2); // viernes
+    expect(meetsStayMinimum(new Date(2026, 8, 21), new Date(2026, 8, 23), LOW)).toBe(false);
+  });
+
+  it("la promo usa la cantidad de noches configurada", () => {
+    const friday = new Date(2026, 8, 25);
+    expect(isWeekendPackage(friday, 4, LOW)).toBe(true);
+    expect(isWeekendPackage(friday, 3, LOW)).toBe(false);
+  });
+
+  it("con la promo desactivada no aplica nunca", () => {
+    const off = { low: { ...LOW.low, packageEnabled: false } };
+    expect(isWeekendPackage(new Date(2026, 8, 25), 4, off)).toBe(false);
+  });
+});
+
 const HIGH = {
   high: {
     nightly: { aratiri: 149800, aguaribay: 149800 },

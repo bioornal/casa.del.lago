@@ -154,6 +154,18 @@ describe("priceBreakdown", () => {
     expect(bd.lodging).toBe(bd.nightly * 2.5);
     expect(bd.total).toBe(methodTotal(SETTINGS, "card", "aguaribay", 3, 2, friday));
   });
+
+  it("usa las noches del paquete configuradas en las reglas de baja", () => {
+    const friday = new Date(2026, 8, 25);
+    const s: RateSettings = {
+      ...SETTINGS,
+      low: { weekdayMinNights: 2, weekendMinNights: 2, packageEnabled: true, packageNights: 2, packageBilledNights: 1.5 },
+    };
+    expect(priceBreakdown(s, "card", "aguaribay", 2, 2, friday).billedNights).toBe(1.5);
+    expect(priceBreakdown(s, "card", "aguaribay", 3, 2, friday).billedNights).toBe(3);
+    const off: RateSettings = { ...s, low: { ...s.low!, packageEnabled: false } };
+    expect(priceBreakdown(off, "card", "aguaribay", 2, 2, friday).billedNights).toBe(2);
+  });
 });
 
 describe("temporada alta", () => {

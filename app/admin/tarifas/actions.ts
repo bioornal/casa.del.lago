@@ -30,7 +30,18 @@ export async function saveRates(
   };
   // Temporada alta: solo si el form la manda. Sin estos campos la parte de alta
   // no se valida ni se guarda (ver parseRateSettingsInput).
-  for (const key of ["high_nightly_aratiri", "high_nightly_aguaribay", "high_min_nights", "high_season_ranges"] as const) {
+  // Lo mismo con las reglas de estadía de temporada baja.
+  for (const key of [
+    "high_nightly_aratiri",
+    "high_nightly_aguaribay",
+    "high_min_nights",
+    "high_season_ranges",
+    "low_weekday_min_nights",
+    "low_weekend_min_nights",
+    "weekend_package_enabled",
+    "weekend_package_nights",
+    "weekend_package_billed",
+  ] as const) {
     if (formData.has(key)) raw[key] = String(formData.get(key) ?? "");
   }
 

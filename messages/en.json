@@ -54,10 +54,10 @@
     "waMessage": "Hi! I saw the availability on La Casa del Lago's website and would like to book {unit} from {checkIn} to {checkOut} for {guests, plural, one {# guest} other {# guests}}.",
     "waNote": "We confirm your booking instantly via WhatsApp",
     "unavailable": "Not available for these dates",
-    "weekendPackage": "Weekend package: 3 nights for the price of 2.5",
+    "weekendPackage": "Weekend package: {nights} nights for the price of {billed}",
     "weekendPromoKicker": "Low-season offer",
-    "weekendPromoTitle": "Weekend: 3 nights for the price of 2.5",
-    "weekendPromoBody": "Book from Friday to Monday and enjoy three nights while paying for only two and a half. Low season only.",
+    "weekendPromoTitle": "Weekend: {nights} nights for the price of {billed}",
+    "weekendPromoBody": "Arrive on a Friday, enjoy {nights} nights and pay for only {billed}. Low season only.",
     "capacity": "Max. {n} guests",
     "pickDatesCta": "Choose dates",
     "specs": "{guests} guests · {bedrooms} rooms · {baths, plural, one {# bath} other {# baths}} · {area} m²",
@@ -89,7 +89,7 @@
       "payment": "Payment methods",
       "paymentCard": "Credit/debit card",
       "stay": "Minimum stay",
-      "stayValue": "2 nights Mon-Thu · weekend 3 for 2.5",
+      "stayValue": "{weekday} nights Mon-Thu · weekend {weekend} nights",
       "stayHigh": "Minimum stay, high season",
       "stayHighValue": "{n} nights"
     },
@@ -419,7 +419,8 @@
     "transferTotalLabel": "Total by bank transfer",
     "checkStatus": "Check your reservation status",
     "seasonLow": "Low season",
-    "seasonHigh": "High season"
+    "seasonHigh": "High season",
+    "weekendPackage": "Weekend package: {nights} nights for the price of {billed}"
   },
   "miReserva": {
     "title": "Check your reservation",

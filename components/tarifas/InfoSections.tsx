@@ -1,8 +1,15 @@
 import { useTranslations } from "next-intl";
 import { SERVICES, DISTANCES, CHECK_IN, CHECK_OUT, PETS_ALLOWED } from "@/lib/site";
+import { DEFAULT_LOW_RULES } from "@/lib/reservation/rate-settings";
 
-/** highMinNights: mínimo de temporada alta; solo se muestra si hay rangos de alta cargados. */
-export function InfoSections({ highMinNights }: { highMinNights?: number } = {}) {
+/**
+ * lowMinNights: mínimos de temporada baja (configurables en /admin/tarifas).
+ * highMinNights: mínimo de temporada alta; solo se muestra si hay rangos de alta cargados.
+ */
+export function InfoSections({
+  lowMinNights = { weekday: DEFAULT_LOW_RULES.weekdayMinNights, weekend: DEFAULT_LOW_RULES.weekendMinNights },
+  highMinNights,
+}: { lowMinNights?: { weekday: number; weekend: number }; highMinNights?: number } = {}) {
   const t = useTranslations("tarifas");
 
   const kickerClass = "mb-5 text-[10px] font-medium uppercase tracking-[.24em] text-lago";
@@ -59,7 +66,7 @@ export function InfoSections({ highMinNights }: { highMinNights?: number } = {})
           </div>
           <div className={rowClass}>
             <span>{t("conditions.stay")}</span>
-            <span>{t("conditions.stayValue")}</span>
+            <span>{t("conditions.stayValue", lowMinNights)}</span>
           </div>
           {highMinNights !== undefined && (
             <div className={rowClass}>

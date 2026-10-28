@@ -8,6 +8,26 @@ export type HighSeason = {
   ranges: SeasonRange[];
 };
 
+/** Reglas de estadía de temporada baja (editables en /admin/tarifas). */
+export type LowSeasonRules = {
+  /** Mínimo de noches con llegada de lunes a jueves. */
+  weekdayMinNights: number;
+  /** Mínimo de noches con llegada de viernes a domingo. */
+  weekendMinNights: number;
+  /** Paquete de fin de semana: llegada viernes, exactamente `packageNights`, se cobran `packageBilledNights`. */
+  packageEnabled: boolean;
+  packageNights: number;
+  packageBilledNights: number;
+};
+
+export const DEFAULT_LOW_RULES: LowSeasonRules = {
+  weekdayMinNights: 2,
+  weekendMinNights: 3,
+  packageEnabled: true,
+  packageNights: 3,
+  packageBilledNights: 2.5,
+};
+
 // Tarifas editables desde /admin/tarifas. Viven en Supabase (tabla rate_settings);
 // este módulo es la forma compartida (server + cliente + tests, sin imports de server).
 //
@@ -24,6 +44,8 @@ export type RateSettings = {
   transferFeePct: number;
   /** Ausente = no hay temporada alta configurada: todo se cobra como baja. */
   high?: HighSeason;
+  /** Ausente = reglas de baja por defecto (DEFAULT_LOW_RULES). */
+  low?: LowSeasonRules;
 };
 
 // Fallback si la DB no responde o aún no se corrió el SQL: valores de temporada
@@ -56,6 +78,12 @@ export type RateSettingsRow = {
   high_nightly_aguaribay?: number | null;
   high_min_nights?: number | null;
   high_season_ranges?: unknown;
+  // Reglas de baja. Pueden faltar si aún no se corrió el ALTER de setup.sql.
+  low_weekday_min_nights?: number | null;
+  low_weekend_min_nights?: number | null;
+  weekend_package_enabled?: boolean | null;
+  weekend_package_nights?: number | null;
+  weekend_package_billed?: number | string | null;
 };
 
 /** numeric de Postgres puede llegar como string; ausente/int inválido → default. */
@@ -77,6 +105,24 @@ function rowHigh(row: RateSettingsRow): HighSeason | undefined {
   };
 }
 
+/** Noches cobradas del paquete: múltiplo de 0,5, mayor a 0 y no más que las noches del paquete. */
+const isBilled = (billed: number, nights: number) =>
+  Number.isFinite(billed) && billed > 0 && billed <= nights && Number.isInteger(billed * 2);
+
+function rowLow(row: RateSettingsRow): LowSeasonRules | undefined {
+  const { low_weekday_min_nights: wd, low_weekend_min_nights: we, weekend_package_nights: pn } = row;
+  const billed = typeof row.weekend_package_billed === "string" ? Number(row.weekend_package_billed) : row.weekend_package_billed;
+  if (!isPosInt(wd) || !isPosInt(we) || !isPosInt(pn) || wd > 30 || we > 30 || pn > 30) return undefined;
+  if (typeof row.weekend_package_enabled !== "boolean" || typeof billed !== "number" || !isBilled(billed, pn)) return undefined;
+  return {
+    weekdayMinNights: wd,
+    weekendMinNights: we,
+    packageEnabled: row.weekend_package_enabled,
+    packageNights: pn,
+    packageBilledNights: billed,
+  };
+}
+
 export function rowToSettings(row: RateSettingsRow): RateSettings {
   const cardFeePct = parsePct(row.card_fee_pct, DEFAULT_RATE_SETTINGS.cardFeePct);
   // priceBreakdown (method-pricing.ts) deriva el precio de lista SIEMPRE del
@@ -94,6 +140,7 @@ export function rowToSettings(row: RateSettingsRow): RateSettings {
     cardFeePct,
   );
   const high = rowHigh(row);
+  const low = rowLow(row);
   return {
     nightly: {
       aratiri: row.nightly_aratiri,
@@ -105,6 +152,7 @@ export function rowToSettings(row: RateSettingsRow): RateSettings {
     cardFeePct,
     transferFeePct,
     ...(high ? { high } : {}),
+    ...(low ? { low } : {}),
   };
 }
 
@@ -123,6 +171,15 @@ export function settingsToRow(s: RateSettings): RateSettingsRow {
           high_nightly_aguaribay: s.high.nightly.aguaribay,
           high_min_nights: s.high.minNights,
           high_season_ranges: s.high.ranges,
+        }
+      : {}),
+    ...(s.low
+      ? {
+          low_weekday_min_nights: s.low.weekdayMinNights,
+          low_weekend_min_nights: s.low.weekendMinNights,
+          weekend_package_enabled: s.low.packageEnabled,
+          weekend_package_nights: s.low.packageNights,
+          weekend_package_billed: s.low.packageBilledNights,
         }
       : {}),
   };
@@ -153,9 +210,52 @@ const HIGH_INPUT_KEYS = [
   "high_season_ranges",
 ] as const;
 type HighInputKey = (typeof HIGH_INPUT_KEYS)[number];
+const LOW_INPUT_KEYS = [
+  "low_weekday_min_nights",
+  "low_weekend_min_nights",
+  "weekend_package_enabled",
+  "weekend_package_nights",
+  "weekend_package_billed",
+] as const;
+type LowInputKey = (typeof LOW_INPUT_KEYS)[number];
 
-/** Campos del form de /admin/tarifas. Los de alta son opcionales: sin ellos no se toca la temporada alta. */
-export type RateSettingsInput = Record<BaseInputKey, string> & Partial<Record<HighInputKey, string>>;
+/**
+ * Campos del form de /admin/tarifas. Los de alta y los de reglas de baja son
+ * opcionales: sin ellos no se toca ese bloque.
+ */
+export type RateSettingsInput = Record<BaseInputKey, string> &
+  Partial<Record<HighInputKey, string>> &
+  Partial<Record<LowInputKey, string>>;
+
+const nightsOf = (raw: string | undefined): number | null => {
+  const n = Number((raw ?? "").trim());
+  return (raw ?? "").trim() !== "" && Number.isInteger(n) && n >= 1 && n <= 30 ? n : null;
+};
+
+function parseLowInput(raw: RateSettingsInput): { ok: true; value: LowSeasonRules } | { ok: false; error: string } {
+  const weekdayMinNights = nightsOf(raw.low_weekday_min_nights);
+  if (weekdayMinNights === null) {
+    return { ok: false, error: "La estadía mínima de lunes a jueves debe ser un entero entre 1 y 30 noches." };
+  }
+  const weekendMinNights = nightsOf(raw.low_weekend_min_nights);
+  if (weekendMinNights === null) {
+    return { ok: false, error: "La estadía mínima de viernes a domingo debe ser un entero entre 1 y 30 noches." };
+  }
+  const packageEnabled = raw.weekend_package_enabled === "true";
+  const packageNights = nightsOf(raw.weekend_package_nights);
+  if (packageNights === null) {
+    return { ok: false, error: "Las noches del paquete de fin de semana deben ser un entero entre 1 y 30." };
+  }
+  const billedRaw = (raw.weekend_package_billed ?? "").trim();
+  const packageBilledNights = billedRaw === "" ? NaN : Number(billedRaw.replace(",", "."));
+  if (!isBilled(packageBilledNights, packageNights)) {
+    return {
+      ok: false,
+      error: "Las noches que se cobran en el paquete de fin de semana deben ser enteras o con media (ej. 2,5), y no más que las noches del paquete.",
+    };
+  }
+  return { ok: true, value: { weekdayMinNights, weekendMinNights, packageEnabled, packageNights, packageBilledNights } };
+}
 
 /** % con hasta 2 decimales entre 0 y 30 (acepta coma o punto). */
 function parsePctInput(raw: string): number | null {
@@ -228,6 +328,12 @@ export function parseRateSettingsInput(
       };
     }
     value.high = { nightly: highNightly, minNights, ranges };
+  }
+
+  if (LOW_INPUT_KEYS.some((k) => raw[k] !== undefined)) {
+    const low = parseLowInput(raw);
+    if (!low.ok) return low;
+    value.low = low.value;
   }
 
   return { ok: true, value };

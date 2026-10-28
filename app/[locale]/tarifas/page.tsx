@@ -11,6 +11,7 @@ import { parseRateQuery } from "@/lib/reservation/search";
 import { getRatesForRange } from "@/lib/reservation/rates.server";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { methodRates } from "@/lib/reservation/method-pricing";
+import { lowRules } from "@/lib/reservation/stay-rules";
 
 import { getBookingMode } from "@/lib/site-settings.server";
 
@@ -51,6 +52,8 @@ export default async function TarifasPage({
   // Precio de lista público = método tarjeta (comisión incluida, ver method-pricing.ts)
   const listPrices = methodRates(settings, "card").nightly;
   const rates = query ? await getRatesForRange(query.checkIn, query.checkOut, query.guests) : null;
+  const low = lowRules(settings);
+  const promo = { nights: low.packageNights, billed: new Intl.NumberFormat(locale).format(low.packageBilledNights) };
 
   return (
     <>
@@ -85,7 +88,7 @@ export default async function TarifasPage({
           </div>
 
           <div className="absolute inset-x-0 bottom-[-52px] z-20">
-            <SearchWidget variant="bar" initial={query ?? undefined} stay={{ high: settings.high }} />
+            <SearchWidget variant="bar" initial={query ?? undefined} stay={{ high: settings.high, low }} />
           </div>
         </section>
 
@@ -100,13 +103,15 @@ export default async function TarifasPage({
             <div className="text-[12px] uppercase tracking-[.14em] text-muted">{t("accommodationsCount", { count: UNITS.length })}</div>
            </div>
 
-           <div className="mb-8 flex flex-col gap-2 rounded-[6px] border border-[#b9d6d5] bg-[#eaf5f3] px-5 py-4 md:flex-row md:items-center md:gap-6 md:px-6">
-             <div className="shrink-0 text-[10px] font-semibold uppercase tracking-[.2em] text-lago">{t("weekendPromoKicker")}</div>
-             <div>
-               <div className="font-display text-[24px] leading-none text-carbon">{t("weekendPromoTitle")}</div>
-               <div className="mt-1 text-[12.5px] leading-[1.5] text-cuerpo">{t("weekendPromoBody")}</div>
+           {low.packageEnabled && (
+             <div className="mb-8 flex flex-col gap-2 rounded-[6px] border border-[#b9d6d5] bg-[#eaf5f3] px-5 py-4 md:flex-row md:items-center md:gap-6 md:px-6">
+               <div className="shrink-0 text-[10px] font-semibold uppercase tracking-[.2em] text-lago">{t("weekendPromoKicker")}</div>
+               <div>
+                 <div className="font-display text-[24px] leading-none text-carbon">{t("weekendPromoTitle", promo)}</div>
+                 <div className="mt-1 text-[12.5px] leading-[1.5] text-cuerpo">{t("weekendPromoBody", promo)}</div>
+               </div>
              </div>
-           </div>
+           )}
 
            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {UNITS.map((unit) => {
@@ -115,7 +120,9 @@ export default async function TarifasPage({
             })}
           </div>
 
-          <InfoSections highMinNights={settings.high && settings.high.ranges.length > 0 ? settings.high.minNights : undefined} />
+          <InfoSections
+            lowMinNights={{ weekday: low.weekdayMinNights, weekend: low.weekendMinNights }}
+            highMinNights={settings.high && settings.high.ranges.length > 0 ? settings.high.minNights : undefined} />
         </div>
       </main>
       <SiteFooter />

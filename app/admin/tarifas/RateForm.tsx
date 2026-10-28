@@ -8,11 +8,7 @@ import { seasonOf, type Season, type SeasonRange } from "@/lib/reservation/seaso
 import { grossUp, netNightly } from "@/lib/reservation/method-pricing";
 import { parseDateOnly } from "@/lib/reservation/booking";
 import { UNITS, type UnitSlug } from "@/lib/units";
-import {
-  LOW_SEASON_WEEKDAY_MIN_NIGHTS,
-  WEEKEND_PACKAGE_BILLED_NIGHTS,
-  WEEKEND_PACKAGE_NIGHTS,
-} from "@/lib/reservation/stay-rules";
+import { lowRules } from "@/lib/reservation/stay-rules";
 
 type Tab = Season | "fees";
 type Prices = Record<UnitSlug, string>;
@@ -41,7 +37,7 @@ const rangeNights = (r: SeasonRange) =>
 function tabForError(error: string): Tab | null {
   if (/temporada alta/i.test(error)) return "high";
   if (/limpieza|huésped|comisión|transferencia/i.test(error)) return "fees";
-  if (/precio por noche/i.test(error)) return "low";
+  if (/precio por noche|estadía mínima|paquete/i.test(error)) return "low";
   return null; // p. ej. "No autorizado" o un fallo de Supabase: no es de un campo
 }
 
@@ -67,6 +63,12 @@ export function RateForm({ settings }: { settings: RateSettings }) {
   const [extraGuestFee, setExtraGuestFee] = useState(String(settings.extraGuestFee));
   const [cardPct, setCardPct] = useState(String(settings.cardFeePct).replace(".", ","));
   const [transferPct, setTransferPct] = useState(String(settings.transferFeePct).replace(".", ","));
+  const savedLow = lowRules(settings);
+  const [weekdayMin, setWeekdayMin] = useState(String(savedLow.weekdayMinNights));
+  const [weekendMin, setWeekendMin] = useState(String(savedLow.weekendMinNights));
+  const [pkgEnabled, setPkgEnabled] = useState(savedLow.packageEnabled);
+  const [pkgNights, setPkgNights] = useState(String(savedLow.packageNights));
+  const [pkgBilled, setPkgBilled] = useState(String(savedLow.packageBilledNights).replace(".", ","));
 
   // Al llegar una respuesta nueva del server: limpiar "sin guardar" o saltar a la pestaña del error.
   const [seenState, setSeenState] = useState(state);
@@ -107,6 +109,19 @@ export function RateForm({ settings }: { settings: RateSettings }) {
       ranges: completeRanges,
     },
   };
+
+  // Ejemplo de la promo con la cabaña más barata, precio con tarjeta.
+  const pkgNightsNum = posInt(pkgNights);
+  const weekendMinNum = posInt(weekendMin);
+  const pkgBilledNum = Number(pkgBilled.trim().replace(",", "."));
+  const pkgExample = (() => {
+    if (pkgNightsNum === null || !(pkgBilledNum > 0) || pkgBilledNum > pkgNightsNum) return null;
+    const nightlyCard = Math.min(...UNITS.map((u) => grossUp(netNightly(preview, u.slug, baseGuestsNum), cardPctNum)));
+    const fmt = (n: number) => String(n).replace(".", ",");
+    return `${pkgNightsNum} noches a ${money(nightlyCard)} se cobran ${fmt(pkgBilledNum)} × ${money(nightlyCard)} = ${money(
+      Math.round(nightlyCard * pkgBilledNum),
+    )} (en vez de ${money(nightlyCard * pkgNightsNum)}), más la limpieza.`;
+  })();
 
   const todaySeason = seasonOf(new Date(), completeRanges);
   const fromPrice = (season: Season) =>
@@ -174,15 +189,51 @@ export function RateForm({ settings }: { settings: RateSettings }) {
           >
             <PriceTable prefix="nightly" values={nightly} onChange={setNightly} cardPct={cardPctNum} transferPct={transferPctNum} />
           </Section>
-          <Section title="Reglas de estadía">
-            <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-3">
-              <Rule title={`Mínimo ${LOW_SEASON_WEEKDAY_MIN_NIGHTS} noches`} body="Llegadas de lunes a jueves" />
-              <Rule
-                title={`${WEEKEND_PACKAGE_NIGHTS} noches al precio de ${String(WEEKEND_PACKAGE_BILLED_NIGHTS).replace(".", ",")}`}
-                body="Llegada viernes, estadía de exactamente 3 noches"
+          <Section title="Estadía mínima" hint="Según el día de llegada del huésped.">
+            <div className="grid gap-4 sm:grid-cols-2 lg:max-w-[560px]">
+              <Field id="low_weekday_min_nights" label="Llegada de lunes a jueves" suffix="noches">
+                <input id="low_weekday_min_nights" name="low_weekday_min_nights" type="number" inputMode="numeric" min={1} max={30} value={weekdayMin} onChange={(e) => setWeekdayMin(e.target.value)} className={inputCls} />
+              </Field>
+              <Field id="low_weekend_min_nights" label="Llegada de viernes a domingo" suffix="noches">
+                <input id="low_weekend_min_nights" name="low_weekend_min_nights" type="number" inputMode="numeric" min={1} max={30} value={weekendMin} onChange={(e) => setWeekendMin(e.target.value)} className={inputCls} />
+              </Field>
+            </div>
+          </Section>
+          <Section
+            title="Promoción de fin de semana"
+            hint="Con llegada un viernes y una estadía de exactamente esa cantidad de noches, se cobra menos. Solo en temporada baja."
+          >
+            <label className="inline-flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                checked={pkgEnabled}
+                onChange={(e) => setPkgEnabled(e.target.checked)}
+                className="peer sr-only"
               />
-              <Rule title={`Mínimo ${WEEKEND_PACKAGE_NIGHTS} noches`} body="Llegadas de viernes a domingo" />
-            </ul>
+              <span className="relative h-6 w-11 rounded-full bg-[#d8cfbf] transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-[#2f6b46] peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-[#183d43]/30" />
+              <span className="text-[13.5px] font-semibold text-[#1f2a24]">
+                {pkgEnabled ? "Promoción activa" : "Promoción desactivada"}
+              </span>
+            </label>
+            <input type="hidden" name="weekend_package_enabled" value={pkgEnabled ? "true" : "false"} />
+            <div className={`mt-4 grid gap-4 sm:grid-cols-2 lg:max-w-[560px] ${pkgEnabled ? "" : "opacity-50"}`}>
+              <Field id="weekend_package_nights" label="Noches de la estadía" suffix="noches">
+                <input id="weekend_package_nights" name="weekend_package_nights" type="number" inputMode="numeric" min={1} max={30} value={pkgNights} onChange={(e) => setPkgNights(e.target.value)} className={inputCls} />
+              </Field>
+              <Field id="weekend_package_billed" label="Se cobran" suffix="noches" note="Enteras o con media, ej. 2,5">
+                <input id="weekend_package_billed" name="weekend_package_billed" type="text" inputMode="decimal" value={pkgBilled} onChange={(e) => setPkgBilled(e.target.value)} className={inputCls} />
+              </Field>
+            </div>
+            {pkgEnabled && pkgExample && (
+              <p className="mb-0 mt-4 rounded-[6px] bg-[#eaf5f3] px-4 py-3 text-[12.5px] leading-[1.6] text-[#245c3c]">
+                Ejemplo: {pkgExample}
+              </p>
+            )}
+            {pkgEnabled && pkgNightsNum !== null && weekendMinNum !== null && pkgNightsNum < weekendMinNum && (
+              <p className="mb-0 mt-3 text-[12.5px] text-[#805b1c]">
+                Atención: la promoción es de {pkgNightsNum} noches pero el mínimo de fin de semana es {weekendMinNum}. Nunca va a aplicar.
+              </p>
+            )}
           </Section>
           <GuestsTable settings={preview} season="low" cardPct={cardPctNum} transferPct={transferPctNum} />
         </div>
@@ -421,15 +472,6 @@ function DateInput({ label, value, onChange }: { label: string; value: string; o
         className="rounded-[6px] border border-[#ddd5c7] bg-white px-2.5 py-2 text-[14px] text-[#1f2a24] outline-none focus:border-[#183d43]"
       />
     </label>
-  );
-}
-
-function Rule({ title, body }: { title: string; body: string }) {
-  return (
-    <li className="rounded-[6px] bg-[#fbf8f2] px-4 py-3">
-      <div className="text-[13.5px] font-semibold text-[#1f2a24]">{title}</div>
-      <div className="mt-0.5 text-[12px] text-[#6b665d]">{body}</div>
-    </li>
   );
 }
 

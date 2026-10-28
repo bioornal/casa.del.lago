@@ -157,3 +157,27 @@ describe("OrderSummary con temporada alta", () => {
     expect(screen.queryByText(/Temporada (baja|alta)/)).toBeNull();
   });
 });
+
+describe("OrderSummary con la promo de fin de semana", () => {
+  const FRIDAY: State = { ...STATE, checkIn: new Date(2026, 8, 25), checkOut: new Date(2026, 8, 28) };
+  const renderPromo = (settings: typeof DEFAULT_RATE_SETTINGS, state = FRIDAY) =>
+    render(
+      <NextIntlClientProvider locale="es" messages={messages}>
+        <OrderSummary state={state} settings={settings} method="card" />
+      </NextIntlClientProvider>,
+    );
+
+  it("muestra la leyenda con las noches de fábrica", () => {
+    renderPromo(DEFAULT_RATE_SETTINGS);
+    expect(screen.getByText("Paquete fin de semana: 3 noches al valor de 2,5")).toBeInTheDocument();
+  });
+
+  it("la leyenda refleja las reglas configuradas", () => {
+    const s = {
+      ...DEFAULT_RATE_SETTINGS,
+      low: { weekdayMinNights: 2, weekendMinNights: 2, packageEnabled: true, packageNights: 2, packageBilledNights: 1.5 },
+    };
+    renderPromo(s, { ...FRIDAY, checkOut: new Date(2026, 8, 27) });
+    expect(screen.getByText("Paquete fin de semana: 2 noches al valor de 1,5")).toBeInTheDocument();
+  });
+});

@@ -261,3 +261,76 @@ describe("temporada alta en rate_settings", () => {
     ).toBe(false);
   });
 });
+
+describe("reglas de temporada baja en rate_settings", () => {
+  const BASE_ROW = {
+    nightly_aratiri: 99800,
+    nightly_aguaribay: 99800,
+    cleaning_fee: 30000,
+    base_guests: 2,
+    extra_guest_fee: 20000,
+  };
+  const LOW_ROW = {
+    low_weekday_min_nights: 3,
+    low_weekend_min_nights: 2,
+    weekend_package_enabled: false,
+    weekend_package_nights: 4,
+    weekend_package_billed: "3.5", // numeric de Postgres llega como string
+  };
+
+  it("sin columnas de baja → sin bloque low (rigen las de fábrica)", () => {
+    expect(rowToSettings(BASE_ROW).low).toBeUndefined();
+  });
+
+  it("lee las reglas de baja y las vuelve a escribir", () => {
+    const s = rowToSettings({ ...BASE_ROW, ...LOW_ROW });
+    expect(s.low).toEqual({
+      weekdayMinNights: 3,
+      weekendMinNights: 2,
+      packageEnabled: false,
+      packageNights: 4,
+      packageBilledNights: 3.5,
+    });
+    expect(settingsToRow(s)).toMatchObject({ ...LOW_ROW, weekend_package_billed: 3.5 });
+  });
+
+  it("una fila inconsistente (cobra más noches de las que dura) se ignora", () => {
+    expect(rowToSettings({ ...BASE_ROW, ...LOW_ROW, weekend_package_billed: 5 }).low).toBeUndefined();
+  });
+
+  const LOW_INPUT = {
+    ...VALID,
+    low_weekday_min_nights: "2",
+    low_weekend_min_nights: "3",
+    weekend_package_enabled: "true",
+    weekend_package_nights: "3",
+    weekend_package_billed: "2,5",
+  };
+
+  it("parseRateSettingsInput acepta las reglas de baja (coma decimal)", () => {
+    const r = parseRateSettingsInput(LOW_INPUT);
+    expect(r.ok && r.value.low).toEqual({
+      weekdayMinNights: 2,
+      weekendMinNights: 3,
+      packageEnabled: true,
+      packageNights: 3,
+      packageBilledNights: 2.5,
+    });
+    const off = parseRateSettingsInput({ ...LOW_INPUT, weekend_package_enabled: "false" });
+    expect(off.ok && off.value.low?.packageEnabled).toBe(false);
+  });
+
+  it("parseRateSettingsInput rechaza reglas de baja inválidas", () => {
+    expect(parseRateSettingsInput({ ...LOW_INPUT, low_weekday_min_nights: "0" }).ok).toBe(false);
+    expect(parseRateSettingsInput({ ...LOW_INPUT, low_weekend_min_nights: "" }).ok).toBe(false);
+    expect(parseRateSettingsInput({ ...LOW_INPUT, weekend_package_nights: "31" }).ok).toBe(false);
+    expect(parseRateSettingsInput({ ...LOW_INPUT, weekend_package_billed: "2,3" }).ok).toBe(false);
+    expect(parseRateSettingsInput({ ...LOW_INPUT, weekend_package_billed: "4" }).ok).toBe(false);
+    expect(parseRateSettingsInput({ ...LOW_INPUT, weekend_package_billed: "0" }).ok).toBe(false);
+  });
+
+  it("sin campos de baja en el form no se toca el bloque", () => {
+    const r = parseRateSettingsInput(VALID);
+    expect(r.ok && r.value.low).toBeUndefined();
+  });
+});

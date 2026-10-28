@@ -1,9 +1,10 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { format } from "date-fns";
 import type { State } from "@/lib/reservation/reducer";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
 import { computeNights } from "@/lib/reservation/pricing";
 import { priceBreakdown, type PaymentMethod } from "@/lib/reservation/method-pricing";
+import { lowRules } from "@/lib/reservation/stay-rules";
 import { isTestUnit, resolveUnit, checkoutTotal, checkoutSavings } from "@/lib/reservation/test-unit";
 
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
@@ -17,6 +18,7 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ state, settings, method = "card" }: OrderSummaryProps) {
   const t = useTranslations("reservas");
+  const locale = useLocale();
   const unit = resolveUnit(state.unitId);
   const nights = computeNights(state.checkIn, state.checkOut);
   // Con la unidad de prueba no hay desglose por noche que mostrar (precio
@@ -119,7 +121,12 @@ export function OrderSummary({ state, settings, method = "card" }: OrderSummaryP
               </div>
             )}
             {nights > 0 && bd.weekendPackage && (
-              <div style={{ fontSize: 12, color: "#2f6b46" }}>{t("weekendPackage")}</div>
+              <div style={{ fontSize: 12, color: "#2f6b46" }}>
+                {t("weekendPackage", {
+                  nights: lowRules(settings).packageNights,
+                  billed: new Intl.NumberFormat(locale).format(lowRules(settings).packageBilledNights),
+                })}
+              </div>
             )}
           </>
         ) : (
