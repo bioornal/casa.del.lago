@@ -1,10 +1,12 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, type ReactNode } from "react";
+import { differenceInCalendarDays } from "date-fns";
 import { saveRates } from "./actions";
 import type { RateSettings } from "@/lib/reservation/rate-settings";
-import type { SeasonRange } from "@/lib/reservation/seasons";
+import { seasonOf, type Season, type SeasonRange } from "@/lib/reservation/seasons";
 import { grossUp, netNightly } from "@/lib/reservation/method-pricing";
+import { parseDateOnly } from "@/lib/reservation/booking";
 import { UNITS, type UnitSlug } from "@/lib/units";
 import {
   LOW_SEASON_WEEKDAY_MIN_NIGHTS,
@@ -12,7 +14,12 @@ import {
   WEEKEND_PACKAGE_NIGHTS,
 } from "@/lib/reservation/stay-rules";
 
+type Tab = Season | "fees";
+type Prices = Record<UnitSlug, string>;
+
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
+const shortDate = (s: string) =>
+  new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "short", year: "numeric" }).format(parseDateOnly(s));
 
 /** Lee un % del input (coma o punto); null si no es un % válido 0–30. */
 function pctOf(raw: string): number | null {
@@ -22,430 +29,526 @@ function pctOf(raw: string): number | null {
   return Number.isFinite(n) && n >= 0 && n <= 30 ? n : null;
 }
 
-const label: React.CSSProperties = {
-  display: "block",
-  fontSize: 12,
-  color: "#6b665d",
-  marginBottom: 6,
-  letterSpacing: ".04em",
+const posInt = (raw: string): number | null => {
+  const n = Number(raw);
+  return raw.trim() !== "" && Number.isInteger(n) && n > 0 ? n : null;
 };
 
-const input: React.CSSProperties = {
-  width: "100%",
-  padding: "11px 12px",
-  border: "1px solid #E7E0D4",
-  borderRadius: 4,
-  fontSize: 14,
-  background: "#fff",
-};
+const rangeNights = (r: SeasonRange) =>
+  r.from && r.to && r.from <= r.to ? differenceInCalendarDays(parseDateOnly(r.to), parseDateOnly(r.from)) + 1 : null;
+
+/** Con el formulario repartido en pestañas, un error del server tiene que llevar a la pestaña del campo. */
+function tabForError(error: string): Tab | null {
+  if (/temporada alta/i.test(error)) return "high";
+  if (/limpieza|huésped|comisión|transferencia/i.test(error)) return "fees";
+  if (/precio por noche/i.test(error)) return "low";
+  return null; // p. ej. "No autorizado" o un fallo de Supabase: no es de un campo
+}
 
 export function RateForm({ settings }: { settings: RateSettings }) {
   const [state, action, pending] = useActionState(saveRates, undefined);
+  const [tab, setTab] = useState<Tab>("low");
+  const [dirty, setDirty] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  // Vista previa en vivo: lo que el público ve con cada canal (neto grosseado).
-  const [nightly, setNightly] = useState<Record<UnitSlug, string>>({
+  const [nightly, setNightly] = useState<Prices>({
     aratiri: String(settings.nightly.aratiri),
     aguaribay: String(settings.nightly.aguaribay),
   });
-  const [baseGuests, setBaseGuests] = useState(String(settings.baseGuests));
-  const [extraGuestFee, setExtraGuestFee] = useState(String(settings.extraGuestFee));
-  const [cardPct, setCardPct] = useState(String(settings.cardFeePct).replace(".", ","));
-  const [transferPct, setTransferPct] = useState(String(settings.transferFeePct).replace(".", ","));
-  const cardPctNum = pctOf(cardPct) ?? settings.cardFeePct;
-  const transferPctNum = pctOf(transferPct) ?? settings.transferFeePct;
-  const baseGuestsNum = Number.isInteger(Number(baseGuests)) && Number(baseGuests) >= 1 && Number(baseGuests) <= 20
-    ? Number(baseGuests)
-    : settings.baseGuests;
-  const extraGuestFeeNum = extraGuestFee.trim() !== "" && Number.isInteger(Number(extraGuestFee)) && Number(extraGuestFee) >= 0
-    ? Number(extraGuestFee)
-    : settings.extraGuestFee;
-  // Temporada alta. Sin bloque guardado arranca con los precios de baja y mínimo 4.
-  const [highNightly, setHighNightly] = useState<Record<UnitSlug, string>>({
+  // Sin bloque de alta guardado arranca con los precios de baja y mínimo 4.
+  const [highNightly, setHighNightly] = useState<Prices>({
     aratiri: String(settings.high?.nightly.aratiri ?? settings.nightly.aratiri),
     aguaribay: String(settings.high?.nightly.aguaribay ?? settings.nightly.aguaribay),
   });
   const [highMin, setHighMin] = useState(String(settings.high?.minNights ?? 4));
   const [ranges, setRanges] = useState<SeasonRange[]>(settings.high?.ranges ?? []);
-  const setRange = (i: number, patch: Partial<SeasonRange>) =>
-    setRanges((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+  const [cleaningFee, setCleaningFee] = useState(String(settings.cleaningFee));
+  const [baseGuests, setBaseGuests] = useState(String(settings.baseGuests));
+  const [extraGuestFee, setExtraGuestFee] = useState(String(settings.extraGuestFee));
+  const [cardPct, setCardPct] = useState(String(settings.cardFeePct).replace(".", ","));
+  const [transferPct, setTransferPct] = useState(String(settings.transferFeePct).replace(".", ","));
 
-  const previewSettings = {
+  // Al llegar una respuesta nueva del server: limpiar "sin guardar" o saltar a la pestaña del error.
+  const [seenState, setSeenState] = useState(state);
+  if (state !== seenState) {
+    setSeenState(state);
+    if (state?.ok) setDirty(false);
+    const errorTab = state?.error ? tabForError(state.error) : null;
+    if (errorTab) setTab(errorTab);
+  }
+
+  // Valores que usa la vista previa: si un campo está a medio tipear, cae al guardado.
+  const cardPctNum = pctOf(cardPct) ?? settings.cardFeePct;
+  const transferPctNum = pctOf(transferPct) ?? settings.transferFeePct;
+  const baseGuestsNum = (() => {
+    const n = posInt(baseGuests);
+    return n !== null && n <= 20 ? n : settings.baseGuests;
+  })();
+  const extraGuestFeeNum =
+    extraGuestFee.trim() !== "" && Number.isInteger(Number(extraGuestFee)) && Number(extraGuestFee) >= 0
+      ? Number(extraGuestFee)
+      : settings.extraGuestFee;
+  const priceOf = (p: Prices, slug: UnitSlug, fallback: number) => posInt(p[slug]) ?? fallback;
+  const completeRanges = ranges.filter((r) => r.from && r.to);
+  const preview: RateSettings = {
     ...settings,
     nightly: {
-      aratiri: Number(nightly.aratiri) || settings.nightly.aratiri,
-      aguaribay: Number(nightly.aguaribay) || settings.nightly.aguaribay,
+      aratiri: priceOf(nightly, "aratiri", settings.nightly.aratiri),
+      aguaribay: priceOf(nightly, "aguaribay", settings.nightly.aguaribay),
     },
     baseGuests: baseGuestsNum,
     extraGuestFee: extraGuestFeeNum,
+    high: {
+      nightly: {
+        aratiri: priceOf(highNightly, "aratiri", settings.nightly.aratiri),
+        aguaribay: priceOf(highNightly, "aguaribay", settings.nightly.aguaribay),
+      },
+      minNights: posInt(highMin) ?? 4,
+      ranges: completeRanges,
+    },
   };
 
+  const todaySeason = seasonOf(new Date(), completeRanges);
+  const fromPrice = (season: Season) =>
+    Math.min(...UNITS.map((u) => grossUp(netNightly(preview, u.slug, baseGuestsNum, season), cardPctNum)));
+  const setRange = (i: number, patch: Partial<SeasonRange>) =>
+    setRanges((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+
   return (
-    <form action={action} style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-      {/* Precio por noche por unidad */}
-      <section style={card}>
-        <h2 style={h2}>Precio por noche</h2>
-        <p style={hint}>
-           Precio neto base para los huéspedes incluidos. Por cada huésped adicional se suma el
-           importe configurado en la sección de tasas.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
-          {UNITS.map((u) => {
-            const net = Number(nightly[u.slug]);
-            const valid = Number.isInteger(net) && net > 0;
-            return (
-              <div key={u.slug}>
-                <label htmlFor={`nightly_${u.slug}`} style={label}>
-                   {u.name} (base, hasta {u.specs.guests} huésp.)
-                </label>
-                <input
-                  id={`nightly_${u.slug}`}
-                  name={`nightly_${u.slug}`}
-                  type="number"
-                  min={1}
-                  step={1}
-                  required
-                  value={nightly[u.slug]}
-                  onChange={(e) => setNightly((v) => ({ ...v, [u.slug]: e.target.value }))}
-                  style={input}
-                />
-                {valid && (
-                  <p style={preview}>
-                    Público para {baseGuestsNum} huésp.: {money(grossUp(net, cardPctNum))} tarjeta · {money(grossUp(net, transferPctNum))} transferencia
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Tasas */}
-      <section style={card}>
-        <h2 style={h2}>Tasas</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
-          <div>
-            <label htmlFor="cleaning_fee" style={label}>
-              Limpieza (por estadía)
-            </label>
-            <input
-              id="cleaning_fee"
-              name="cleaning_fee"
-              type="number"
-              min={0}
-              step={1}
-              required
-              defaultValue={settings.cleaningFee}
-              style={input}
-            />
-          </div>
-          <div>
-            <label htmlFor="base_guests" style={label}>
-              Huéspedes incluidos
-            </label>
-            <input
-              id="base_guests"
-              name="base_guests"
-              type="number"
-              min={1}
-              max={20}
-              step={1}
-              required
-               value={baseGuests}
-               onChange={(e) => setBaseGuests(e.target.value)}
-              style={input}
-            />
-          </div>
-          <div>
-            <label htmlFor="extra_guest_fee" style={label}>
-              Huésped extra
-            </label>
-            <input
-              id="extra_guest_fee"
-              name="extra_guest_fee"
-              type="number"
-              min={0}
-              step={1}
-              required
-               value={extraGuestFee}
-               onChange={(e) => setExtraGuestFee(e.target.value)}
-              style={input}
-            />
-          </div>
-        </div>
-        <p style={hint}>
-           El cargo por huésped extra se aplica a cada noche por encima de la cantidad incluida.
-        </p>
-      </section>
-
-      <section style={card}>
-        <h2 style={h2}>Precios efectivos por huéspedes</h2>
-        <p style={hint}>
-          Vista previa de lo que calcula la web. Los importes netos son lo que recibe el alojamiento;
-          los importes públicos ya incluyen el costo de cada canal.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-          {UNITS.map((u) => {
-            const guests = Array.from(
-              { length: Math.max(0, u.specs.guests - baseGuestsNum + 1) },
-              (_, i) => baseGuestsNum + i,
-            );
-            return (
-              <div key={u.slug} style={{ border: "1px solid #E7E0D4", borderRadius: 5, overflow: "hidden" }}>
-                <div style={{ padding: "12px 14px", background: "#fbf8f2", fontSize: 13, fontWeight: 700 }}>
-                  {u.name} · máximo {u.specs.guests}
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, padding: "10px 14px", fontSize: 11, color: "#6b665d", borderTop: "1px solid #E7E0D4" }}>
-                  <strong>Personas</strong><strong>Neto</strong><strong>Tarjeta</strong><strong>Transf.</strong>
-                  {guests.map((count) => {
-                    const net = netNightly(previewSettings, u.slug, count);
-                    return (
-                      <span key={count} style={{ display: "contents" }}>
-                        <span>{count}</span>
-                        <span>{money(net)}</span>
-                        <span>{money(grossUp(net, cardPctNum))}</span>
-                        <span>{money(grossUp(net, transferPctNum))}</span>
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Temporada alta */}
-      <section style={card}>
-        <h2 style={h2}>Temporada alta</h2>
-        <p style={hint}>
-          Las noches que caen dentro de un rango se cobran con estos precios netos. Limpieza, huésped
-          extra y comisiones son los mismos que en baja. En alta no aplica el paquete de fin de semana.
-          Si una estadía cruza el cambio de temporada, cada noche se cobra con su tarifa.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
-          {UNITS.map((u) => {
-            const net = Number(highNightly[u.slug]);
-            const valid = Number.isInteger(net) && net > 0;
-            return (
-              <div key={u.slug}>
-                <label htmlFor={`high_nightly_${u.slug}`} style={label}>
-                  {u.name} · noche en alta (base)
-                </label>
-                <input
-                  id={`high_nightly_${u.slug}`}
-                  name={`high_nightly_${u.slug}`}
-                  type="number"
-                  min={1}
-                  step={1}
-                  required
-                  value={highNightly[u.slug]}
-                  onChange={(e) => setHighNightly((v) => ({ ...v, [u.slug]: e.target.value }))}
-                  style={input}
-                />
-                {valid && (
-                  <p style={preview}>
-                    Público para {baseGuestsNum} huésp.: {money(grossUp(net, cardPctNum))} tarjeta · {money(grossUp(net, transferPctNum))} transferencia
-                  </p>
-                )}
-              </div>
-            );
-          })}
-          <div>
-            <label htmlFor="high_min_nights" style={label}>
-              Estadía mínima en alta (noches)
-            </label>
-            <input
-              id="high_min_nights"
-              name="high_min_nights"
-              type="number"
-              min={1}
-              max={30}
-              step={1}
-              required
-              value={highMin}
-              onChange={(e) => setHighMin(e.target.value)}
-              style={input}
-            />
-          </div>
-        </div>
-
-        <h3 style={{ fontSize: 13, fontWeight: 700, margin: "22px 0 8px" }}>Fechas de temporada alta</h3>
-        <p style={hint}>
-          Desde y hasta son inclusive: es la fecha de cada noche. Ejemplo: del 15/12 al 28/02 hace de
-          alta la noche del 28/02; el check-out del 01/03 no cuenta. Sin rangos, todo se cobra como baja.
-        </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {ranges.map((r, i) => (
-            <div key={i} style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 12 }}>
-              <div>
-                <label htmlFor={`range_from_${i}`} style={label}>Desde</label>
-                <input
-                  id={`range_from_${i}`}
-                  type="date"
-                  value={r.from}
-                  onChange={(e) => setRange(i, { from: e.target.value })}
-                  style={{ ...input, width: 180 }}
-                />
-              </div>
-              <div>
-                <label htmlFor={`range_to_${i}`} style={label}>Hasta</label>
-                <input
-                  id={`range_to_${i}`}
-                  type="date"
-                  value={r.to}
-                  onChange={(e) => setRange(i, { to: e.target.value })}
-                  style={{ ...input, width: 180 }}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setRanges((rs) => rs.filter((_, j) => j !== i))}
-                style={secondaryButton}
-              >
-                Quitar
-              </button>
-            </div>
-          ))}
-          <div>
-            <button type="button" onClick={() => setRanges((rs) => [...rs, { from: "", to: "" }])} style={secondaryButton}>
-              Agregar rango
-            </button>
-          </div>
-        </div>
-        {/* Las filas a medio completar no viajan: el server valida el resto. */}
-        <input type="hidden" name="high_season_ranges" value={JSON.stringify(ranges.filter((r) => r.from && r.to))} />
-      </section>
-
-      <section style={{ ...card, background: "#fbf8f2" }}>
-        <h2 style={h2}>Condiciones de temporada baja</h2>
-        <ul style={{ margin: 0, paddingLeft: 20, color: "#6b665d", fontSize: 13, lineHeight: 1.8 }}>
-          <li>Lunes a jueves: estadía mínima de {LOW_SEASON_WEEKDAY_MIN_NIGHTS} noches.</li>
-          <li>Fin de semana: paquete de {WEEKEND_PACKAGE_NIGHTS} noches al valor de {WEEKEND_PACKAGE_BILLED_NIGHTS}.</li>
-          <li>En temporada alta no aplica el paquete de fin de semana.</li>
-          <li>Aguaribay admite hasta 6 huéspedes; Aratirí admite hasta 7.</li>
-        </ul>
-      </section>
-
-      {/* Costo por canal de cobro */}
-      <section style={card}>
-        <h2 style={h2}>Costo por canal de cobro</h2>
-        <p style={hint}>
-          El precio por noche que configurás arriba es lo que <strong>RECIBÍS</strong>; el
-          público ve el precio con el costo del canal incluido (neto ÷ (1 − %), redondeado
-          hacia arriba a $100). El precio de lista es el de tarjeta; pagando por
-          transferencia el huésped ve el ahorro en pesos.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16 }}>
-          <div>
-            <label htmlFor="card_fee_pct" style={label}>
-              Comisión tarjeta (%)
-            </label>
-            <input
-              id="card_fee_pct"
-              name="card_fee_pct"
-              type="text"
-              inputMode="decimal"
-              required
-              value={cardPct}
-              onChange={(e) => setCardPct(e.target.value)}
-              style={input}
-            />
-          </div>
-          <div>
-            <label htmlFor="transfer_fee_pct" style={label}>
-              Costo transferencia (%)
-            </label>
-            <input
-              id="transfer_fee_pct"
-              name="transfer_fee_pct"
-              type="text"
-              inputMode="decimal"
-              required
-              value={transferPct}
-              onChange={(e) => setTransferPct(e.target.value)}
-              style={input}
-            />
-          </div>
-        </div>
-        <p style={hint}>
-          Referencia: tarjeta MP ~7,7% efectivo (6,29% + IVA, liberación inmediata);
-          transferencia ~5% (retención IIBB Misiones). Si cambia el plazo de liberación
-          en MP, ajustá el % de tarjeta. Valores entre 0 y 30, acepta decimales con coma.
-        </p>
-      </section>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <button
-          type="submit"
-          disabled={pending}
-          style={{
-            padding: "13px 30px",
-            background: pending ? "#8a8170" : "#23362B",
-            color: "#F8F5F0",
-            border: "none",
-            borderRadius: 3,
-            cursor: pending ? "default" : "pointer",
-            fontSize: 12.5,
-            letterSpacing: ".1em",
-            textTransform: "uppercase",
-          }}
-        >
-          {pending ? "Guardando…" : "Guardar tarifas"}
-        </button>
-        {state?.ok && (
-          <span style={{ fontSize: 13, color: "#3f8f5f" }}>
-            Guardado. Los precios públicos ya reflejan el cambio.
-          </span>
-        )}
-        {state?.error && (
-          <span role="alert" style={{ fontSize: 13, color: "#8a3b1d" }}>
-            {state.error}
-          </span>
-        )}
+    <form
+      action={action}
+      noValidate
+      onChange={() => {
+        setDirty(true);
+        setLocalError(null);
+      }}
+      onSubmit={(e) => {
+        // Una fila con una sola fecha no viaja al server: mejor avisar que perderla en silencio.
+        if (ranges.some((r) => !r.from !== !r.to)) {
+          e.preventDefault();
+          setTab("high");
+          setLocalError("Completá las dos fechas de cada período de temporada alta, o quitá la fila.");
+        }
+      }}
+      className="pb-28"
+    >
+      {/* Selector de temporada */}
+      <div role="tablist" aria-label="Sección de tarifas" className="grid gap-3 md:grid-cols-3">
+        <TabCard
+          active={tab === "low"}
+          onClick={() => setTab("low")}
+          title="Temporada baja"
+          badge={todaySeason === "low" ? "Rige hoy" : undefined}
+          lines={[`Desde ${money(fromPrice("low"))} por noche`, "Todo el año fuera de las fechas de alta"]}
+        />
+        <TabCard
+          active={tab === "high"}
+          onClick={() => setTab("high")}
+          title="Temporada alta"
+          badge={todaySeason === "high" ? "Rige hoy" : undefined}
+          lines={[
+            `Desde ${money(fromPrice("high"))} por noche`,
+            completeRanges.length === 0
+              ? "Sin fechas cargadas"
+              : `${shortDate(completeRanges[0].from)} → ${shortDate(completeRanges[0].to)}` +
+                (completeRanges.length > 1 ? ` (+${completeRanges.length - 1})` : ""),
+          ]}
+        />
+        <TabCard
+          active={tab === "fees"}
+          onClick={() => setTab("fees")}
+          title="Cargos y comisiones"
+          lines={[
+            `Limpieza ${money(Number(cleaningFee) || 0)} · Huésped extra ${money(extraGuestFeeNum)}`,
+            `Tarjeta ${String(cardPctNum).replace(".", ",")}% · Transferencia ${String(transferPctNum).replace(".", ",")}%`,
+          ]}
+        />
       </div>
 
-      <p style={{ ...hint, margin: 0 }}>
-        Impacta de inmediato en las tarifas públicas y en las reservas nuevas. Las reservas
-        ya creadas conservan el total con el que se hicieron.
-      </p>
+      <div className="mt-5 rounded-[10px] border border-[#E7E0D4] bg-white">
+        {/* Temporada baja */}
+        <div role="tabpanel" hidden={tab !== "low"}>
+          <Section
+            title="Precio por noche"
+            hint={`Lo que recibís por noche para ${baseGuestsNum} huéspedes. El huésped ve el precio con la comisión ya incluida.`}
+          >
+            <PriceTable prefix="nightly" values={nightly} onChange={setNightly} cardPct={cardPctNum} transferPct={transferPctNum} />
+          </Section>
+          <Section title="Reglas de estadía">
+            <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-3">
+              <Rule title={`Mínimo ${LOW_SEASON_WEEKDAY_MIN_NIGHTS} noches`} body="Llegadas de lunes a jueves" />
+              <Rule
+                title={`${WEEKEND_PACKAGE_NIGHTS} noches al precio de ${String(WEEKEND_PACKAGE_BILLED_NIGHTS).replace(".", ",")}`}
+                body="Llegada viernes, estadía de exactamente 3 noches"
+              />
+              <Rule title={`Mínimo ${WEEKEND_PACKAGE_NIGHTS} noches`} body="Llegadas de viernes a domingo" />
+            </ul>
+          </Section>
+          <GuestsTable settings={preview} season="low" cardPct={cardPctNum} transferPct={transferPctNum} />
+        </div>
+
+        {/* Temporada alta */}
+        <div role="tabpanel" hidden={tab !== "high"}>
+          <Section
+            title="Fechas de temporada alta"
+            hint="Cada noche entre estas fechas (inclusive) se cobra como alta. Si una estadía cruza el cambio, cada noche se cobra con su tarifa."
+          >
+            <div className="flex flex-col gap-2">
+              {ranges.length === 0 && (
+                <p className="m-0 rounded-[6px] border border-dashed border-[#d8cfbf] px-4 py-3 text-[13px] text-[#6b665d]">
+                  Sin períodos cargados: todo el año se cobra como temporada baja.
+                </p>
+              )}
+              {ranges.map((r, i) => {
+                const n = rangeNights(r);
+                return (
+                  <div key={i} className="flex flex-wrap items-center gap-3 rounded-[6px] bg-[#fbf8f2] px-3 py-2.5">
+                    <DateInput label="Desde" value={r.from} onChange={(v) => setRange(i, { from: v })} />
+                    <span aria-hidden className="text-[#a59d8f]">→</span>
+                    <DateInput label="Hasta" value={r.to} onChange={(v) => setRange(i, { to: v })} />
+                    <span className="text-[12px] text-[#6b665d]">
+                      {n !== null ? `${n} noches` : r.from && r.to ? "La fecha final es anterior a la inicial" : ""}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRanges((rs) => rs.filter((_, j) => j !== i));
+                        setDirty(true);
+                      }}
+                      className="ml-auto rounded-[4px] px-2.5 py-1.5 text-[12px] text-[#8a3b1d] hover:bg-[#f6e6df]"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                );
+              })}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setRanges((rs) => [...rs, { from: "", to: "" }])}
+                  className="mt-1 rounded-[4px] border border-[#d8cfbf] bg-white px-3.5 py-2 text-[12.5px] text-[#23362B] hover:bg-[#fbf8f2]"
+                >
+                  + Agregar período
+                </button>
+              </div>
+            </div>
+            {/* Las filas vacías no viajan; las incompletas se frenan en onSubmit. */}
+            <input type="hidden" name="high_season_ranges" value={JSON.stringify(completeRanges)} />
+          </Section>
+          <Section
+            title="Precio por noche"
+            hint={`Lo que recibís por noche en alta para ${baseGuestsNum} huéspedes. Limpieza, huésped extra y comisiones son los mismos que en baja.`}
+          >
+            <PriceTable prefix="high_nightly" values={highNightly} onChange={setHighNightly} cardPct={cardPctNum} transferPct={transferPctNum} />
+          </Section>
+          <Section title="Reglas de estadía">
+            <div className="flex flex-wrap items-end gap-6">
+              <Field id="high_min_nights" label="Estadía mínima" suffix="noches" width="w-[150px]">
+                <input
+                  id="high_min_nights"
+                  name="high_min_nights"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={30}
+                  value={highMin}
+                  onChange={(e) => setHighMin(e.target.value)}
+                  className={inputCls}
+                />
+              </Field>
+              <p className="m-0 pb-2.5 text-[12.5px] text-[#6b665d]">
+                Rige para cualquier día de llegada. En alta no hay promoción de fin de semana.
+              </p>
+            </div>
+          </Section>
+          <GuestsTable settings={preview} season="high" cardPct={cardPctNum} transferPct={transferPctNum} />
+        </div>
+
+        {/* Cargos y comisiones */}
+        <div role="tabpanel" hidden={tab !== "fees"}>
+          <Section title="Cargos" hint="Valen para las dos temporadas.">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Field id="cleaning_fee" label="Limpieza" prefix="$" note="Una vez por estadía">
+                <input id="cleaning_fee" name="cleaning_fee" type="number" inputMode="numeric" min={0} value={cleaningFee} onChange={(e) => setCleaningFee(e.target.value)} className={inputCls} />
+              </Field>
+              <Field id="base_guests" label="Huéspedes incluidos" suffix="personas" note="Cubiertos por el precio por noche">
+                <input id="base_guests" name="base_guests" type="number" inputMode="numeric" min={1} max={20} value={baseGuests} onChange={(e) => setBaseGuests(e.target.value)} className={inputCls} />
+              </Field>
+              <Field id="extra_guest_fee" label="Huésped extra" prefix="$" note="Por persona adicional, por noche">
+                <input id="extra_guest_fee" name="extra_guest_fee" type="number" inputMode="numeric" min={0} value={extraGuestFee} onChange={(e) => setExtraGuestFee(e.target.value)} className={inputCls} />
+              </Field>
+            </div>
+          </Section>
+          <Section
+            title="Comisiones de cobro"
+            hint="Se suman al precio que ve el huésped para que recibas el neto completo. El precio publicado es el de tarjeta; con transferencia el huésped ve el ahorro."
+          >
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Field id="card_fee_pct" label="Tarjeta (Mercado Pago)" suffix="%" note="7,7% con acreditación en el día">
+                <input id="card_fee_pct" name="card_fee_pct" type="text" inputMode="decimal" value={cardPct} onChange={(e) => setCardPct(e.target.value)} className={inputCls} />
+              </Field>
+              <Field id="transfer_fee_pct" label="Transferencia" suffix="%" note="Retención de IIBB Misiones">
+                <input id="transfer_fee_pct" name="transfer_fee_pct" type="text" inputMode="decimal" value={transferPct} onChange={(e) => setTransferPct(e.target.value)} className={inputCls} />
+              </Field>
+            </div>
+          </Section>
+        </div>
+      </div>
+
+      {/* Barra de guardado */}
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[#E7E0D4] bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3.5 md:px-8">
+          <div className="min-w-0 flex-1 text-[13px]">
+            {localError || state?.error ? (
+              <span role="alert" className="text-[#8a3b1d]">{localError ?? state?.error}</span>
+            ) : dirty ? (
+              <span className="text-[#805b1c]">Hay cambios sin guardar.</span>
+            ) : state?.ok ? (
+              <span className="text-[#3f8f5f]">Guardado. La web ya muestra los precios nuevos.</span>
+            ) : (
+              <span className="hidden text-[#6b665d] sm:inline">Los cambios aplican a reservas nuevas; las ya hechas conservan su precio.</span>
+            )}
+          </div>
+          <button
+            type="submit"
+            disabled={pending}
+            className="rounded-[4px] bg-[#23362B] px-7 py-3 text-[12px] font-semibold uppercase tracking-[.1em] text-[#F8F5F0] transition-colors hover:bg-[#1a2a21] disabled:cursor-default disabled:bg-[#8a8170]"
+          >
+            {pending ? "Guardando…" : "Guardar cambios"}
+          </button>
+        </div>
+      </div>
     </form>
   );
 }
 
-const card: React.CSSProperties = {
-  background: "#fff",
-  border: "1px solid #E7E0D4",
-  borderRadius: 8,
-  padding: 24,
-};
+const inputCls =
+  "w-full min-w-0 border-0 bg-transparent px-3 py-2.5 text-[15px] tabular-nums text-[#1f2a24] outline-none";
 
-const h2: React.CSSProperties = {
-  fontFamily: "var(--font-display)",
-  fontWeight: 500,
-  fontSize: 22,
-  margin: "0 0 8px",
-};
+function TabCard({
+  active,
+  onClick,
+  title,
+  badge,
+  lines,
+}: {
+  active: boolean;
+  onClick: () => void;
+  title: string;
+  badge?: string;
+  lines: string[];
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onClick}
+      className={`rounded-[10px] border px-5 py-3.5 text-left md:py-4 ${
+        active ? "border-[#183d43] bg-[#183d43] text-[#F8F5F0]" : "border-[#E7E0D4] bg-white text-[#1f2a24] hover:border-[#bfb4a2]"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-display text-[22px] leading-tight">{title}</span>
+        {badge && (
+          <span className={`rounded-full px-2.5 py-1 text-[10.5px] font-semibold ${active ? "bg-[#d9eee4] text-[#245c3c]" : "bg-[#e6f1ec] text-[#245c3c]"}`}>
+            {badge}
+          </span>
+        )}
+      </div>
+      {lines.map((l, i) => (
+        <div
+          key={i}
+          className={`mt-1 text-[12.5px] ${active ? "text-[#c7dde3]" : "text-[#6b665d]"} ${i === 0 ? "font-semibold" : "hidden md:block"}`}
+        >
+          {l}
+        </div>
+      ))}
+    </button>
+  );
+}
 
-const hint: React.CSSProperties = {
-  fontSize: 12.5,
-  color: "#6b665d",
-  lineHeight: 1.6,
-  margin: "0 0 16px",
-};
+function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+  return (
+    <section className="border-b border-[#efe9df] px-5 py-6 last:border-b-0 md:px-7">
+      <h2 className="m-0 font-display text-[22px] font-medium">{title}</h2>
+      {hint && <p className="mb-0 mt-1 max-w-[720px] text-[12.5px] leading-[1.6] text-[#6b665d]">{hint}</p>}
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
 
-const secondaryButton: React.CSSProperties = {
-  padding: "10px 16px",
-  background: "#fff",
-  color: "#23362B",
-  border: "1px solid #d8cfbf",
-  borderRadius: 4,
-  cursor: "pointer",
-  fontSize: 12.5,
-};
+function Field({
+  id,
+  label,
+  prefix,
+  suffix,
+  note,
+  width,
+  children,
+}: {
+  id: string;
+  label: string;
+  prefix?: string;
+  suffix?: string;
+  note?: string;
+  width?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={width}>
+      <label htmlFor={id} className="mb-1.5 block text-[12px] font-medium text-[#4b473f]">
+        {label}
+      </label>
+      <div className="flex items-center rounded-[6px] border border-[#ddd5c7] bg-white focus-within:border-[#183d43] focus-within:ring-2 focus-within:ring-[#183d43]/15">
+        {prefix && <span className="pl-3 text-[14px] text-[#8a8170]">{prefix}</span>}
+        {children}
+        {suffix && <span className="pr-3 text-[12.5px] text-[#8a8170]">{suffix}</span>}
+      </div>
+      {note && <p className="mb-0 mt-1.5 text-[11.5px] text-[#8a8170]">{note}</p>}
+    </div>
+  );
+}
 
-const preview: React.CSSProperties = {
-  fontSize: 11.5,
-  color: "#155e75",
-  lineHeight: 1.5,
-  margin: "6px 0 0",
-};
+function DateInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <label className="flex items-center gap-2 text-[12px] text-[#6b665d]">
+      {label}
+      <input
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-[6px] border border-[#ddd5c7] bg-white px-2.5 py-2 text-[14px] text-[#1f2a24] outline-none focus:border-[#183d43]"
+      />
+    </label>
+  );
+}
+
+function Rule({ title, body }: { title: string; body: string }) {
+  return (
+    <li className="rounded-[6px] bg-[#fbf8f2] px-4 py-3">
+      <div className="text-[13.5px] font-semibold text-[#1f2a24]">{title}</div>
+      <div className="mt-0.5 text-[12px] text-[#6b665d]">{body}</div>
+    </li>
+  );
+}
+
+/** Una fila por cabaña: lo que recibe el alojamiento y lo que ve el huésped en cada canal. */
+function PriceTable({
+  prefix,
+  values,
+  onChange,
+  cardPct,
+  transferPct,
+}: {
+  prefix: "nightly" | "high_nightly";
+  values: Prices;
+  onChange: (fn: (v: Prices) => Prices) => void;
+  cardPct: number;
+  transferPct: number;
+}) {
+  // Grilla en vez de <table>: en el celular cada cabaña se apila (nombre, input, precios) sin scroll lateral.
+  const cols = "md:grid md:grid-cols-[minmax(0,1.3fr)_210px_minmax(0,1fr)_minmax(0,1fr)] md:items-center md:gap-4";
+  return (
+    <div>
+      <div className={`hidden pb-2 text-[11px] uppercase tracking-[.08em] text-[#8a8170] ${cols}`}>
+        <span>Cabaña</span>
+        <span>Recibís por noche</span>
+        <span className="text-right">Huésped paga con tarjeta</span>
+        <span className="text-right">Con transferencia</span>
+      </div>
+      {UNITS.map((u) => {
+        const id = `${prefix}_${u.slug}`;
+        const net = posInt(values[u.slug]);
+        return (
+          <div key={u.slug} className={`border-t border-[#efe9df] py-3 ${cols}`}>
+            <div className="mb-2 md:mb-0">
+              <label htmlFor={id} className="text-[14px] font-semibold text-[#1f2a24]">
+                {u.name}
+              </label>
+              <div className="text-[11.5px] text-[#8a8170]">Hasta {u.specs.guests} huéspedes</div>
+            </div>
+            <div className="flex items-center rounded-[6px] border border-[#ddd5c7] bg-white focus-within:border-[#183d43] focus-within:ring-2 focus-within:ring-[#183d43]/15">
+              <span className="pl-3 text-[14px] text-[#8a8170]">$</span>
+              <input
+                id={id}
+                name={id}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                value={values[u.slug]}
+                onChange={(e) => onChange((v) => ({ ...v, [u.slug]: e.target.value }))}
+                className={inputCls}
+              />
+            </div>
+            <div className="mt-2 flex justify-between text-[15px] font-semibold tabular-nums text-[#183d43] md:mt-0 md:block md:text-right">
+              <span className="text-[12px] font-normal text-[#8a8170] md:hidden">Huésped paga con tarjeta</span>
+              {net ? money(grossUp(net, cardPct)) : "—"}
+            </div>
+            <div className="mt-1 flex justify-between text-[14px] tabular-nums text-[#4b473f] md:mt-0 md:block md:text-right">
+              <span className="text-[12px] text-[#8a8170] md:hidden">Con transferencia</span>
+              {net ? money(grossUp(net, transferPct)) : "—"}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Detalle plegable: precio por noche según cantidad de huéspedes, para la temporada de la pestaña. */
+function GuestsTable({
+  settings,
+  season,
+  cardPct,
+  transferPct,
+}: {
+  settings: RateSettings;
+  season: Season;
+  cardPct: number;
+  transferPct: number;
+}) {
+  return (
+    <details className="px-5 py-5 md:px-7">
+      <summary className="cursor-pointer select-none text-[13px] font-semibold text-[#183d43]">
+        Ver precio por noche según cantidad de huéspedes
+      </summary>
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {UNITS.map((u) => {
+          const counts = Array.from(
+            { length: Math.max(0, u.specs.guests - settings.baseGuests + 1) },
+            (_, i) => settings.baseGuests + i,
+          );
+          return (
+            <div key={u.slug} className="overflow-hidden rounded-[6px] border border-[#efe9df]">
+              <div className="bg-[#fbf8f2] px-4 py-2.5 text-[13px] font-semibold">{u.name}</div>
+              <table className="w-full border-collapse text-[12.5px] tabular-nums">
+                <thead>
+                  <tr className="text-[11px] text-[#8a8170]">
+                    <th className="px-4 py-2 text-left font-medium">Huéspedes</th>
+                    <th className="px-4 py-2 text-right font-medium">Recibís</th>
+                    <th className="px-4 py-2 text-right font-medium">Tarjeta</th>
+                    <th className="px-4 py-2 text-right font-medium">Transferencia</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {counts.map((count) => {
+                    const net = netNightly(settings, u.slug, count, season);
+                    return (
+                      <tr key={count} className="border-t border-[#f3eee6]">
+                        <td className="px-4 py-1.5">{count}</td>
+                        <td className="px-4 py-1.5 text-right">{money(net)}</td>
+                        <td className="px-4 py-1.5 text-right">{money(grossUp(net, cardPct))}</td>
+                        <td className="px-4 py-1.5 text-right">{money(grossUp(net, transferPct))}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+    </details>
+  );
+}
