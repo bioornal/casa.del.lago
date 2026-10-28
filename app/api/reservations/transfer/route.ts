@@ -91,10 +91,10 @@ export async function POST(req: Request) {
   const unit = getUnit(unitId)!;
   const checkInDate = parseDateOnly(checkIn);
   const checkOutDate = parseDateOnly(checkOut);
-  if (!meetsStayMinimum(checkInDate, checkOutDate)) return bad();
+  const settings = await getRateSettings();
+  if (!meetsStayMinimum(checkInDate, checkOutDate, settings)) return bad();
   if (guests > unit.specs.guests) return bad();
   const nights = computeNights(new Date(checkIn), new Date(checkOut));
-  const settings = await getRateSettings();
   // Total del método TRANSFERENCIA (menor al precio de lista; ver method-pricing.ts)
   const total = methodTotal(settings, "transfer", unit.slug, nights, guests, checkInDate);
 

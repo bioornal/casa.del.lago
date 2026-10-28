@@ -105,7 +105,8 @@ export async function POST(req: Request) {
   const unit = resolveUnit(unitId);
   const checkInDate = parseDateOnly(checkIn);
   const checkOutDate = parseDateOnly(checkOut);
-  if (!isTestUnit(unitId) && !meetsStayMinimum(checkInDate, checkOutDate)) {
+  const settings = await getRateSettings();
+  if (!isTestUnit(unitId) && !meetsStayMinimum(checkInDate, checkOutDate, settings)) {
     return NextResponse.json({ error: "minimum_nights" }, { status: 400 });
   }
   if (guests > unit.specs.guests) {
@@ -120,7 +121,6 @@ export async function POST(req: Request) {
   }
 
   const nights = computeNights(new Date(checkIn), new Date(checkOut));
-  const settings = await getRateSettings();
   // Precio de lista = método tarjeta (comisión MP incluida; ver method-pricing.ts).
   // checkoutTotal recalcula acá server-side, igual que el checkout muestra: la
   // unidad de prueba cobra el monto plano de TEST_UNIT_TOTAL, no un precio real.
