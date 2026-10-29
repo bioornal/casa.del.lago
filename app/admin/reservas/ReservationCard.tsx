@@ -9,7 +9,12 @@ const METHOD: Record<string, string> = { transfer: "Transferencia", card: "Tarje
 
 /** Etiqueta de estado pensada para el día a día: primero lo que pasa hoy. */
 function stateTag(r: ReservationRow, today: string): { label: string; cls: string } {
-  if (r.status === "released") return { label: "Liberada", cls: "bg-[#f3e6e0] text-[#8a3b1d]" };
+  // released sirve para dos cosas: un hold que nunca se pagó ("Liberada") y una
+  // reserva que estuvo confirmada y se canceló (tiene confirmed_at, o fue manual).
+  if (r.status === "released") {
+    const wasConfirmed = r.confirmed_at !== null || r.payment_method === "manual";
+    return { label: wasConfirmed ? "Cancelada" : "Liberada", cls: "bg-[#f3e6e0] text-[#8a3b1d]" };
+  }
   if (r.status === "pending") return { label: "Pendiente", cls: "bg-[#fbecd0] text-[#805b1c]" };
   if (r.check_in === today) return { label: "Llega hoy", cls: "bg-[#183d43] text-marfil" };
   if (r.check_out === today) return { label: "Sale hoy", cls: "bg-[#e3eef0] text-[#183d43]" };
@@ -88,6 +93,7 @@ export function ReservationCard({
               )}
               <ReservationActions
                 id={r.id}
+                status="pending"
                 canConfirm={r.payment_method === "transfer"}
                 summary={`${r.first_name} ${r.last_name} · ${r.unit_name} · ${formatStayDate(r.check_in)} → ${formatStayDate(r.check_out)}`}
               />
@@ -98,8 +104,8 @@ export function ReservationCard({
 
       <details className="group border-t border-[#f0eae0]">
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between px-4 text-[13.5px] text-[#6b665d] [&::-webkit-details-marker]:hidden">
-          Detalles
-          <svg aria-hidden className=" h-4 w-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+          {pending ? "Detalles" : r.status === "confirmed" ? "Detalles · Cancelar" : "Detalles · Eliminar"}
+          <svg aria-hidden className="h-4 w-4 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
         </summary>
         <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 px-4 pb-4 text-[13.5px]">
           <dt className="text-[#8a8170]">Código</dt>
@@ -127,6 +133,17 @@ export function ReservationCard({
             </>
           )}
         </dl>
+        {/* Cancelar/eliminar van acá adentro y no junto a WhatsApp/Llamar: son
+            acciones de excepción y quedan a un toque de distancia de un error. */}
+        {!pending && (
+          <div className="border-t border-dashed border-[#f0eae0] px-4 py-3">
+            <ReservationActions
+              id={r.id}
+              status={r.status}
+              summary={`${r.first_name} ${r.last_name} · ${r.unit_name} · ${formatStayDate(r.check_in)} → ${formatStayDate(r.check_out)}`}
+            />
+          </div>
+        )}
       </details>
     </article>
   );

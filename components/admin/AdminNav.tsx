@@ -21,8 +21,22 @@ const ITEMS: Item[] = [
     match: (p) => p.startsWith("/admin/reservas"),
     icon: (
       <svg className={ICON} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12" />
+        <circle cx="4.25" cy="6.5" r="1.1" fill="currentColor" stroke="none" />
+        <circle cx="4.25" cy="12" r="1.1" fill="currentColor" stroke="none" />
+        <circle cx="4.25" cy="17.5" r="1.1" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
+  {
+    href: "/admin/calendario",
+    label: "Calendario",
+    match: (p) => p.startsWith("/admin/calendario"),
+    icon: (
+      <svg className={ICON} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <rect x="3" y="4.5" width="18" height="16" rx="2.5" />
         <path d="M3 9.5h18M8 2.5v4M16 2.5v4" />
+        <path d="M7 13.5h6M10 17h7" strokeWidth="2.4" />
       </svg>
     ),
   },
@@ -118,7 +132,7 @@ export function AdminNav() {
         aria-label="Secciones del panel"
         className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E7E0D4] bg-white/97 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-5">
           {ITEMS.map((it) => {
             const active = it.match(pathname);
             return (
@@ -126,11 +140,11 @@ export function AdminNav() {
                 key={it.href}
                 href={it.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex h-[62px] flex-col items-center justify-center gap-1 text-[11.5px] no-underline ${
+                className={`flex h-[62px] flex-col items-center justify-center gap-1 text-[11px] no-underline ${
                   active ? "font-semibold text-[#183d43]" : "text-[#8a8170]"
                 }`}
               >
-                <span className={`flex h-7 w-12 items-center justify-center rounded-full ${active ? "bg-[#d9eee4]" : ""}`}>
+                <span className={`flex h-7 w-11 items-center justify-center rounded-full ${active ? "bg-[#d9eee4]" : ""}`}>
                   {it.icon}
                 </span>
                 {it.label}

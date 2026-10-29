@@ -2,9 +2,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const getReservationById = vi.fn();
 const setReservationStatus = vi.fn();
+const cancelConfirmedReservation = vi.fn();
+const deleteReleasedReservation = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   getReservationById: (...a: unknown[]) => getReservationById(...a),
   setReservationStatus: (...a: unknown[]) => setReservationStatus(...a),
+  cancelConfirmedReservation: (...a: unknown[]) => cancelConfirmedReservation(...a),
+  deleteReleasedReservation: (...a: unknown[]) => deleteReleasedReservation(...a),
 }));
 
 const getAdminUser = vi.fn();
@@ -98,5 +102,40 @@ describe("POST /api/admin/reservations/[id]", () => {
     const res = await POST(post("confirm"), ctx);
     expect(res.status).toBe(400);
     expect(setReservationStatus).not.toHaveBeenCalled();
+  });
+
+  it("cancel → libera una confirmada (las fechas vuelven a quedar libres) sin el email de 'falta de pago'", async () => {
+    getReservationById.mockResolvedValueOnce({
+      id: "abc", code: "CDL-OK", unit_id: "aratiri", payment_method: "manual", status: "confirmed",
+    });
+    const res = await POST(post("cancel"), ctx);
+    expect(res.status).toBe(200);
+    expect(cancelConfirmedReservation).toHaveBeenCalledWith("abc");
+    expect(setReservationStatus).not.toHaveBeenCalled();
+    expect(sendReleaseEmail).not.toHaveBeenCalled();
+  });
+
+  it("cancel rechaza una pending (para eso está Liberar)", async () => {
+    const res = await POST(post("cancel"), ctx);
+    expect(res.status).toBe(400);
+    expect(cancelConfirmedReservation).not.toHaveBeenCalled();
+  });
+
+  it("delete → borra sólo una reserva ya liberada o cancelada", async () => {
+    getReservationById.mockResolvedValueOnce({
+      id: "abc", code: "CDL-X", unit_id: "aratiri", payment_method: "manual", status: "released",
+    });
+    const res = await POST(post("delete"), ctx);
+    expect(res.status).toBe(200);
+    expect(deleteReleasedReservation).toHaveBeenCalledWith("abc");
+  });
+
+  it("delete rechaza una reserva activa: primero hay que cancelarla", async () => {
+    getReservationById.mockResolvedValueOnce({
+      id: "abc", code: "CDL-Y", unit_id: "aratiri", payment_method: "manual", status: "confirmed",
+    });
+    const res = await POST(post("delete"), ctx);
+    expect(res.status).toBe(400);
+    expect(deleteReleasedReservation).not.toHaveBeenCalled();
   });
 });

@@ -98,6 +98,14 @@ textos informativos ≥ 12,5px.
   contadores por pestaña (`lib/admin/reservation-views.ts`, fecha de hoy en
   hora argentina). Ajustes guarda lo técnico (unidad y pago de prueba) en un
   plegable. En Opiniones, "Borrar" vive dentro de "Editar".
+- **Cancelar / eliminar reservas:** la ruta `/api/admin/reservations/[id]`
+  acepta `cancel` (confirmed → released, libera fechas, SIN email: el de
+  release habla de "pago no identificado") y `delete` (sólo released). En la
+  tarjeta van dentro de "Detalles". Una released con `confirmed_at` o manual se
+  muestra "Cancelada"; sin eso, "Liberada" (hold que no se pagó).
+- **Calendario (`/admin/calendario`):** vista mensual con una franja por
+  cabaña (color fijo), pendientes rayadas, ocupación del mes y agenda del día
+  tocado. Lógica en `lib/admin/calendar.ts` (fechas ISO como string).
 
 ## Verificación
 ```

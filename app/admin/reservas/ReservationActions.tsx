@@ -3,19 +3,36 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-// En el celular un toque de más es fácil y "Liberar" no tiene vuelta atrás desde
-// el panel: ambas acciones piden confirmación nombrando la reserva.
-export function ReservationActions({ id, canConfirm, summary }: { id: string; canConfirm: boolean; summary?: string }) {
+type Action = "confirm" | "release" | "cancel" | "delete";
+
+// En el celular un toque de más es fácil: toda acción pide confirmación
+// nombrando la reserva y diciendo qué pasa después.
+const QUESTION: Record<Action, string> = {
+  confirm: "¿Confirmar esta reserva? Se le envía el email de confirmación al huésped.",
+  release: "¿Liberar esta reserva? Las fechas vuelven a quedar disponibles y se le avisa al huésped por email.",
+  cancel:
+    "¿Cancelar esta reserva? Las fechas vuelven a quedar libres en la web.\nNo se le envía ningún email al huésped: avisale vos por WhatsApp.\nSi pagó con tarjeta, el reembolso se hace desde Mercado Pago.",
+  delete: "¿Eliminar esta reserva para siempre? Desaparece del historial y no se puede deshacer.",
+};
+
+const pill = "min-h-[46px] rounded-full px-5 text-[14.5px] disabled:opacity-50";
+
+export function ReservationActions({
+  id,
+  status,
+  canConfirm,
+  summary,
+}: {
+  id: string;
+  status: "pending" | "confirmed" | "released";
+  canConfirm?: boolean;
+  summary?: string;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
-  const act = async (action: "confirm" | "release") => {
-    const what = summary ? `\n\n${summary}` : "";
-    const question =
-      action === "confirm"
-        ? `¿Confirmar esta reserva? Se le envía el email de confirmación al huésped.${what}`
-        : `¿Liberar esta reserva? Las fechas vuelven a quedar disponibles y se le avisa al huésped por email.${what}`;
-    if (!confirm(question)) return;
+  const act = async (action: Action) => {
+    if (!confirm(`${QUESTION[action]}${summary ? `\n\n${summary}` : ""}`)) return;
     setBusy(true);
     const res = await fetch(`/api/admin/reservations/${id}`, {
       method: "POST",
@@ -24,21 +41,35 @@ export function ReservationActions({ id, canConfirm, summary }: { id: string; ca
     });
     setBusy(false);
     if (res.ok) router.refresh();
-    else alert("No se pudo completar la acción.");
+    else alert("No se pudo completar la acción. Recargá la página y probá de nuevo.");
   };
 
-  return (
-    <div style={{ display: "flex", gap: 8 }}>
-      {canConfirm && (
-        <button type="button" disabled={busy} onClick={() => act("confirm")}
-          style={{ flex: 2, minHeight: 46, padding: "0 20px", background: "#183d43", color: "#F8F5F0", border: "none", borderRadius: 999, cursor: "pointer", fontSize: 14.5, fontWeight: 600 }}>
-          {busy ? "Procesando…" : "Confirmar pago"}
+  if (status === "pending") {
+    return (
+      <div className="flex gap-2">
+        {canConfirm && (
+          <button type="button" disabled={busy} onClick={() => act("confirm")} className={`${pill} flex-[2] bg-[#183d43] font-semibold text-marfil`}>
+            {busy ? "Procesando…" : "Confirmar pago"}
+          </button>
+        )}
+        <button type="button" disabled={busy} onClick={() => act("release")} className={`${pill} flex-1 border border-[#e0b9a6] bg-transparent text-[#8a3b1d]`}>
+          Liberar
         </button>
-      )}
-      <button type="button" disabled={busy} onClick={() => act("release")}
-        style={{ flex: 1, minHeight: 46, padding: "0 20px", background: "transparent", color: "#8a3b1d", border: "1px solid #e0b9a6", borderRadius: 999, cursor: "pointer", fontSize: 14.5 }}>
-        Liberar
+      </div>
+    );
+  }
+
+  if (status === "confirmed") {
+    return (
+      <button type="button" disabled={busy} onClick={() => act("cancel")} className={`${pill} w-full border border-[#e0b9a6] bg-white text-[#8a3b1d] sm:w-auto`}>
+        {busy ? "Cancelando…" : "Cancelar reserva"}
       </button>
-    </div>
+    );
+  }
+
+  return (
+    <button type="button" disabled={busy} onClick={() => act("delete")} className={`${pill} w-full border border-[#e0b9a6] bg-white text-[#8a3b1d] sm:w-auto`}>
+      {busy ? "Eliminando…" : "Eliminar del historial"}
+    </button>
   );
 }

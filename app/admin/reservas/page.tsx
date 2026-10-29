@@ -11,7 +11,7 @@ const EMPTY: Record<string, string> = {
   upcoming: "No hay reservas próximas.",
   pending: "No hay reservas esperando confirmación.",
   confirmed: "Todavía no hay reservas confirmadas.",
-  released: "No hay reservas liberadas.",
+  released: "No hay reservas canceladas.",
   all: "Todavía no hay reservas.",
 };
 

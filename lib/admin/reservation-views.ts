@@ -10,7 +10,7 @@ export const VIEW_LABEL: Record<ReservationViewId, string> = {
   upcoming: "Próximas",
   pending: "Pendientes",
   confirmed: "Confirmadas",
-  released: "Liberadas",
+  released: "Canceladas",
   all: "Todas",
 };
 

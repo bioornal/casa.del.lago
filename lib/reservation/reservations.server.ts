@@ -177,6 +177,35 @@ export async function setReservationStatusByCode(
   if (error) throw new Error(`setReservationStatusByCode: ${error.message}`);
 }
 
+/**
+ * Cancela una reserva YA confirmada (el huésped canceló, se cargó por error…):
+ * pasa a released, así deja de bloquear fechas en la web. Sólo toca confirmadas
+ * — una pending se libera con setReservationStatus — y no borra la fila: queda
+ * en el historial como "Cancelada".
+ */
+export async function cancelConfirmedReservation(id: string): Promise<void> {
+  const { error } = await getServiceClient()
+    .from("reservations")
+    .update({ status: "released" })
+    .eq("id", id)
+    .eq("status", "confirmed");
+  if (error) throw new Error(`cancelConfirmedReservation: ${error.message}`);
+}
+
+/**
+ * Borra definitivamente una reserva que ya no está activa (released). Una
+ * activa no se puede borrar directo: primero se cancela, así nunca desaparece
+ * una estadía en curso por un toque de más.
+ */
+export async function deleteReleasedReservation(id: string): Promise<void> {
+  const { error } = await getServiceClient()
+    .from("reservations")
+    .delete()
+    .eq("id", id)
+    .eq("status", "released");
+  if (error) throw new Error(`deleteReleasedReservation: ${error.message}`);
+}
+
 /** Libera (status=released) una reserva por code SOLO si sigue pending. Idempotente y
  *  seguro ante rejected/refunded tardíos: nunca toca una confirmada. */
 export async function releasePendingByCode(code: string): Promise<void> {
