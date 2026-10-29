@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { AdminHeader, ADMIN_PAGE } from "@/components/admin/AdminHeader";
-import { listReservations } from "@/lib/reservation/reservations.server";
+import { listActiveStaysBetween, type StayRow } from "@/lib/reservation/reservations.server";
 import { todayIso } from "@/lib/admin/reservation-views";
-import { parseMonth, shiftMonth, monthOccupancy } from "@/lib/admin/calendar";
+import { parseMonth, shiftMonth, monthOccupancy, monthGrid } from "@/lib/admin/calendar";
 import { UNITS } from "@/lib/units";
 import { CalendarMonth, type CalendarStay, type CalendarUnit } from "./CalendarMonth";
 
@@ -28,10 +28,12 @@ export default async function AdminCalendarioPage({
   const today = todayIso();
   const ref = parseMonth(mes, today);
 
+  // Sólo las semanas que se ven (con los días de relleno de los costados).
+  const weeks = monthGrid(ref.year, ref.month);
   let dbError = false;
-  let rows: Awaited<ReturnType<typeof listReservations>> = [];
+  let rows: StayRow[] = [];
   try {
-    rows = await listReservations("all");
+    rows = await listActiveStaysBetween(weeks[0][0].iso, weeks[weeks.length - 1][6].iso);
   } catch {
     dbError = true;
   }
@@ -44,9 +46,10 @@ export default async function AdminCalendarioPage({
   }));
   const unitIds = new Set(units.map((u) => u.id));
 
-  // Sólo lo que ocupa fechas en cabañas reales: sin canceladas ni la unidad de prueba.
+  // Sólo cabañas reales: la unidad de prueba no se dibuja (las canceladas ya
+  // vienen filtradas desde la consulta).
   const stays: CalendarStay[] = rows
-    .filter((r) => r.status !== "released" && unitIds.has(r.unit_id))
+    .filter((r) => unitIds.has(r.unit_id))
     .map((r) => ({
       id: r.id,
       unit_id: r.unit_id,

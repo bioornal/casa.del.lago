@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const UNSPLASH = "https://images.unsplash.com";
 
 // Fotos reales del lodge — bucket público "imagenes" en Supabase Storage.
@@ -237,6 +239,7 @@ export function ImageSlot({
   fit = "cover",
   photo,
   position,
+  sizes = "(max-width: 768px) 100vw, 50vw",
 }: {
   label: string;
   className?: string;
@@ -246,6 +249,12 @@ export function ImageSlot({
   photo?: string;
   /** object-position del recorte (p. ej. "50% 20%"); pisa el tweak por foto. */
   position?: string;
+  /**
+   * Ancho con que se muestra, para que el optimizador mande la foto al tamaño
+   * justo (atributo sizes de HTML). Una foto a pantalla completa pasa "100vw";
+   * una celda de grilla, su fracción.
+   */
+  sizes?: string;
 }) {
   const seed = toSeed(label);
   const real = photo ?? REAL_PHOTOS[seed];
@@ -260,14 +269,16 @@ export function ImageSlot({
 
   return (
     <div className={`relative overflow-hidden bg-stone-100 ${className}`} aria-label={label}>
-      <img
+      {/* next/image: la foto llega al ancho de `sizes`, en AVIF/WebP y
+          cacheada por el CDN, en vez del original del bucket (ver next.config). */}
+      <Image
         src={src}
         alt={label}
+        fill
+        sizes={sizes}
+        preload={priority}
         style={{ filter: tweak?.filter, objectPosition: position ?? tweak?.position }}
-        className={`absolute inset-0 h-full w-full ${objectClass} transition-transform duration-[900ms] ease-[cubic-bezier(.16,.84,.44,1)]`}
-        loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : "auto"}
-        decoding={priority ? "sync" : "async"}
+        className={`${objectClass} transition-transform duration-[900ms] ease-[cubic-bezier(.16,.84,.44,1)]`}
       />
     </div>
   );

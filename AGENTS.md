@@ -115,6 +115,24 @@ textos informativos ≥ 12,5px.
   instantáneo al cambiar de pestaña. Las acciones que cambian datos siguen
   usando `getAdminUser()` (consulta al servidor de Auth).
 
+## Consumo de Supabase (plan gratuito)
+Lo que más gasta el plan gratuito es el **egress** (5 GB/mes), no la cantidad
+de consultas. Criterios:
+- **Fotos:** siempre por `next/image` (`ImageSlot`, Hero, visor), nunca
+  `<img src={bucketSrc(...)}>`. En Netlify pasan por su Image CDN (AVIF/WebP al
+  ancho de `sizes`, cacheadas): la ficha de Aratirí bajó de 12,8 MB a 0,74 MB
+  en celular. `next.config.ts` sólo admite el bucket `imagenes` del proyecto.
+  Al agregar un `ImageSlot` a pantalla completa, pasarle `sizes="100vw"`.
+- **Disponibilidad:** `getBlockedNightsByUnit` trae todas las cabañas en UNA
+  consulta y filtra los holds vencidos en la lectura; la limpieza
+  (`releaseExpiredPendingReservations`) corre sólo antes de insertar (payments,
+  transfer, reserva manual) y tras responder en /admin/reservas.
+- **Panel:** el comprobante se firma al tocarlo
+  (`/api/admin/reservations/[id]/comprobante`); el calendario consulta sólo las
+  semanas visibles (`listActiveStaysBetween`).
+- Home, fichas y legales son estáticas (SSG): no consultan la base por visita;
+  se regeneran con `revalidatePath` al guardar en el panel.
+
 ## Guía para el cliente
 El dueño tiene una guía en Claude Docs: "Guía de la web — La Casa del Lago
 Urugua-í" (https://claude.ai/artifact/C4R1jhAmAoC3n9rrugDMaJ). Está escrita

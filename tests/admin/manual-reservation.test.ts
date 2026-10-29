@@ -2,13 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/admin/auth", () => ({ getAdminUser: vi.fn(() => Promise.resolve({ email: "a@a.com" })) }));
 
-const { OverlapError, insertReservation, generateUniqueBookingCode } = vi.hoisted(() => {
+const { OverlapError, insertReservation, generateUniqueBookingCode, releaseExpiredPendingReservations } = vi.hoisted(() => {
   class OverlapError extends Error { constructor() { super("overlap"); this.name = "OverlapError"; } }
-  return { OverlapError, insertReservation: vi.fn(), generateUniqueBookingCode: vi.fn() };
+  return { OverlapError, insertReservation: vi.fn(), generateUniqueBookingCode: vi.fn(), releaseExpiredPendingReservations: vi.fn() };
 });
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
   generateUniqueBookingCode: (...a: unknown[]) => generateUniqueBookingCode(...a),
+  releaseExpiredPendingReservations: (...a: unknown[]) => releaseExpiredPendingReservations(...a),
   OverlapError,
 }));
 
@@ -22,12 +23,21 @@ const VALID = {
 beforeEach(() => {
   vi.clearAllMocks();
   insertReservation.mockResolvedValue(undefined);
+  releaseExpiredPendingReservations.mockResolvedValue(undefined);
   // Alfabeto sin 0/O ni 1/I (ver lib/reservation/code.ts): "AB23" respeta el
   // regex /^CDL-\d{4}-[A-Z2-9]{4}$/ que ya verifican los tests de forma.
   generateUniqueBookingCode.mockResolvedValue("CDL-2026-AB23");
 });
 
 describe("createManualReservation", () => {
+  it("libera los holds vencidos antes de insertar: un hold de tarjeta caducado no bloquea la carga", async () => {
+    await createManualReservation(VALID);
+    expect(releaseExpiredPendingReservations).toHaveBeenCalledOnce();
+    expect(releaseExpiredPendingReservations.mock.invocationCallOrder[0]).toBeLessThan(
+      insertReservation.mock.invocationCallOrder[0],
+    );
+  });
+
   it("inserta con payment_method manual y status confirmed", async () => {
     const res = await createManualReservation(VALID);
     expect(res).toEqual({ ok: true });

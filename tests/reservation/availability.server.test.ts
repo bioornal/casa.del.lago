@@ -1,18 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-// Cadena de supabase-js: from().select().eq().neq().lt().gt() → { data, error }
+// Cadena de supabase-js: from().select().in().neq().or().lt().gt() → { data, error }
 const gt = vi.fn();
 const lt = vi.fn(() => ({ gt }));
-const neq = vi.fn(() => ({ lt }));
-const eq = vi.fn(() => ({ neq }));
-const select = vi.fn(() => ({ eq }));
+const or = vi.fn(() => ({ lt }));
+const neq = vi.fn(() => ({ or }));
+const inFn = vi.fn(() => ({ neq }));
+const select = vi.fn(() => ({ in: inFn }));
 const from = vi.fn(() => ({ select }));
 vi.mock("@/lib/supabase/server", () => ({ getServiceClient: () => ({ from }) }));
+const releaseExpiredPendingReservations = vi.fn(() => Promise.resolve());
 vi.mock("@/lib/reservation/reservations.server", () => ({
-  releaseExpiredPendingReservations: vi.fn(() => Promise.resolve()),
+  releaseExpiredPendingReservations: () => releaseExpiredPendingReservations(),
 }));
 
-import { getAvailabilityServer } from "@/lib/reservation/availability.server";
+import { getAvailabilityServer, getBlockedNightsByUnit } from "@/lib/reservation/availability.server";
 import { GET } from "@/app/api/availability/[unitId]/route";
 
 const RANGE = { from: new Date(2026, 5, 1), to: new Date(2026, 11, 1) };
@@ -20,9 +22,10 @@ const RANGE = { from: new Date(2026, 5, 1), to: new Date(2026, 11, 1) };
 beforeEach(() => {
   vi.clearAllMocks();
   from.mockReturnValue({ select });
-  select.mockReturnValue({ eq });
-  eq.mockReturnValue({ neq });
-  neq.mockReturnValue({ lt });
+  select.mockReturnValue({ in: inFn });
+  inFn.mockReturnValue({ neq });
+  neq.mockReturnValue({ or });
+  or.mockReturnValue({ lt });
   lt.mockReturnValue({ gt });
   gt.mockResolvedValue({ data: [], error: null });
 });
@@ -30,7 +33,7 @@ beforeEach(() => {
 describe("getAvailabilityServer", () => {
   it("expande cada reserva a sus noches ocupadas (checkout es turnover)", async () => {
     gt.mockResolvedValueOnce({
-      data: [{ check_in: "2026-06-10", check_out: "2026-06-12" }],
+      data: [{ unit_id: "aratiri", check_in: "2026-06-10", check_out: "2026-06-12" }],
       error: null,
     });
     const res = await getAvailabilityServer("aratiri", RANGE);
@@ -41,11 +44,30 @@ describe("getAvailabilityServer", () => {
     expect(res.disabledDates[0].getDate()).toBe(10);
   });
 
-  it("filtra por unidad y exclue liberadas", async () => {
+  it("filtra por unidad, excluye liberadas y holds vencidos — sin escribir en la base", async () => {
     await getAvailabilityServer("aguaribay", RANGE);
     expect(from).toHaveBeenCalledWith("reservations");
-    expect(eq).toHaveBeenCalledWith("unit_id", "aguaribay");
+    expect(inFn).toHaveBeenCalledWith("unit_id", ["aguaribay"]);
     expect(neq).toHaveBeenCalledWith("status", "released");
+    // Un hold vencido no bloquea: se filtra en la lectura en vez de limpiarlo
+    // con un UPDATE en cada consulta de disponibilidad.
+    expect(or).toHaveBeenCalledWith(expect.stringMatching(/^status.neq.pending,expires_at.is.null,expires_at.gt./));
+    expect(releaseExpiredPendingReservations).not.toHaveBeenCalled();
+  });
+
+  it("varias cabañas en UNA consulta, repartidas por unidad", async () => {
+    gt.mockResolvedValueOnce({
+      data: [
+        { unit_id: "aratiri", check_in: "2026-06-10", check_out: "2026-06-11" },
+        { unit_id: "aguaribay", check_in: "2026-06-20", check_out: "2026-06-22" },
+      ],
+      error: null,
+    });
+    const res = await getBlockedNightsByUnit(["aratiri", "aguaribay"], RANGE);
+    expect(from).toHaveBeenCalledTimes(1);
+    expect(res.source).toBe("supabase");
+    expect(res.byUnit.aratiri).toHaveLength(1);
+    expect(res.byUnit.aguaribay).toHaveLength(2);
   });
 
   it("fail-open (stub) si la query devuelve error", async () => {
@@ -70,7 +92,7 @@ describe("GET /api/availability/[unitId]", () => {
 
   it("serializa las noches ocupadas como YYYY-MM-DD", async () => {
     gt.mockResolvedValueOnce({
-      data: [{ check_in: "2026-06-10", check_out: "2026-06-12" }],
+      data: [{ unit_id: "aratiri", check_in: "2026-06-10", check_out: "2026-06-12" }],
       error: null,
     });
     const req = new Request("http://t/api/availability/aratiri?from=2026-06-01&to=2026-12-01");

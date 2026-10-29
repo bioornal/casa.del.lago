@@ -23,15 +23,9 @@ function stateTag(r: ReservationRow, today: string): { label: string; cls: strin
   return { label: "Confirmada", cls: "bg-[#d9eee4] text-[#245c3c]" };
 }
 
-export function ReservationCard({
-  r,
-  comprobanteUrl,
-  today,
-}: {
-  r: ReservationRow;
-  comprobanteUrl: string | null;
-  today: string;
-}) {
+export function ReservationCard({ r, today }: { r: ReservationRow; today: string }) {
+  // El link firmado se pide recién al tocarlo (ver api/admin/reservations/[id]/comprobante).
+  const comprobanteUrl = r.comprobante_path ? `/api/admin/reservations/${r.id}/comprobante` : null;
   const wa = guestWhatsAppLink(r.phone);
   const tel = guestTelLink(r.phone);
   const tag = stateTag(r, today);

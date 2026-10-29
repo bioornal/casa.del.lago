@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { uploadComprobante, removeComprobante, isAllowedMime, MAX_BYTES } from "@/lib/reservation/comprobante.server";
 import {
   insertReservation,
+  releaseExpiredPendingReservations,
   generateUniqueBookingCode,
   OverlapError,
 } from "@/lib/reservation/reservations.server";
@@ -116,6 +117,15 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("[transfer] upload fallo:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "storage" }, { status: 502 });
+  }
+
+  // Los holds de tarjeta vencidos siguen contando para la constraint de
+  // exclusión hasta pasar a released. Las lecturas de disponibilidad ya no los
+  // limpian (los filtran), así que se limpian acá, justo antes de insertar.
+  try {
+    await releaseExpiredPendingReservations();
+  } catch (err) {
+    console.error("[transfer] cleanup de holds falló:", err instanceof Error ? err.message : err);
   }
 
   // 2. Insertar PENDIENTE. La constraint de exclusión es el candado: si las

@@ -24,9 +24,11 @@ const { OverlapError } = vi.hoisted(() => {
 });
 const insertReservation = vi.fn();
 const generateUniqueBookingCode = vi.fn();
+const releaseExpiredPendingReservations = vi.fn();
 vi.mock("@/lib/reservation/reservations.server", () => ({
   insertReservation: (...a: unknown[]) => insertReservation(...a),
   generateUniqueBookingCode: (...a: unknown[]) => generateUniqueBookingCode(...a),
+  releaseExpiredPendingReservations: (...a: unknown[]) => releaseExpiredPendingReservations(...a),
   OverlapError,
 }));
 
@@ -76,6 +78,7 @@ beforeEach(() => {
   uploadComprobante.mockResolvedValue("comprobantes/x.jpg");
   removeComprobante.mockResolvedValue(undefined);
   insertReservation.mockResolvedValue(undefined);
+  releaseExpiredPendingReservations.mockResolvedValue(undefined);
   // Alfabeto sin 0/O ni 1/I (ver lib/reservation/code.ts): "AB23" respeta el
   // regex /^CDL-\d{4}-[A-Z2-9]{4}$/ que ya verifican los tests de forma.
   generateUniqueBookingCode.mockResolvedValue("CDL-2026-AB23");
@@ -95,6 +98,22 @@ describe("POST /api/reservations/transfer", () => {
     expect(insertReservation).toHaveBeenCalledOnce();
     expect(insertReservation.mock.calls[0][0].status).toBe("pending");
     expect(insertReservation.mock.calls[0][0].paymentMethod).toBe("transfer");
+  });
+
+  it("libera los holds de tarjeta vencidos ANTES de insertar (la lectura ya no los limpia)", async () => {
+    await POST(form(VALID, goodFile()));
+    expect(releaseExpiredPendingReservations).toHaveBeenCalledOnce();
+    expect(releaseExpiredPendingReservations.mock.invocationCallOrder[0]).toBeLessThan(
+      insertReservation.mock.invocationCallOrder[0],
+    );
+  });
+
+  it("si la limpieza de holds falla, igual intenta insertar (la constraint es el candado)", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    releaseExpiredPendingReservations.mockRejectedValueOnce(new Error("boom"));
+    const res = await POST(form(VALID, goodFile()));
+    expect(res.status).toBe(200);
+    expect(insertReservation).toHaveBeenCalledOnce();
   });
 
   it("502 si no se consigue un código libre, sin subir el comprobante", async () => {

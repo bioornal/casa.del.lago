@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/reservation/availability.server", () => ({
-  getAvailabilityServer: vi.fn(),
+  getBlockedNightsByUnit: vi.fn(),
 }));
 
 // Tarifas: siempre los defaults (los mismos valores de lib/units) — el test no
@@ -13,19 +13,22 @@ vi.mock("@/lib/reservation/rate-settings.server", async () => {
   return { getRateSettings: () => Promise.resolve(DEFAULT_RATE_SETTINGS) };
 });
 
-import { getAvailabilityServer } from "@/lib/reservation/availability.server";
+import { getBlockedNightsByUnit } from "@/lib/reservation/availability.server";
 import { getRatesForRange } from "@/lib/reservation/rates.server";
 import { UNITS, pricePerNight } from "@/lib/units";
 import { DEFAULT_RATE_SETTINGS } from "@/lib/reservation/rate-settings";
 import { methodTotal, transferSavings } from "@/lib/reservation/method-pricing";
 
-const mocked = vi.mocked(getAvailabilityServer);
+const mocked = vi.mocked(getBlockedNightsByUnit);
+/** Las mismas noches ocupadas en todas las cabañas. */
+const busy = (dates: Date[]) =>
+  mocked.mockResolvedValue({ byUnit: Object.fromEntries(UNITS.map((u) => [u.slug, dates])), source: "supabase" });
 
 beforeEach(() => mocked.mockReset());
 
 describe("getRatesForRange", () => {
   it("disponible + montos públicos = método tarjeta (comisión incluida) + ahorro transferencia", async () => {
-    mocked.mockResolvedValue({ disabledDates: [], source: "supabase" });
+    busy([]);
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     expect(rates).toHaveLength(UNITS.length);
     const aratiri = rates.find((r) => r.unit.slug === "aratiri")!;
@@ -40,7 +43,7 @@ describe("getRatesForRange", () => {
   });
 
   it("suma $20.000 por huésped adicional", async () => {
-    mocked.mockResolvedValue({ disabledDates: [], source: "supabase" });
+    busy([]);
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 6);
     const aratiri = rates.find((r) => r.unit.slug === "aratiri")!;
     expect(aratiri.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aratiri", 3, 6));
@@ -49,7 +52,7 @@ describe("getRatesForRange", () => {
   });
 
   it("aguaribay: total de lista consistente con method-pricing", async () => {
-    mocked.mockResolvedValue({ disabledDates: [], source: "supabase" });
+    busy([]);
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     const aguaribay = rates.find((r) => r.unit.slug === "aguaribay")!;
     expect(aguaribay.total).toBe(methodTotal(DEFAULT_RATE_SETTINGS, "card", "aguaribay", 3, 4));
@@ -57,14 +60,27 @@ describe("getRatesForRange", () => {
   });
 
   it("no disponible si alguna noche del rango está ocupada", async () => {
-    mocked.mockResolvedValue({ disabledDates: [new Date(2026, 6, 3)], source: "supabase" });
+    busy([new Date(2026, 6, 3)]);
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     expect(rates.every((r) => r.available === false)).toBe(true);
   });
 
   it("el check-out es exclusivo: una fecha ocupada igual al check-out no afecta", async () => {
-    mocked.mockResolvedValue({ disabledDates: [new Date(2026, 6, 5)], source: "supabase" });
+    busy([new Date(2026, 6, 5)]);
     const rates = await getRatesForRange("2026-07-02", "2026-07-05", 4);
     expect(rates.every((r) => r.available === true)).toBe(true);
+  });
+
+  it("consulta la disponibilidad de todas las cabañas en UNA llamada", async () => {
+    busy([]);
+    await getRatesForRange("2026-07-02", "2026-07-05", 4);
+    expect(mocked).toHaveBeenCalledTimes(1);
+    expect(mocked.mock.calls[0][0]).toEqual(UNITS.map((u) => u.slug));
+  });
+
+  it("sin noches válidas no consulta la base", async () => {
+    busy([]);
+    await getRatesForRange("2026-07-05", "2026-07-05", 4);
+    expect(mocked).not.toHaveBeenCalled();
   });
 });

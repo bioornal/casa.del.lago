@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { ImageSlot, slotSrc } from "@/components/ui/ImageSlot";
 
 export type GalleryItem = { label: string; photo?: string };
@@ -62,16 +63,22 @@ export function GalleryLightbox({
       {/* Image */}
       <div className="relative z-[1] flex items-center justify-center max-w-[92vw] max-h-[86vh]">
         {item.photo ? (
-          <img
-            src={slotSrc(item.label, item.photo)}
-            alt={item.label}
-            className="max-h-[86vh] max-w-[92vw] w-auto h-auto object-contain rounded-[3px]"
-            decoding="async"
-          />
+          // Caja fija con la foto en "contain": next/image necesita medidas, y
+          // así el visor también recibe la foto optimizada y no el original.
+          <div className="relative h-[86vh] w-[92vw] max-w-[1400px]">
+            <Image
+              src={slotSrc(item.label, item.photo)}
+              alt={item.label}
+              fill
+              sizes="92vw"
+              className="rounded-[3px] object-contain"
+            />
+          </div>
         ) : (
           <ImageSlot
             label={item.label}
             priority
+            sizes="92vw"
             className="h-[60vh] md:h-[80vh] w-[92vw] md:w-auto md:max-w-[1100px] rounded-[3px]"
           />
         )}

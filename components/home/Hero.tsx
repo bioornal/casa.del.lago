@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { KenBurns } from "@/components/motion/KenBurns";
+import Image from "next/image";
 import { bucketSrc } from "@/components/ui/ImageSlot";
 
 // El atardecer bajo el árbol grande, 16:9. Sale del bucket propio: antes esta
@@ -28,15 +29,17 @@ export function Hero({ children }: { children?: React.ReactNode }) {
       {/* Media. El Ken Burns cierra en scale(1), así que no hace falta sangrado
           y se ve el 100% del encuadre en reposo. */}
       <div className="absolute inset-0">
-        <KenBurns className="block h-full w-full">
-          <img
+        <KenBurns className="relative block h-full w-full">
+          {/* Optimizada (AVIF/WebP al ancho de la pantalla) y precargada: es lo
+              primero que se ve, y el original pesa 0,5 MB. */}
+          <Image
             src={HERO_IMAGE}
             alt=""
             aria-hidden
-            className="h-full w-full object-cover object-center"
-            loading="eager"
-            fetchPriority="high"
-            decoding="sync"
+            fill
+            sizes="100vw"
+            preload
+            className="object-cover object-center"
           />
         </KenBurns>
       </div>

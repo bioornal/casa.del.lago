@@ -1,5 +1,4 @@
 import { getServiceClient } from "@/lib/supabase/server";
-import { releaseExpiredPendingReservations } from "./reservations.server";
 import type { Availability, DateRange } from "./availability";
 import type { UnitId } from "./reducer";
 
@@ -29,44 +28,48 @@ function expandRange(checkIn: string, checkOut: string): Date[] {
   return out;
 }
 
+type Blocked = { byUnit: Record<string, Date[]>; source: "supabase" | "stub" };
+
 /**
- * Disponibilidad real desde Supabase: las reservas activas (status != released)
- * de la unidad que solapan la ventana [from, to). Fail-open: ante cualquier error
- * devuelve el stub (sin fechas deshabilitadas) para no romper la UI.
+ * Noches ocupadas de VARIAS cabañas en UNA consulta: las reservas activas que
+ * solapan [from, to). Antes cada cabaña hacía su consulta más un UPDATE de
+ * limpieza, en cada búsqueda de cada visitante.
+ *
+ * Los holds de tarjeta vencidos se descartan en el filtro (pending con
+ * expires_at ya pasado) en vez de limpiarlos con un UPDATE en cada lectura:
+ * la limpieza real corre sólo antes de insertar una reserva (payments y
+ * transfer), que es cuando la constraint de exclusión los necesita fuera.
+ *
+ * Fail-open: ante cualquier error devuelve "stub" sin fechas, para no romper
+ * la UI (la constraint de la base sigue siendo el candado real).
  */
-export async function getAvailabilityServer(
-  unitId: UnitId,
-  range: DateRange,
-): Promise<Availability> {
+export async function getBlockedNightsByUnit(unitIds: string[], range: DateRange): Promise<Blocked> {
   try {
-    try {
-      await releaseExpiredPendingReservations();
-    } catch (err) {
-      console.error("[availability] cleanup de holds falló:", err instanceof Error ? err.message : err);
-    }
-    const fromYmd = toDateOnly(range.from);
-    const toYmd = toDateOnly(range.to);
     const { data, error } = await getServiceClient()
       .from("reservations")
-      .select("check_in, check_out")
-      .eq("unit_id", unitId)
+      .select("unit_id, check_in, check_out")
+      .in("unit_id", unitIds)
       .neq("status", "released")
-      .lt("check_in", toYmd)
-      .gt("check_out", fromYmd);
+      .or(`status.neq.pending,expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+      .lt("check_in", toDateOnly(range.to))
+      .gt("check_out", toDateOnly(range.from));
     if (error) {
-      console.error(`[availability] query error para ${unitId}: ${error.message}`);
-      return STUB;
+      console.error(`[availability] query error para ${unitIds.join(",")}: ${error.message}`);
+      return { byUnit: {}, source: "stub" };
     }
-    const rows = (data ?? []) as Array<{ check_in: string; check_out: string }>;
-    const disabledDates: Date[] = [];
-    for (const r of rows) {
-      for (const d of expandRange(r.check_in, r.check_out)) disabledDates.push(d);
+    const byUnit: Record<string, Date[]> = Object.fromEntries(unitIds.map((u) => [u, []]));
+    for (const r of (data ?? []) as Array<{ unit_id: string; check_in: string; check_out: string }>) {
+      (byUnit[r.unit_id] ??= []).push(...expandRange(r.check_in, r.check_out));
     }
-    return { disabledDates, source: "supabase" };
+    return { byUnit, source: "supabase" };
   } catch (err) {
-    console.error(
-      `[availability] error para ${unitId}: ${err instanceof Error ? err.message : String(err)}`,
-    );
-    return STUB;
+    console.error(`[availability] error para ${unitIds.join(",")}: ${err instanceof Error ? err.message : String(err)}`);
+    return { byUnit: {}, source: "stub" };
   }
+}
+
+/** Disponibilidad de una cabaña (la usa la API pública). */
+export async function getAvailabilityServer(unitId: UnitId, range: DateRange): Promise<Availability> {
+  const { byUnit, source } = await getBlockedNightsByUnit([unitId], range);
+  return source === "stub" ? STUB : { disabledDates: byUnit[unitId] ?? [], source };
 }

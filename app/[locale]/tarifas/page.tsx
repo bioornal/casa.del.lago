@@ -65,6 +65,7 @@ export default async function TarifasPage({
               label="Lago Urugua-í"
               photo="hero/ChatGPT1.jpg"
               className="h-full w-full"
+              sizes="100vw"
               priority
               position="50% 58%"
             />

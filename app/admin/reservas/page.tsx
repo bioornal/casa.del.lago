@@ -2,7 +2,6 @@ import Link from "next/link";
 import { after } from "next/server";
 import { AdminHeader, ADMIN_PAGE } from "@/components/admin/AdminHeader";
 import { listReservations, releaseExpiredPendingReservations } from "@/lib/reservation/reservations.server";
-import { signComprobanteUrl } from "@/lib/reservation/comprobante.server";
 import {
   parseView,
   reservationView,
@@ -53,12 +52,6 @@ export default async function AdminReservasPage({
   );
 
   const { list, counts } = reservationView(rows, view, today);
-  const withUrls = await Promise.all(
-    list.map(async (r) => ({
-      r,
-      comprobanteUrl: r.comprobante_path ? await signComprobanteUrl(r.comprobante_path) : null,
-    })),
-  );
 
   const blocked = blockedNightsByUnit(rows, today);
   const availabilityHealthy = dbError === null;
@@ -114,15 +107,15 @@ export default async function AdminReservasPage({
         </div>
       </nav>
 
-      {withUrls.length === 0 && !dbError && (
+      {list.length === 0 && !dbError && (
         <p className="rounded-[12px] border border-dashed border-[#d8cfbf] px-4 py-8 text-center text-[14.5px] text-[#6b665d]">
           {EMPTY[view]}
         </p>
       )}
 
       <div className="grid gap-3 lg:grid-cols-2">
-        {withUrls.map(({ r, comprobanteUrl }) => (
-          <ReservationCard key={r.id} r={r} comprobanteUrl={comprobanteUrl} today={today} />
+        {list.map((r) => (
+          <ReservationCard key={r.id} r={r} today={today} />
         ))}
       </div>
     </div>

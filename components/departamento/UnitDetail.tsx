@@ -230,7 +230,14 @@ export function UnitDetail({
                   key={photo}
                   className={`overflow-hidden rounded-[4px] ${span ? SPAN_CLS[span] : ""}`}
                 >
-                  <ImageSlot label={alt} photo={photo} className="h-full w-full" priority={i === 0} />
+                  <ImageSlot
+                    label={alt}
+                    photo={photo}
+                    className="h-full w-full"
+                    priority={i === 0}
+                    // 2 columnas en mobile y 4 en desktop: una celda simple ocupa la mitad / la cuarta parte.
+                    sizes={span === "hero" || span === "wide" ? "(max-width: 768px) 100vw, 660px" : "(max-width: 768px) 50vw, 330px"}
+                  />
                 </div>
               ))}
             </div>

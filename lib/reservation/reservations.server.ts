@@ -150,6 +150,28 @@ export async function listReservations(
   return (data ?? []) as ReservationRow[];
 }
 
+export type StayRow = Pick<
+  ReservationRow,
+  "id" | "unit_id" | "unit_name" | "status" | "check_in" | "check_out" | "first_name" | "last_name" | "guests" | "nights" | "phone"
+>;
+
+/**
+ * Reservas activas que pisan [fromIso, toIso] (fechas ISO, ambos inclusive),
+ * con sólo las columnas que dibuja el calendario del panel. Antes el
+ * calendario traía todas las reservas de la historia y todas sus columnas en
+ * cada cambio de mes.
+ */
+export async function listActiveStaysBetween(fromIso: string, toIso: string): Promise<StayRow[]> {
+  const { data, error } = await getServiceClient()
+    .from("reservations")
+    .select("id,unit_id,unit_name,status,check_in,check_out,first_name,last_name,guests,nights,phone")
+    .neq("status", "released")
+    .lte("check_in", toIso)
+    .gte("check_out", fromIso);
+  if (error) throw new Error(`listActiveStaysBetween: ${error.message}`);
+  return (data ?? []) as StayRow[];
+}
+
 export async function getReservationById(id: string): Promise<ReservationRow | null> {
   const { data, error } = await getServiceClient()
     .from("reservations").select("*").eq("id", id).single();

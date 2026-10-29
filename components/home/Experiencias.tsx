@@ -72,6 +72,7 @@ export function Experiencias() {
               label="El espejo de agua del lago Urugua-í en un día despejado"
               photo="hero/ChatGPT2.jpg"
               className="h-full w-full"
+              sizes="100vw"
             />
           </Parallax>
 

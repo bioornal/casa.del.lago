@@ -4,6 +4,7 @@ import { getAdminUser } from "@/lib/admin/auth";
 import {
   insertReservation,
   generateUniqueBookingCode,
+  releaseExpiredPendingReservations,
   OverlapError,
 } from "@/lib/reservation/reservations.server";
 import { computeNights } from "@/lib/reservation/pricing";
@@ -63,6 +64,14 @@ export async function createManualReservation(
   } catch (err) {
     console.error("[admin] código único falló:", err instanceof Error ? err.message : err);
     return { ok: false, error: "code" };
+  }
+
+  // Un hold de tarjeta vencido sigue ocupando fechas para la constraint hasta
+  // pasar a released; las lecturas ya no lo limpian, así que se hace acá.
+  try {
+    await releaseExpiredPendingReservations();
+  } catch (err) {
+    console.error("[admin] cleanup de holds falló:", err instanceof Error ? err.message : err);
   }
 
   try {
