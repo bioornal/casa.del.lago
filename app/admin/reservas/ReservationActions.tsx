@@ -28,15 +28,15 @@ export function ReservationActions({ id, canConfirm, summary }: { id: string; ca
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ display: "flex", gap: 8 }}>
       {canConfirm && (
         <button type="button" disabled={busy} onClick={() => act("confirm")}
-          style={{ minHeight: 46, padding: "0 20px", background: "#23362B", color: "#F8F5F0", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 14, fontWeight: 600 }}>
-          {busy ? "Procesando…" : "Confirmar"}
+          style={{ flex: 2, minHeight: 46, padding: "0 20px", background: "#183d43", color: "#F8F5F0", border: "none", borderRadius: 999, cursor: "pointer", fontSize: 14.5, fontWeight: 600 }}>
+          {busy ? "Procesando…" : "Confirmar pago"}
         </button>
       )}
       <button type="button" disabled={busy} onClick={() => act("release")}
-        style={{ minHeight: 46, padding: "0 20px", background: "transparent", color: "#8a3b1d", border: "1px solid #e0b9a6", borderRadius: 6, cursor: "pointer", fontSize: 14 }}>
+        style={{ flex: 1, minHeight: 46, padding: "0 20px", background: "transparent", color: "#8a3b1d", border: "1px solid #e0b9a6", borderRadius: 999, cursor: "pointer", fontSize: 14.5 }}>
         Liberar
       </button>
     </div>

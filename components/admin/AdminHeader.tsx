@@ -1,66 +1,38 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
-import { signOut } from "@/app/admin/login/actions";
 
-type AdminSection = "reservas" | "tarifas" | "opiniones" | "configuracion" | "pago-prueba";
-
-const NAV: Array<{ key: AdminSection; href: string; label: string }> = [
-  { key: "reservas", href: "/admin/reservas", label: "Reservas" },
-  { key: "tarifas", href: "/admin/tarifas", label: "Tarifas" },
-  { key: "opiniones", href: "/admin/opiniones", label: "Opiniones" },
-  { key: "configuracion", href: "/admin/configuracion", label: "Configuración" },
-  { key: "pago-prueba", href: "/admin/pago-prueba", label: "Pago de prueba" },
-];
-
+// Encabezado de cada pantalla del panel. La navegación vive aparte (AdminNav,
+// en el layout): antes este bloque oscuro con el menú adentro ocupaba toda la
+// primera pantalla del celular antes de mostrar un solo dato.
 export function AdminHeader({
-  current,
-  eyebrow = "Panel de operaciones",
   title,
   description,
-  status,
-  children,
+  alert,
+  actions,
 }: {
-  current: AdminSection;
-  eyebrow?: string;
   title: string;
-  description: string;
-  status?: { label: string; ok?: boolean };
-  children?: ReactNode;
+  description?: string;
+  /** Aviso que el dueño tiene que ver (sólo cuando algo anda mal). */
+  alert?: ReactNode;
+  /** Botón principal de la pantalla, a la derecha del título. */
+  actions?: ReactNode;
 }) {
   return (
-    <header className="mb-6 rounded-[12px] bg-[#183d43] px-5 py-5 text-marfil md:mb-8 md:py-6 shadow-[0_22px_55px_-42px_rgba(21,45,55,.8)] md:px-8">
-      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-        <div>
-          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[.26em] text-[#a9cbd5]">{eyebrow}</div>
-          <h1 className="m-0 font-display text-[clamp(34px,5vw,52px)] font-normal leading-none">{title}</h1>
-          <p className="mb-0 mt-3 max-w-[620px] text-[14px] leading-[1.6] text-[#c7dde3]">{description}</p>
+    <div className="mb-5 md:mb-7">
+      <div className="flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="m-0 font-display text-[32px] font-normal leading-[1.05] text-carbon md:text-[42px]">{title}</h1>
+          {description && <p className="mb-0 mt-1.5 max-w-[620px] text-[14px] leading-[1.5] text-[#6b665d]">{description}</p>}
         </div>
-        {status && (
-          <div className={`rounded-full px-3 py-2 text-center text-[12.5px] font-semibold ${status.ok ? "bg-[#d9eee4] text-[#245c3c]" : "bg-[#f8e4c1] text-[#805b1c]"}`}>
-            {status.label}
-          </div>
-        )}
+        {actions && <div className="shrink-0">{actions}</div>}
       </div>
-      <nav className="mt-6 flex flex-wrap items-center gap-2 border-t border-white/15 pt-5">
-        {NAV.map((item) => {
-          const active = item.key === current;
-          return (
-            <Link
-              key={item.key}
-              href={item.href}
-              className={`inline-flex min-h-[44px] items-center rounded-[6px] border px-4 text-[14px] no-underline transition-colors ${active ? "border-[#d9eee4] bg-[#d9eee4] font-semibold text-[#245c3c]" : "border-white/20 bg-transparent text-[#dcebed] hover:bg-white/10"}`}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-        {children}
-        <form action={signOut} className="ml-auto">
-          <button type="submit" className="min-h-[44px] rounded-[6px] border border-white/20 bg-transparent px-4 text-[14px] text-[#dcebed] transition-colors hover:bg-white/10">
-            Cerrar sesión
-          </button>
-        </form>
-      </nav>
-    </header>
+      {alert && (
+        <div role="alert" className="mt-4 rounded-[10px] border border-[#e9d6a8] bg-[#fef6e7] px-4 py-3 text-[14px] leading-[1.5] text-[#7a5a18]">
+          {alert}
+        </div>
+      )}
+    </div>
   );
 }
+
+/** Contenedor común de las pantallas del panel (deja aire para las pestañas de abajo). */
+export const ADMIN_PAGE = "mx-auto max-w-[1200px] px-4 pb-[calc(96px+env(safe-area-inset-bottom))] pt-5 md:px-8 md:pb-24 md:pt-8";

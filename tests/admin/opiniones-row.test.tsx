@@ -75,4 +75,11 @@ describe("TestimonioRow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Editar" }));
     expect(screen.getByLabelText(/Texto de la reseña/)).toHaveValue("Todo impecable, volvemos.");
   });
+
+  it("Borrar vive dentro de Editar: en el celular no queda al lado de Ocultar", () => {
+    renderRow();
+    expect(screen.queryByRole("button", { name: /Borrar/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Editar" }));
+    expect(screen.getByRole("button", { name: /Borrar/ })).toBeInTheDocument();
+  });
 });

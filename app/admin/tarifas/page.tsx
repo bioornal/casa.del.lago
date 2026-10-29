@@ -1,5 +1,5 @@
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
-import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminHeader, ADMIN_PAGE } from "@/components/admin/AdminHeader";
 import { RateForm } from "./RateForm";
 
 export const metadata = { title: "Tarifas — Panel La Casa del Lago" };
@@ -11,8 +11,8 @@ export default async function AdminTarifasPage() {
   const settings = await getRateSettings();
 
   return (
-    <div className="mx-auto max-w-[1200px] px-5 pb-24 pt-6 md:px-8 md:pt-10">
-      <AdminHeader current="tarifas" title="Tarifas" description="Configurá lo que recibe el alojamiento y revisá el precio final que ve cada huésped." />
+    <div className={ADMIN_PAGE}>
+      <AdminHeader title="Tarifas" description="Cargá lo que querés recibir por noche; la web calcula el precio que ve el huésped." />
       <RateForm settings={settings} />
     </div>
   );

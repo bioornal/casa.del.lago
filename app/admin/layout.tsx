@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { display, sans } from "@/lib/fonts";
+import { AdminNav } from "@/components/admin/AdminNav";
 import "../globals.css";
 
 export const metadata = {
@@ -33,6 +34,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               color: "#1D1D1D",
             }}
           >
+            <AdminNav />
             {children}
           </div>
         </NextIntlClientProvider>

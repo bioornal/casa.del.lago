@@ -3,20 +3,6 @@ import type { CSSProperties } from "react";
 // Mismos estilos inline que el resto del panel (RateForm, ModeToggle). Se
 // comparten acá para que las tres piezas de esta pantalla no se desincronicen.
 
-export const card: CSSProperties = {
-  background: "#fff",
-  border: "1px solid #E7E0D4",
-  borderRadius: 8,
-  padding: 24,
-};
-
-export const h2: CSSProperties = {
-  fontFamily: "var(--font-display)",
-  fontWeight: 500,
-  fontSize: 22,
-  margin: "0 0 8px",
-};
-
 export const hint: CSSProperties = {
   fontSize: 13.5,
   color: "#6b665d",
@@ -34,44 +20,29 @@ export const label: CSSProperties = {
 
 export const input: CSSProperties = {
   width: "100%",
+  minHeight: 48,
   padding: "11px 12px",
-  border: "1px solid #E7E0D4",
-  borderRadius: 4,
+  border: "1px solid #ddd5c7",
+  borderRadius: 8,
   fontSize: 14,
   background: "#fff",
   fontFamily: "inherit",
 };
 
-export const ok: CSSProperties = { fontSize: 13, color: "#3f8f5f" };
-export const err: CSSProperties = { fontSize: 13, color: "#8a3b1d" };
+export const ok: CSSProperties = { fontSize: 14, color: "#3f8f5f" };
+export const err: CSSProperties = { fontSize: 14, color: "#8a3b1d" };
 
 export function submit(pending: boolean): CSSProperties {
   return {
-    padding: "13px 30px",
-    background: pending ? "#8a8170" : "#23362B",
+    minHeight: 48,
+    padding: "0 24px",
+    background: pending ? "#8a8170" : "#183d43",
     color: "#F8F5F0",
     border: "none",
-    borderRadius: 3,
+    borderRadius: 999,
     cursor: pending ? "default" : "pointer",
-    fontSize: 12.5,
-    letterSpacing: ".1em",
-    textTransform: "uppercase",
+    fontSize: 14.5,
+    fontWeight: 600,
   };
 }
 
-/** Botón chico de las filas (subir, bajar, publicar, editar, borrar). */
-export function rowButton(danger = false): CSSProperties {
-  return {
-    background: "transparent",
-    border: "1px solid #E7E0D4",
-    borderRadius: 4,
-    // 44px: son los botones que el dueño toca desde el celular.
-    minHeight: 44,
-    minWidth: 44,
-    padding: "0 14px",
-    fontSize: 14,
-    cursor: "pointer",
-    color: danger ? "#8a3b1d" : "#6b665d",
-    fontFamily: "inherit",
-  };
-}

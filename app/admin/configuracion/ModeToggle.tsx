@@ -16,39 +16,32 @@ export function ModeToggle({
   const next: BookingMode = isOnline ? "whatsapp" : "online";
 
   return (
-    <div style={card}>
-      <h2 style={h2}>Modo de reserva</h2>
+    <section className="rounded-[14px] border border-[#E7E0D4] bg-white p-4 md:p-6">
+      <h2 className="m-0 font-display text-[22px] font-normal">Cómo reservan los huéspedes</h2>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0" }}>
-        <span
-          style={{
-            display: "inline-block",
-            width: 10,
-            height: 10,
-            borderRadius: "50%",
-            background: isOnline ? "#3f8f5f" : "#b0741d",
-          }}
-        />
-        <strong style={{ fontSize: 17 }}>
-          {isOnline ? "Reserva online ABIERTA" : "Reserva online PAUSADA"}
-        </strong>
+      <div
+        className={`mt-3 flex items-center gap-3 rounded-[10px] px-4 py-3 ${
+          isOnline ? "bg-[#e8f5ee] text-[#245c3c]" : "bg-[#fbecd0] text-[#6b4a12]"
+        }`}
+      >
+        <span aria-hidden className={`h-2.5 w-2.5 shrink-0 rounded-full ${isOnline ? "bg-[#3f8f5f]" : "bg-[#b0741d]"}`} />
+        <strong className="text-[15.5px]">{isOnline ? "Reservan y pagan en la web" : "Reservan por WhatsApp"}</strong>
       </div>
 
-      <p style={hint}>
+      <p className="mb-0 mt-3 text-[14px] leading-[1.55] text-[#6b665d]">
         {isOnline
-          ? "Los huéspedes pueden reservar y pagar desde el sitio, con tarjeta o transferencia."
-          : "Los botones de reservar derivan a WhatsApp con las fechas prellenadas, /reservas redirige a tarifas y los pagos están bloqueados. El sitio sigue mostrando precios y disponibilidad."}
+          ? "El huésped elige fechas, paga con tarjeta o transferencia y la reserva te llega sola."
+          : "Los botones de reservar abren WhatsApp con las fechas ya escritas. La web sigue mostrando precios y disponibilidad, pero no cobra."}
       </p>
 
       {overridden && (
-        <p role="alert" style={{ ...hint, color: "#8a3b1d", fontWeight: 500 }}>
-          ⚠ La variable de entorno NEXT_PUBLIC_BOOKING_MODE está seteada en Netlify y le
-          gana a esta configuración. Mientras siga puesta, este botón no cambia nada de
-          cara al público: hay que borrarla en Netlify y redeployar.
+        <p role="alert" className="mb-0 mt-3 rounded-[8px] bg-[#f7e9e2] px-3 py-2 text-[13.5px] leading-[1.5] text-[#8a3b1d]">
+          Este ajuste está bloqueado desde la configuración del servidor (NEXT_PUBLIC_BOOKING_MODE en Netlify):
+          cambiarlo acá no tiene efecto hasta que se quite esa variable.
         </p>
       )}
 
-      <form action={action}>
+      <form action={action} className="mt-4">
         <input type="hidden" name="booking_mode" value={next} />
         <button
           type="submit"
@@ -60,57 +53,20 @@ export function ModeToggle({
               e.preventDefault();
             }
           }}
-          style={{
-            padding: "13px 30px",
-            background: pending ? "#8a8170" : next === "online" ? "#23362B" : "#8a3b1d",
-            color: "#F8F5F0",
-            border: "none",
-            borderRadius: 3,
-            cursor: pending ? "default" : "pointer",
-            fontSize: 12.5,
-            letterSpacing: ".1em",
-            textTransform: "uppercase",
-          }}
+          className={`min-h-[48px] w-full rounded-full px-5 text-[14.5px] font-semibold text-marfil disabled:bg-[#8a8170] sm:w-auto ${
+            next === "online" ? "bg-[#183d43]" : "bg-[#8a3b1d]"
+          }`}
         >
-          {pending
-            ? "Guardando…"
-            : next === "online"
-              ? "Abrir reserva online"
-              : "Pausar reserva online"}
+          {pending ? "Guardando…" : next === "online" ? "Pasar a cobro en la web" : "Pasar a reservas por WhatsApp"}
         </button>
       </form>
 
-      {state?.ok && (
-        <p style={{ fontSize: 13, color: "#3f8f5f", marginTop: 14 }}>
-          Guardado. Recargá esta página para ver el estado nuevo.
-        </p>
-      )}
+      {state?.ok && <p className="mb-0 mt-3 text-[14px] text-[#3f8f5f]">Guardado ✓ Recargá la página para ver el estado nuevo.</p>}
       {state?.error && (
-        <p role="alert" style={{ fontSize: 13, color: "#8a3b1d", marginTop: 14 }}>
+        <p role="alert" className="mb-0 mt-3 text-[14px] text-[#8a3b1d]">
           {state.error}
         </p>
       )}
-    </div>
+    </section>
   );
 }
-
-const card: React.CSSProperties = {
-  background: "#fff",
-  border: "1px solid #E7E0D4",
-  borderRadius: 8,
-  padding: 24,
-};
-
-const h2: React.CSSProperties = {
-  fontFamily: "'Cormorant Garamond', serif",
-  fontWeight: 500,
-  fontSize: 22,
-  margin: 0,
-};
-
-const hint: React.CSSProperties = {
-  fontSize: 12.5,
-  color: "#6b665d",
-  lineHeight: 1.6,
-  margin: "0 0 16px",
-};

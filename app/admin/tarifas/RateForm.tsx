@@ -148,11 +148,12 @@ export function RateForm({ settings }: { settings: RateSettings }) {
       className="pb-28"
     >
       {/* Selector de temporada */}
-      <div role="tablist" aria-label="Sección de tarifas" className="grid gap-3 md:grid-cols-3">
+      <div role="tablist" aria-label="Sección de tarifas" className="grid grid-cols-3 gap-2 md:gap-3">
         <TabCard
           active={tab === "low"}
           onClick={() => setTab("low")}
           title="Temporada baja"
+          short="Baja"
           badge={todaySeason === "low" ? "Rige hoy" : undefined}
           lines={[`Desde ${money(fromPrice("low"))} por noche`, "Todo el año fuera de las fechas de alta"]}
         />
@@ -160,6 +161,7 @@ export function RateForm({ settings }: { settings: RateSettings }) {
           active={tab === "high"}
           onClick={() => setTab("high")}
           title="Temporada alta"
+          short="Alta"
           badge={todaySeason === "high" ? "Rige hoy" : undefined}
           lines={[
             `Desde ${money(fromPrice("high"))} por noche`,
@@ -173,6 +175,7 @@ export function RateForm({ settings }: { settings: RateSettings }) {
           active={tab === "fees"}
           onClick={() => setTab("fees")}
           title="Cargos y comisiones"
+          short="Cargos"
           lines={[
             `Limpieza ${money(Number(cleaningFee) || 0)} · Huésped extra ${money(extraGuestFeeNum)}`,
             `Tarjeta ${String(cardPctNum).replace(".", ",")}% · Transferencia ${String(transferPctNum).replace(".", ",")}%`,
@@ -211,7 +214,7 @@ export function RateForm({ settings }: { settings: RateSettings }) {
                 className="peer sr-only"
               />
               <span className="relative h-6 w-11 rounded-full bg-[#d8cfbf] transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:bg-[#2f6b46] peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-[#183d43]/30" />
-              <span className="text-[13.5px] font-semibold text-[#1f2a24]">
+              <span className="text-[14.5px] font-semibold text-[#1f2a24]">
                 {pkgEnabled ? "Promoción activa" : "Promoción desactivada"}
               </span>
             </label>
@@ -253,11 +256,13 @@ export function RateForm({ settings }: { settings: RateSettings }) {
               {ranges.map((r, i) => {
                 const n = rangeNights(r);
                 return (
-                  <div key={i} className="flex flex-wrap items-center gap-3 rounded-[6px] bg-[#fbf8f2] px-3 py-2.5">
-                    <DateInput label="Desde" value={r.from} onChange={(v) => setRange(i, { from: v })} />
-                    <span aria-hidden className="text-[#a59d8f]">→</span>
-                    <DateInput label="Hasta" value={r.to} onChange={(v) => setRange(i, { to: v })} />
-                    <span className="text-[12px] text-[#6b665d]">
+                  <div key={i} className="rounded-[10px] bg-[#fbf8f2] px-3 pb-1 pt-3 md:flex md:items-end md:gap-4 md:pb-3">
+                    <div className="grid grid-cols-2 gap-2 md:w-[400px] md:gap-3">
+                      <DateInput label="Desde" value={r.from} onChange={(v) => setRange(i, { from: v })} />
+                      <DateInput label="Hasta" value={r.to} onChange={(v) => setRange(i, { to: v })} />
+                    </div>
+                    <div className="flex flex-1 items-center justify-between gap-3">
+                    <span className={`text-[13.5px] ${n === null && r.from && r.to ? "text-[#8a3b1d]" : "text-[#6b665d]"}`}>
                       {n !== null ? `${n} noches` : r.from && r.to ? "La fecha final es anterior a la inicial" : ""}
                     </span>
                     <button
@@ -266,10 +271,11 @@ export function RateForm({ settings }: { settings: RateSettings }) {
                         setRanges((rs) => rs.filter((_, j) => j !== i));
                         setDirty(true);
                       }}
-                      className="ml-auto min-h-[44px] rounded-[6px] px-3.5 text-[14px] text-[#8a3b1d] hover:bg-[#f6e6df]"
+                      className="-mr-2 min-h-[44px] rounded-[6px] px-3.5 text-[14px] text-[#8a3b1d] hover:bg-[#f6e6df]"
                     >
                       Quitar
                     </button>
+                    </div>
                   </div>
                 );
               })}
@@ -347,25 +353,25 @@ export function RateForm({ settings }: { settings: RateSettings }) {
       </div>
 
       {/* Barra de guardado */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[#E7E0D4] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3.5 md:px-8">
-          <div className="min-w-0 flex-1 text-[13px]">
+      <div className="fixed inset-x-0 bottom-[calc(62px+env(safe-area-inset-bottom))] z-20 border-t border-[#E7E0D4] bg-white/95 shadow-[0_-10px_24px_-20px_rgba(21,45,55,.6)] backdrop-blur md:bottom-0">
+        <div className="mx-auto flex max-w-[1200px] items-center gap-x-4 px-4 py-2.5 md:px-8 md:py-3.5">
+          <div className="min-w-0 flex-1 text-[13.5px] leading-[1.35]">
             {localError || state?.error ? (
               <span role="alert" className="text-[#8a3b1d]">{localError ?? state?.error}</span>
             ) : dirty ? (
-              <span className="text-[#805b1c]">Hay cambios sin guardar.</span>
+              <span className="font-semibold text-[#805b1c]">Cambios sin guardar</span>
             ) : state?.ok ? (
-              <span className="text-[#3f8f5f]">Guardado. La web ya muestra los precios nuevos.</span>
+              <span className="text-[#3f8f5f]">Guardado ✓ La web ya muestra los precios nuevos.</span>
             ) : (
-              <span className="hidden text-[#6b665d] sm:inline">Los cambios aplican a reservas nuevas; las ya hechas conservan su precio.</span>
+              <span className="text-[#6b665d]">Aplica a reservas nuevas.</span>
             )}
           </div>
           <button
             type="submit"
             disabled={pending}
-            className="rounded-[4px] bg-[#23362B] px-7 py-3 text-[12px] font-semibold uppercase tracking-[.1em] text-[#F8F5F0] transition-colors hover:bg-[#1a2a21] disabled:cursor-default disabled:bg-[#8a8170]"
+            className="min-h-[46px] shrink-0 rounded-full bg-[#183d43] px-6 text-[14.5px] font-semibold text-[#F8F5F0] transition-colors hover:bg-[#122f34] disabled:cursor-default disabled:bg-[#8a8170]"
           >
-            {pending ? "Guardando…" : "Guardar cambios"}
+            {pending ? "Guardando…" : "Guardar"}
           </button>
         </div>
       </div>
@@ -376,16 +382,20 @@ export function RateForm({ settings }: { settings: RateSettings }) {
 const inputCls =
   "w-full min-w-0 border-0 bg-transparent px-3 py-2.5 text-[15px] tabular-nums text-[#1f2a24] outline-none";
 
+// En el celular las tres pestañas van en una fila con el nombre corto (antes
+// apiladas ocupaban media pantalla); el resumen completo se ve desde md.
 function TabCard({
   active,
   onClick,
   title,
+  short,
   badge,
   lines,
 }: {
   active: boolean;
   onClick: () => void;
   title: string;
+  short: string;
   badge?: string;
   lines: string[];
 }) {
@@ -395,14 +405,15 @@ function TabCard({
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`rounded-[10px] border px-5 py-3.5 text-left md:py-4 ${
+      className={`min-h-[52px] rounded-[10px] border px-2 py-2 text-center md:px-5 md:py-4 md:text-left ${
         active ? "border-[#183d43] bg-[#183d43] text-[#F8F5F0]" : "border-[#E7E0D4] bg-white text-[#1f2a24] hover:border-[#bfb4a2]"
       }`}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-display text-[22px] leading-tight">{title}</span>
+      <div className="flex flex-col items-center gap-1 md:flex-row md:justify-between md:gap-2">
+        <span className="text-[15px] font-semibold md:hidden">{short}</span>
+        <span className="hidden font-display text-[22px] leading-tight md:inline">{title}</span>
         {badge && (
-          <span className={`rounded-full px-2.5 py-1 text-[10.5px] font-semibold ${active ? "bg-[#d9eee4] text-[#245c3c]" : "bg-[#e6f1ec] text-[#245c3c]"}`}>
+          <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold md:px-2.5 md:py-1 md:text-[11.5px] ${active ? "bg-[#d9eee4] text-[#245c3c]" : "bg-[#e6f1ec] text-[#245c3c]"}`}>
             {badge}
           </span>
         )}
@@ -410,7 +421,7 @@ function TabCard({
       {lines.map((l, i) => (
         <div
           key={i}
-          className={`mt-1 text-[12.5px] ${active ? "text-[#c7dde3]" : "text-[#6b665d]"} ${i === 0 ? "font-semibold" : "hidden md:block"}`}
+          className={`mt-1 hidden text-[12.5px] md:block ${active ? "text-[#c7dde3]" : "text-[#6b665d]"} ${i === 0 ? "font-semibold" : ""}`}
         >
           {l}
         </div>
@@ -421,9 +432,9 @@ function TabCard({
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
-    <section className="border-b border-[#efe9df] px-5 py-6 last:border-b-0 md:px-7">
+    <section className="border-b border-[#efe9df] px-4 py-5 last:border-b-0 md:px-7 md:py-6">
       <h2 className="m-0 font-display text-[22px] font-medium">{title}</h2>
-      {hint && <p className="mb-0 mt-1 max-w-[720px] text-[12.5px] leading-[1.6] text-[#6b665d]">{hint}</p>}
+      {hint && <p className="mb-0 mt-1 max-w-[720px] text-[13.5px] leading-[1.55] text-[#6b665d]">{hint}</p>}
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -448,28 +459,28 @@ function Field({
 }) {
   return (
     <div className={width}>
-      <label htmlFor={id} className="mb-1.5 block text-[12px] font-medium text-[#4b473f]">
+      <label htmlFor={id} className="mb-1.5 block text-[13.5px] font-medium text-[#4b473f]">
         {label}
       </label>
-      <div className="flex items-center rounded-[6px] border border-[#ddd5c7] bg-white focus-within:border-[#183d43] focus-within:ring-2 focus-within:ring-[#183d43]/15">
+      <div className="flex min-h-[48px] items-center rounded-[8px] border border-[#ddd5c7] bg-white focus-within:border-[#183d43] focus-within:ring-2 focus-within:ring-[#183d43]/15">
         {prefix && <span className="pl-3 text-[14px] text-[#8a8170]">{prefix}</span>}
         {children}
         {suffix && <span className="pr-3 text-[12.5px] text-[#8a8170]">{suffix}</span>}
       </div>
-      {note && <p className="mb-0 mt-1.5 text-[11.5px] text-[#8a8170]">{note}</p>}
+      {note && <p className="mb-0 mt-1.5 text-[12.5px] text-[#8a8170]">{note}</p>}
     </div>
   );
 }
 
 function DateInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
-    <label className="flex items-center gap-2 text-[12px] text-[#6b665d]">
+    <label className="block min-w-0 text-[13px] text-[#6b665d]">
       {label}
       <input
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-[6px] border border-[#ddd5c7] bg-white px-2.5 py-2 text-[14px] text-[#1f2a24] outline-none focus:border-[#183d43]"
+        className="mt-1 block min-h-[46px] w-full min-w-0 rounded-[8px] border border-[#ddd5c7] bg-white px-2.5 text-[15px] text-[#1f2a24] outline-none focus:border-[#183d43]"
       />
     </label>
   );
@@ -508,9 +519,9 @@ function PriceTable({
               <label htmlFor={id} className="text-[14px] font-semibold text-[#1f2a24]">
                 {u.name}
               </label>
-              <div className="text-[11.5px] text-[#8a8170]">Hasta {u.specs.guests} huéspedes</div>
+              <div className="text-[12.5px] text-[#8a8170]">Hasta {u.specs.guests} huéspedes</div>
             </div>
-            <div className="flex items-center rounded-[6px] border border-[#ddd5c7] bg-white focus-within:border-[#183d43] focus-within:ring-2 focus-within:ring-[#183d43]/15">
+            <div className="flex min-h-[48px] items-center rounded-[8px] border border-[#ddd5c7] bg-white focus-within:border-[#183d43] focus-within:ring-2 focus-within:ring-[#183d43]/15">
               <span className="pl-3 text-[14px] text-[#8a8170]">$</span>
               <input
                 id={id}
@@ -524,11 +535,11 @@ function PriceTable({
               />
             </div>
             <div className="mt-2 flex justify-between text-[15px] font-semibold tabular-nums text-[#183d43] md:mt-0 md:block md:text-right">
-              <span className="text-[12px] font-normal text-[#8a8170] md:hidden">Huésped paga con tarjeta</span>
+              <span className="text-[13px] font-normal text-[#8a8170] md:hidden">Huésped paga con tarjeta</span>
               {net ? money(grossUp(net, cardPct)) : "—"}
             </div>
             <div className="mt-1 flex justify-between text-[14px] tabular-nums text-[#4b473f] md:mt-0 md:block md:text-right">
-              <span className="text-[12px] text-[#8a8170] md:hidden">Con transferencia</span>
+              <span className="text-[13px] text-[#8a8170] md:hidden">Con transferencia</span>
               {net ? money(grossUp(net, transferPct)) : "—"}
             </div>
           </div>
@@ -551,8 +562,8 @@ function GuestsTable({
   transferPct: number;
 }) {
   return (
-    <details className="px-5 py-5 md:px-7">
-      <summary className="cursor-pointer select-none text-[13px] font-semibold text-[#183d43]">
+    <details className="px-4 py-3 md:px-7 md:py-5">
+      <summary className="flex min-h-[44px] cursor-pointer select-none items-center text-[14px] font-semibold text-[#183d43]">
         Ver precio por noche según cantidad de huéspedes
       </summary>
       <div className="mt-4 grid gap-4 md:grid-cols-2">

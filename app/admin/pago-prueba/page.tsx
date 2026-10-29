@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getAdminUser } from "@/lib/admin/auth";
-import { AdminHeader } from "@/components/admin/AdminHeader";
+import Link from "next/link";
+import { AdminHeader, ADMIN_PAGE } from "@/components/admin/AdminHeader";
 import { TestPaymentBrick } from "./TestPaymentBrick";
 
 // Pago de PRUEBA de la integración productiva de MP ($1000, reembolsable).
@@ -11,8 +12,11 @@ export default async function PagoPruebaPage() {
   if (!admin) redirect("/admin/login");
 
   return (
-    <div className="mx-auto max-w-[1200px] px-5 pb-24 pt-6 md:px-8 md:pt-10">
-      <AdminHeader current="pago-prueba" title="Pago de prueba" description="Validá las credenciales productivas de Mercado Pago con un cobro controlado y reembolsable." />
+    <div className={ADMIN_PAGE}>
+      <Link href="/admin/configuracion" className="mb-2 inline-flex min-h-[40px] items-center text-[14px] text-[#155e75] no-underline">
+        ← Ajustes
+      </Link>
+      <AdminHeader title="Pago de prueba" description="Validá las credenciales de Mercado Pago con un cobro real y reembolsable." />
 
       <div style={{ maxWidth: 700, padding: "14px 16px", borderRadius: 6, background: "#fef6e7",
         border: "1px solid #e9d6a8", color: "#7a5a18", fontSize: 13, marginBottom: 8 }}>

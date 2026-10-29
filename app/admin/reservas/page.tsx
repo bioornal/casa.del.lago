@@ -1,12 +1,19 @@
-import { AdminHeader } from "@/components/admin/AdminHeader";
-import { listReservations, type ReservationStatus } from "@/lib/reservation/reservations.server";
+import Link from "next/link";
+import { AdminHeader, ADMIN_PAGE } from "@/components/admin/AdminHeader";
+import { listReservations } from "@/lib/reservation/reservations.server";
 import { signComprobanteUrl } from "@/lib/reservation/comprobante.server";
 import { getAvailabilityServer } from "@/lib/reservation/availability.server";
-import { ReservationActions } from "./ReservationActions";
+import { parseView, reservationView, todayIso, VIEW_IDS, VIEW_LABEL } from "@/lib/admin/reservation-views";
 import { ManualReservationForm } from "./ManualReservationForm";
-import { guestWhatsAppLink, guestTelLink, formatStayDate } from "@/lib/admin/guest-contact";
+import { ReservationCard } from "./ReservationCard";
 
-const money = (n: number) => `$${new Intl.NumberFormat("es-AR").format(n)}`;
+const EMPTY: Record<string, string> = {
+  upcoming: "No hay reservas próximas.",
+  pending: "No hay reservas esperando confirmación.",
+  confirmed: "Todavía no hay reservas confirmadas.",
+  released: "No hay reservas liberadas.",
+  all: "Todavía no hay reservas.",
+};
 
 export default async function AdminReservasPage({
   searchParams,
@@ -14,27 +21,26 @@ export default async function AdminReservasPage({
   searchParams: Promise<{ filter?: string }>;
 }) {
   const { filter: raw } = await searchParams;
-  const filter = (["pending", "confirmed", "released", "all"].includes(raw ?? "")
-    ? raw
-    : "pending") as ReservationStatus | "all";
+  const view = parseView(raw);
+  const today = todayIso();
 
   // Fail-open: sin el proyecto Supabase configurado (o DB caída) el panel igual
   // entra y muestra el aviso, en vez de romper con un 500.
   let dbError: string | null = null;
   let rows: Awaited<ReturnType<typeof listReservations>> = [];
   try {
-    rows = await listReservations(filter);
+    // Se traen todas y se filtran acá: así cada pestaña muestra su contador.
+    rows = await listReservations("all");
   } catch (err) {
     dbError = err instanceof Error ? err.message : String(err);
   }
+  const { list, counts } = reservationView(rows, view, today);
   const withUrls = await Promise.all(
-    rows.map(async (r) => ({
+    list.map(async (r) => ({
       r,
       comprobanteUrl: r.comprobante_path ? await signComprobanteUrl(r.comprobante_path) : null,
     })),
   );
-
-  const tabs: Array<ReservationStatus | "all"> = ["pending", "confirmed", "released", "all"];
 
   const winFrom = new Date();
   const winTo = new Date(winFrom.getFullYear() + 1, winFrom.getMonth(), 1);
@@ -45,106 +51,68 @@ export default async function AdminReservasPage({
   const availabilityHealthy = avAra.source === "supabase" && avAgu.source === "supabase";
 
   return (
-    <div className="mx-auto max-w-[1200px] px-5 pb-24 pt-6 md:px-8 md:pt-10">
+    <div className={ADMIN_PAGE}>
       <AdminHeader
-        current="reservas"
         title="Reservas"
-        description="Disponibilidad, reservas directas y bloqueos manuales en un solo lugar."
-        status={{ label: availabilityHealthy ? "Disponibilidad sincronizada con Supabase" : "Disponibilidad requiere revisión", ok: availabilityHealthy }}
+        alert={
+          dbError
+            ? "No se pudieron leer las reservas. Probá recargar en un rato; si sigue, avisale a quien mantiene la web."
+            : !availabilityHealthy
+              ? "No se pudo verificar la disponibilidad real. Antes de cargar una reserva, confirmá las fechas."
+              : undefined
+        }
       />
 
-      <ManualReservationForm disabledByUnit={{ aratiri: avAra.disabledDates, aguaribay: avAgu.disabledDates }} availabilityHealthy={availabilityHealthy} />
-
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
-        {tabs.map((tb) => (
-          <a key={tb} href={`/admin/reservas?filter=${tb}`}
-            aria-current={filter === tb ? "page" : undefined}
-            style={{
-              display: "inline-flex", alignItems: "center", minHeight: 44,
-              padding: "0 16px", borderRadius: 6, fontSize: 14, textDecoration: "none", letterSpacing: ".02em",
-              border: filter === tb ? "1px solid #23362B" : "1px solid #d8cfbf",
-              background: filter === tb ? "#23362B" : "#fff",
-              color: filter === tb ? "#F8F5F0" : "#6b665d",
-            }}>
-            {tb === "pending" ? "Pendientes" : tb === "confirmed" ? "Confirmadas" : tb === "released" ? "Liberadas" : "Todas"}
-          </a>
-        ))}
-        </div>
-        <span className="text-[13px] text-muted">{withUrls.length} {withUrls.length === 1 ? "reserva" : "reservas"}</span>
-      </div>
-
-      {dbError && (
-        <div role="alert" style={{ padding: "14px 16px", borderRadius: 6, background: "#fef6e7", border: "1px solid #e9d6a8", color: "#7a5a18", fontSize: 13, marginBottom: 20 }}>
-          No se pudo leer Supabase ({dbError}). ¿Ya configuraste el proyecto nuevo
-          (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY) y corriste el setup.sql?
-        </div>
+      {/* Lo único que pide acción: arriba de todo y con un toque para verlo. */}
+      {counts.pending > 0 && view !== "pending" && (
+        <Link
+          href="/admin/reservas?filter=pending"
+          className="mb-4 flex min-h-[52px] items-center justify-between gap-3 rounded-[12px] bg-[#fbecd0] px-4 text-[14.5px] text-[#6b4a12] no-underline"
+        >
+          <span>
+            <strong>{counts.pending}</strong> {counts.pending === 1 ? "reserva espera" : "reservas esperan"} tu confirmación
+          </span>
+          <span aria-hidden className="text-[18px]">→</span>
+        </Link>
       )}
 
-      {withUrls.length === 0 && !dbError && <p style={{ color: "#6b665d" }}>No hay reservas en este filtro.</p>}
+      <ManualReservationForm
+        disabledByUnit={{ aratiri: avAra.disabledDates, aguaribay: avAgu.disabledDates }}
+        availabilityHealthy={availabilityHealthy}
+      />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {withUrls.map(({ r, comprobanteUrl }) => {
-          const wa = guestWhatsAppLink(r.phone);
-          const tel = guestTelLink(r.phone);
-          return (
-          <div key={r.id} className="admin-reservation-card">
-            <div className="admin-reservation-person">
-              <div style={{ fontWeight: 600 }}>{r.unit_name}</div>
-              <div style={{ fontSize: 15, color: "#1f1d19" }}>{r.first_name} {r.last_name}</div>
-              <a href={`mailto:${r.email}`} style={{ fontSize: 14, color: "#6b665d", wordBreak: "break-all" }}>{r.email}</a>
-              <div style={{ fontSize: 14, color: "#6b665d" }}>{r.phone || "—"}</div>
-              {/* El dueño opera desde el celular: un toque para escribir o llamar. */}
-              {(wa || tel) && (
-                <div className="admin-contact-actions">
-                  {wa && (
-                    <a href={wa} target="_blank" rel="noreferrer" className="admin-contact-btn admin-contact-btn--wa">
-                      WhatsApp
-                    </a>
-                  )}
-                  {tel && (
-                    <a href={tel} className="admin-contact-btn">
-                      Llamar
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="admin-reservation-stay" style={{ fontSize: 14 }}>
-              <div style={{ fontWeight: 600 }}>{formatStayDate(r.check_in)} → {formatStayDate(r.check_out)}</div>
-              <div style={{ color: "#8a8170", fontSize: 12.5 }}>{r.check_in} → {r.check_out}</div>
-              <div style={{ color: "#6b665d" }}>{r.nights} noches · {r.guests} huésp.</div>
-              <div style={{ fontWeight: 600 }}>{money(r.total)}</div>
-            </div>
-            <div className="admin-reservation-meta" style={{ fontSize: 14 }}>
-              <div>
-                <span style={{ padding: "2px 8px", borderRadius: 4, fontSize: 12, background: r.payment_method === "transfer" ? "#eef3ee" : "#f3eee6" }}>
-                  {r.payment_method === "transfer" ? "Transferencia" : "Tarjeta"}
-                </span>
-              </div>
-              <div style={{ color: "#6b665d", marginTop: 4 }}>Ref: {r.code}</div>
-              {r.payment_id && <div style={{ color: "#6b665d" }}>Pago MP: {r.payment_id}</div>}
-              <div style={{ marginTop: 4, fontWeight: 600, color: r.status === "pending" ? "#a06a1d" : r.status === "confirmed" ? "#23362B" : "#8a3b1d" }}>
-                {r.status === "pending" ? "Pendiente" : r.status === "confirmed" ? "Confirmada" : "Liberada"}
-              </div>
-              {comprobanteUrl && (
-                <a href={comprobanteUrl} target="_blank" rel="noreferrer" style={{ display: "inline-block", padding: "8px 0", fontSize: 14, color: "#A04B2A" }}>
-                  Ver comprobante ↗
-                </a>
-              )}
-            </div>
-            <div className="admin-reservation-actions">
-              {r.status === "pending" && (
-                <ReservationActions
-                  id={r.id}
-                  canConfirm={r.payment_method === "transfer"}
-                  summary={`${r.first_name} ${r.last_name} · ${r.unit_name} · ${formatStayDate(r.check_in)} → ${formatStayDate(r.check_out)}`}
-                />
-              )}
-            </div>
-          </div>
-          );
-        })}
+      {/* Filtros: una sola fila que se desliza de costado en el celular. */}
+      <nav aria-label="Filtrar reservas" className="-mx-4 mb-4 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0">
+        <div className="flex w-max gap-2">
+          {VIEW_IDS.map((v) => {
+            const active = v === view;
+            return (
+              <Link
+                key={v}
+                href={`/admin/reservas?filter=${v}`}
+                aria-current={active ? "page" : undefined}
+                className={`inline-flex min-h-[42px] items-center gap-2 rounded-full border px-4 text-[14px] no-underline ${
+                  active ? "border-[#183d43] bg-[#183d43] font-semibold text-marfil" : "border-[#d8cfbf] bg-white text-[#4b473f]"
+                }`}
+              >
+                {VIEW_LABEL[v]}
+                <span className={`rounded-full px-1.5 text-[12px] ${active ? "bg-white/15" : "bg-[#f3efe7] text-[#6b665d]"}`}>{counts[v]}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
+      {withUrls.length === 0 && !dbError && (
+        <p className="rounded-[12px] border border-dashed border-[#d8cfbf] px-4 py-8 text-center text-[14.5px] text-[#6b665d]">
+          {EMPTY[view]}
+        </p>
+      )}
+
+      <div className="grid gap-3 lg:grid-cols-2">
+        {withUrls.map(({ r, comprobanteUrl }) => (
+          <ReservationCard key={r.id} r={r} comprobanteUrl={comprobanteUrl} today={today} />
+        ))}
       </div>
     </div>
   );

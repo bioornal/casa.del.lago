@@ -290,55 +290,6 @@ html[data-fx]:not([data-fx~="grano"]) [data-grain] { display: none !important; }
   width: 100%;
 }
 
-.admin-reservation-card {
-  display: grid;
-  grid-template-columns: minmax(220px, 1.35fr) minmax(170px, .9fr) minmax(190px, 1fr) auto;
-  gap: 18px;
-  align-items: center;
-  padding: 20px;
-  border: 1px solid var(--color-borde-medio);
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 18px 40px -38px rgba(21,45,55,.7);
-}
-.admin-reservation-person > div:first-child {
-  margin-bottom: 6px;
-  color: var(--color-carbon);
-  font-family: var(--font-display);
-  font-size: 21px;
-}
-.admin-reservation-stay,
-.admin-reservation-meta {
-  line-height: 1.55;
-}
-.admin-reservation-actions {
-  justify-self: end;
-}
-@media (max-width: 860px) {
-  .admin-reservation-card {
-    grid-template-columns: 1fr 1fr;
-  }
-  .admin-reservation-person {
-    grid-column: 1 / -1;
-  }
-  .admin-reservation-actions {
-    justify-self: stretch;
-  }
-}
-@media (max-width: 560px) {
-  .admin-reservation-card {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 16px;
-  }
-  .admin-reservation-person,
-  .admin-reservation-actions {
-    grid-column: auto;
-  }
-  .admin-reservation-actions > div {
-    width: 100%;
-  }
-}
 /* ================================================================================ */
 
 /* iOS Safari hace zoom al enfocar cualquier campo con letra < 16px y no vuelve

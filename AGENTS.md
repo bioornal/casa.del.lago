@@ -90,6 +90,14 @@ textos informativos ≥ 12,5px.
 - **Panel:** login con labels/autocomplete; reservas con botones WhatsApp/Llamar
   al huésped (`lib/admin/guest-contact.ts`), fechas legibles ("jue 5 nov"),
   confirmación antes de Confirmar/Liberar; reserva manual plegada por defecto.
+- **Panel tipo app (2026-10-29, segunda vuelta):** navegación en
+  `components/admin/AdminNav.tsx` (montada en `app/admin/layout.tsx`): barra
+  superior compacta + pestañas fijas abajo en mobile (Reservas · Tarifas ·
+  Opiniones · Ajustes). `AdminHeader` es sólo título/aviso; `ADMIN_PAGE` es el
+  contenedor común. Reservas abre en "Próximas" ordenadas por llegada, con
+  contadores por pestaña (`lib/admin/reservation-views.ts`, fecha de hoy en
+  hora argentina). Ajustes guarda lo técnico (unidad y pago de prueba) en un
+  plegable. En Opiniones, "Borrar" vive dentro de "Editar".
 
 ## Verificación
 ```

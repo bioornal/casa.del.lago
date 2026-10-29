@@ -14,11 +14,11 @@ export function AgregadoForm({ current }: { current: ReviewsAggregate }) {
   const [state, action, pending] = useActionState(guardarAgregado, undefined);
 
   return (
-    <form action={action} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 }}>
+    <form action={action} style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <div>
           <label htmlFor="rating" style={label}>
-            Puntaje de la ficha
+            Puntaje (ej. 4,7)
           </label>
           <input
             id="rating"
@@ -32,7 +32,7 @@ export function AgregadoForm({ current }: { current: ReviewsAggregate }) {
         </div>
         <div>
           <label htmlFor="count" style={label}>
-            Total de reseñas en Google
+            Cantidad de reseñas
           </label>
           <input
             id="count"
@@ -47,7 +47,7 @@ export function AgregadoForm({ current }: { current: ReviewsAggregate }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
         <button type="submit" disabled={pending} style={submit(pending)}>
           {pending ? "Guardando…" : "Guardar puntaje"}
         </button>
@@ -59,10 +59,10 @@ export function AgregadoForm({ current }: { current: ReviewsAggregate }) {
         )}
       </div>
 
+      {/* No se declara como dato estructurado a propósito: Google penaliza
+          marcar reseñas de terceros como propias. */}
       <p style={{ ...hint, margin: 0 }}>
-        Copialo de tu ficha de Google cuando cambie: no se actualiza solo. Acepta coma o punto
-        (4,7 o 4.7). Ojo que el sitio no lo declara como dato estructurado a propósito — Google
-        penaliza marcar reseñas de terceros como propias.
+        No se actualiza solo: copialo de tu ficha de Google cuando cambie.
       </p>
     </form>
   );

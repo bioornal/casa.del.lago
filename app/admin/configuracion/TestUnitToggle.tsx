@@ -20,10 +20,10 @@ export function TestUnitToggle({ current }: { current: boolean }) {
   const [state, action, pending] = useActionState(saveTestUnit, undefined);
 
   return (
-    <div style={card}>
-      <h2 style={h2}>Unidad de prueba</h2>
+    <div className="rounded-[10px] bg-[#fbf8f2] p-4">
+      <h3 className="m-0 text-[15px] font-semibold">Unidad de prueba</h3>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0 12px" }}>
         <span
           style={{
             display: "inline-block",
@@ -33,27 +33,18 @@ export function TestUnitToggle({ current }: { current: boolean }) {
             background: current ? "#3f8f5f" : "#b0741d",
           }}
         />
-        <strong style={{ fontSize: 17 }}>{current ? "HABILITADA" : "Deshabilitada"}</strong>
+        <strong style={{ fontSize: 15 }}>{current ? "Habilitada" : "Deshabilitada"}</strong>
       </div>
 
       <p style={hint}>
-        Una unidad de alojamiento que no existe, para probar la cadena completa de una
-        reserva pagada: cobro con tarjeta, fila en reservas, email al huésped con el
-        .ics adjunto y aviso al dueño. No aparece en el sitio, no está en el buscador
-        ni en tarifas, y no bloquea disponibilidad de ninguna unidad real. Solo se
-        llega por el link.
+        Una cabaña ficticia para probar una reserva pagada de punta a punta (cobro,
+        emails y aviso al dueño). No aparece en la web ni bloquea fechas reales; sólo
+        se llega por el link. Cobra {money(TEST_UNIT_TOTAL)} reales.
       </p>
 
-      <p style={hint}>
-        Cobra {money(TEST_UNIT_TOTAL)} reales con la tarjeta que se use para probar.
-      </p>
-
-      <p style={hint}>
-        Apagar el flag puede tardar hasta 30 segundos en propagarse a todos los
-        servidores: la lectura de este valor tiene un memo con ese TTL y en
-        serverless hay varias instancias corriendo a la vez. No asumas que
-        quedó cerrado al instante de tocar el botón.
-      </p>
+      {/* El flag tiene memo de 30 s y en serverless hay varias instancias:
+          apagarlo no es instantáneo en todos los servidores. */}
+      <p style={hint}>Al deshabilitarla puede tardar hasta 30 segundos en cerrarse del todo.</p>
 
       {current && (
         <p style={hint}>
@@ -78,15 +69,15 @@ export function TestUnitToggle({ current }: { current: boolean }) {
             }
           }}
           style={{
-            padding: "13px 30px",
-            background: pending ? "#8a8170" : current ? "#8a3b1d" : "#23362B",
+            minHeight: 46,
+            padding: "0 20px",
+            background: pending ? "#8a8170" : current ? "#8a3b1d" : "#183d43",
             color: "#F8F5F0",
             border: "none",
-            borderRadius: 3,
+            borderRadius: 999,
             cursor: pending ? "default" : "pointer",
-            fontSize: 12.5,
-            letterSpacing: ".1em",
-            textTransform: "uppercase",
+            fontSize: 14,
+            fontWeight: 600,
           }}
         >
           {pending ? "Guardando…" : current ? "Deshabilitar unidad de prueba" : "Habilitar unidad de prueba"}
@@ -107,23 +98,9 @@ export function TestUnitToggle({ current }: { current: boolean }) {
   );
 }
 
-const card: React.CSSProperties = {
-  background: "#fff",
-  border: "1px solid #E7E0D4",
-  borderRadius: 8,
-  padding: 24,
-};
-
-const h2: React.CSSProperties = {
-  fontFamily: "'Cormorant Garamond', serif",
-  fontWeight: 500,
-  fontSize: 22,
-  margin: 0,
-};
-
 const hint: React.CSSProperties = {
-  fontSize: 12.5,
+  fontSize: 13.5,
   color: "#6b665d",
-  lineHeight: 1.6,
-  margin: "0 0 16px",
+  lineHeight: 1.55,
+  margin: "0 0 12px",
 };

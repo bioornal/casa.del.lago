@@ -36,9 +36,7 @@ function CampoTexto({ id, defaultValue }: { id: string; defaultValue: string }) 
         style={{ ...input, resize: "vertical", lineHeight: 1.6 }}
       />
       <p style={{ ...hint, margin: "6px 0 0", color: cerca ? "#8a3b1d" : "#6b665d" }}>
-        {value.length}/{BODY_MAX} caracteres. Pegalo tal cual, sin comillas y sin corregir la
-        ortografía: las comillas las agrega el sitio y la voz del huésped es parte de que se lea
-        auténtico.
+        {value.length}/{BODY_MAX} · Pegalo tal cual, sin comillas (las agrega la web).
       </p>
     </div>
   );
@@ -81,10 +79,10 @@ export function TestimonioForm({
     >
       {existing && <input type="hidden" name="id" value={existing.id} />}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
         <div>
           <label htmlFor={`author-${existing?.id ?? "new"}`} style={label}>
-            Nombre (como figura en Google)
+            Nombre
           </label>
           <input
             id={`author-${existing?.id ?? "new"}`}
@@ -97,7 +95,7 @@ export function TestimonioForm({
         </div>
         <div>
           <label htmlFor={`date-${existing?.id ?? "new"}`} style={label}>
-            Fecha (como la muestra Google)
+            Fecha
           </label>
           <input
             id={`date-${existing?.id ?? "new"}`}
@@ -110,7 +108,7 @@ export function TestimonioForm({
         </div>
         <div>
           <label htmlFor={`lang-${existing?.id ?? "new"}`} style={label}>
-            Idioma del texto
+            Idioma
           </label>
           <select
             id={`lang-${existing?.id ?? "new"}`}
@@ -147,9 +145,9 @@ export function TestimonioForm({
 
       <CampoTexto id={`body-${existing?.id ?? "new"}`} defaultValue={existing?.body ?? ""} />
 
-      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
         <button type="submit" disabled={pending} style={submit(pending)}>
-          {pending ? "Guardando…" : editando ? "Guardar cambios" : "Agregar testimonio"}
+          {pending ? "Guardando…" : editando ? "Guardar cambios" : "Agregar reseña"}
         </button>
         {editando && onDone && (
           <button
@@ -158,9 +156,10 @@ export function TestimonioForm({
             style={{
               background: "transparent",
               border: "1px solid #E7E0D4",
-              borderRadius: 4,
-              padding: "8px 14px",
-              fontSize: 13,
+              borderRadius: 999,
+              minHeight: 48,
+              padding: "0 20px",
+              fontSize: 14.5,
               cursor: "pointer",
               color: "#6b665d",
             }}
