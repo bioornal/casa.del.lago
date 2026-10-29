@@ -133,6 +133,28 @@ de consultas. Criterios:
 - Home, fichas y legales son estáticas (SSG): no consultan la base por visita;
   se regeneran con `revalidatePath` al guardar en el panel.
 
+## SEO y motores de IA (2026-10-29)
+- **Metadatos:** `app/[locale]/layout.tsx` fija `metadataBase` (sin él canonical,
+  hreflang y og:url salían relativos y Google los ignoraba). Cada página arma
+  los suyos con `pageMetadata()` (`lib/metadata.ts`): título, descripción,
+  canonical + hreflang con `x-default` (`pageAlternates` en `lib/seo.ts`) y
+  tarjeta para compartir. Textos en el namespace `seo` de messages.
+- **H1 de la home:** incluye el kicker "Lago Urugua-í · Misiones" (se ve igual).
+- **JSON-LD** (`lib/jsonld.ts`): WebSite + LodgingBusiness (sameAs/hasMap a la
+  ficha de Google Maps, `GOOGLE_MAPS_URL` en `lib/contact.ts`) que contiene
+  las Accommodation por `@id`; FAQPage de la sección visible "Preguntas
+  frecuentes" (namespace `faq`). Sin aggregateRating a propósito (reseñas de
+  Google, de terceros). Todo dato tiene que coincidir con lo visible.
+- **robots.txt:** sólo bloquea /admin y /api; /reservas y /mi-reserva usan
+  noindex (bloquearlas impediría leerlo). Crawlers de IA permitidos explícitos.
+- **Sitemap:** hreflang + x-default e imágenes de cada cabaña
+  (`lib/unit-photos.ts`).
+- **`/llms.txt`:** ruta estática generada con las tarifas reales; se revalida
+  al guardar tarifas.
+- Pendiente (manual, del dueño): verificar el dominio en Google Search Console
+  y enviar el sitemap; poner esta web en la ficha de Google Maps; cargar
+  INSTAGRAM_URL/FACEBOOK_URL (y Airbnb si se quiere) para sumarlos al sameAs.
+
 ## Guía para el cliente
 El dueño tiene una guía en Claude Docs: "Guía de la web — La Casa del Lago
 Urugua-í" (https://claude.ai/artifact/C4R1jhAmAoC3n9rrugDMaJ). Está escrita

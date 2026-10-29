@@ -6,6 +6,7 @@ import { SearchWidget } from "@/components/home/SearchWidget";
 import { UnitRateCard } from "@/components/tarifas/UnitRateCard";
 import { InfoSections } from "@/components/tarifas/InfoSections";
 import { ImageSlot } from "@/components/ui/ImageSlot";
+import { pageMetadata } from "@/lib/metadata";
 import { UNITS } from "@/lib/units";
 import { parseRateQuery } from "@/lib/reservation/search";
 import { getRatesForRange } from "@/lib/reservation/rates.server";
@@ -21,12 +22,16 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "meta" });
-  return {
-    title: "Tarifas — La Casa del Lago Urugua-í",
-    description: t("description"),
-    alternates: { languages: { es: "/es/tarifas", en: "/en/tarifas", pt: "/pt/tarifas" } },
-  };
+  const t = await getTranslations({ locale, namespace: "seo" });
+  // El canonical apunta a /tarifas sin ?checkIn=…: cada búsqueda de fechas es
+  // la misma página para Google.
+  return pageMetadata({
+    locale,
+    path: "/tarifas",
+    title: t("ratesTitle"),
+    description: t("ratesDescription"),
+    imageAlt: t("ogAlt"),
+  });
 }
 
 const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);

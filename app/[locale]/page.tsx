@@ -16,38 +16,13 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { getBookingMode } from "@/lib/site-settings.server";
 import { getPublishedTestimonios, getReviewsAggregate } from "@/lib/reviews/testimonios.server";
-import { bucketSrc } from "@/components/ui/ImageSlot";
-import { CONTACT_EMAIL } from "@/lib/contact";
+import { bucketSrc, UNIT_COVER_PHOTOS } from "@/components/ui/ImageSlot";
+import { PreguntasFrecuentes } from "@/components/home/PreguntasFrecuentes";
+import { lodgingJsonLd, faqJsonLd } from "@/lib/jsonld";
+import { pageMetadata } from "@/lib/metadata";
 
-const LODGING_JSONLD = {
-  "@context": "https://schema.org",
-  "@type": "LodgingBusiness",
-  name: "La Casa del Lago Urugua-í",
-  description:
-    "Cabañas a orillas del lago Urugua-í, entre Puerto Iguazú y Puerto Libertad, Misiones. Reserva directa, confirmación automática.",
-  address: {
-    "@type": "PostalAddress",
-    // El paraje va en streetAddress: schema.org no tiene campo de barrio, y
-    // addressLocality tiene que seguir siendo la localidad —Puerto Libertad— que
-    // es la que figura en las fichas de Google, Airbnb y Facebook del lodge.
-    streetAddress: "Puerto Bossetti, costa del lago Urugua-í",
-    addressLocality: "Puerto Libertad",
-    addressRegion: "Misiones",
-    addressCountry: "AR",
-  },
-  // Coordenadas reales, tomadas de la ficha de Google Maps del lodge.
-  geo: { "@type": "GeoCoordinates", latitude: -25.842811, longitude: -54.538968 },
-  telephone: "+54 9 3757 446156",
-  email: CONTACT_EMAIL,
-  priceRange: "$$",
-  aggregateRating: undefined,
-  amenityFeature: [
-    { "@type": "LocationFeatureSpecification", name: "Wi-Fi" },
-    { "@type": "LocationFeatureSpecification", name: "Aire acondicionado" },
-    { "@type": "LocationFeatureSpecification", name: "Cocina equipada" },
-    { "@type": "LocationFeatureSpecification", name: "Estacionamiento" },
-  ],
-};
+// Fotos reales para el JSON-LD del negocio: la panorámica y una de cada cabaña.
+const LODGING_IMAGES = ["hero/hero2.jpg", ...Object.values(UNIT_COVER_PHOTOS)].map((p) => bucketSrc(p));
 
 export async function generateMetadata({
   params,
@@ -55,39 +30,16 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "meta" });
-  const title = t("title");
-  const description = t("description");
-  return {
-    title,
-    description,
-    alternates: {
-      languages: { es: "/es", en: "/en", pt: "/pt" },
-    },
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      locale: { es: "es_AR", en: "en_US", pt: "pt_BR" }[locale] ?? "es_AR",
-      siteName: "La Casa del Lago Urugua-í",
-      images: [
-        {
-          // La misma panorámica del hero, del bucket propio. Antes apuntaba a un
-          // Cloudinary de otro cliente (ArumaLodge), que además servía otra foto.
-          url: bucketSrc("hero/hero2.jpg"),
-          width: 1678,
-          height: 937,
-          type: "image/jpeg",
-          alt: "La Casa del Lago Urugua-í — Lago Urugua-í, Misiones",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
-  };
+  const t = await getTranslations({ locale, namespace: "seo" });
+  // El título ya trae la marca ("… | La Casa del Lago"): sin plantilla.
+  return pageMetadata({
+    locale,
+    path: "",
+    title: t("homeTitle"),
+    description: t("homeDescription"),
+    imageAlt: t("ogAlt"),
+    absoluteTitle: true,
+  });
 }
 
 export default async function HomePage({
@@ -106,12 +58,19 @@ export default async function HomePage({
     getReviewsAggregate(),
   ]);
   const listPrices = methodRates(rateSettings, "card").nightly;
+  const seo = await getTranslations({ locale, namespace: "seo" });
+  const faq = await getTranslations({ locale, namespace: "faq" });
+  const lodgingLd = lodgingJsonLd({
+    locale,
+    description: seo("homeDescription"),
+    images: LODGING_IMAGES,
+    fromPrice: Math.min(...Object.values(listPrices)),
+  });
+  const faqLd = faqJsonLd(faq.raw("items") as Array<{ q: string; a: string }>);
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(LODGING_JSONLD) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <SiteNav />
       <main className="relative">
         {/* El buscador vive dentro de la columna de texto del hero, debajo del
@@ -128,6 +87,7 @@ export default async function HomePage({
             antes de "Reservar ahora". */}
         <Opiniones testimonios={testimonios} agregado={agregado} />
         <CtaReserva bookingMode={bookingMode} />
+        <PreguntasFrecuentes />
         <Contacto />
       </main>
       <SiteFooter />

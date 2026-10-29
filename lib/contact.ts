@@ -12,6 +12,16 @@ export const CONTACT_PHONE_HREF = "tel:+5493757446156";
 export const INSTAGRAM_URL: string | null = null;
 export const FACEBOOK_URL: string | null = null;
 
+// Ficha de Google Maps del lodge ("LA CASA DEL LAGO URUGUA-I"): el CID sale
+// del mapa embebido en Contacto. Va en el sameAs del JSON-LD, que es lo que
+// le dice a Google y a las IAs que esta web y esa ficha son el mismo negocio.
+export const GOOGLE_MAPS_URL = "https://www.google.com/maps?cid=13059304702414548858";
+
+/** Perfiles oficiales del negocio en otros sitios (schema.org sameAs). */
+export const SAME_AS: string[] = [GOOGLE_MAPS_URL, INSTAGRAM_URL, FACEBOOK_URL].filter(
+  (u): u is string => u !== null,
+);
+
 /** Link a WhatsApp, opcionalmente con mensaje prellenado. */
 export function waLink(message?: string): string {
   const base = `https://wa.me/${WHATSAPP_NUMBER}`;

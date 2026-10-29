@@ -64,23 +64,28 @@ export function Hero({ children }: { children?: React.ReactNode }) {
 
       <div className="relative z-[3] mx-auto w-full max-w-[1240px]">
         <div>
-          <div className="flex items-center gap-[14px]">
-            <span className="h-px w-[38px] bg-[rgba(245,238,225,.55)]" />
-            <span className="font-sans text-[11.5px] font-semibold uppercase tracking-[0.32em] text-[rgba(245,238,225,.86)]">
-              {t("kicker")}
+          {/* El kicker vive DENTRO del h1: el titular es poético ("Dormir tan
+              cerca del agua…") y sin él el h1 no nombraba ni el lago ni
+              Misiones. Visualmente no cambia nada. */}
+          <h1 className="m-0 font-normal">
+            <span className="flex items-center gap-[14px]">
+              <span aria-hidden className="h-px w-[38px] bg-[rgba(245,238,225,.55)]" />
+              <span className="font-sans text-[11.5px] font-semibold uppercase tracking-[0.32em] text-[rgba(245,238,225,.86)]">
+                {t("kicker")}
+              </span>
             </span>
-          </div>
-
-          <h1
-            className="font-display m-0 mt-[22px] text-balance font-normal leading-[0.94] tracking-[-0.028em] text-[#F8F3E8]"
-            style={{
-              fontSize: "clamp(46px,7.2vw,116px)",
-              textShadow: "0 2px 40px rgba(18,16,14,.35)",
-            }}
-          >
-            {t("title")}
-            <br />
-            <span className="font-light italic">{t("titleAccent")}</span>
+            <span
+              className="font-display mt-[22px] block text-balance leading-[0.94] tracking-[-0.028em] text-[#F8F3E8]"
+              style={{
+                fontSize: "clamp(46px,7.2vw,116px)",
+                textShadow: "0 2px 40px rgba(18,16,14,.35)",
+              }}
+            >
+              {/* Espacio explícito: el <br/> no lo es para un lector de texto. */}
+              {t("title")}{" "}
+              <br />
+              <span className="font-light italic">{t("titleAccent")}</span>
+            </span>
           </h1>
 
           <p

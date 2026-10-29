@@ -64,3 +64,30 @@ describe("robots", () => {
     expect(robots().sitemap).toMatch(/\/sitemap\.xml$/);
   });
 });
+
+describe("sitemap — señales para buscadores", () => {
+  it("cada entrada declara x-default apuntando al español", () => {
+    for (const e of sitemap()) {
+      const langs = e.alternates?.languages as Record<string, string>;
+      expect(langs["x-default"]).toMatch(/\/es(\/|$)/);
+    }
+  });
+
+  it("las fichas de cabaña listan sus fotos (búsqueda de imágenes)", () => {
+    const unitEntry = sitemap().find((e) => e.url.endsWith("/es/departamentos/aratiri"))!;
+    expect(unitEntry.images?.length).toBeGreaterThan(3);
+    // El host sale de NEXT_PUBLIC_SUPABASE_URL (en Netlify lo fija netlify.toml).
+    expect(unitEntry.images![0]).toContain("/storage/v1/object/public/imagenes/");
+  });
+});
+
+describe("robots — noindex visible", () => {
+  it("no bloquea /reservas ni /mi-reserva: tienen noindex y el crawler tiene que poder leerlo", () => {
+    const rules = robots().rules;
+    const all = Array.isArray(rules) ? rules : [rules];
+    for (const r of all) {
+      const dis = ([] as string[]).concat(r.disallow ?? []);
+      expect(dis.some((d) => d.includes("reservas"))).toBe(false);
+    }
+  });
+});

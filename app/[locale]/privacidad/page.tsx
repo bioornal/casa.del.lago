@@ -1,6 +1,7 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/lib/i18n/routing";
 import { LegalPage } from "@/components/legal/LegalPage";
+import { pageMetadata } from "@/lib/metadata";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -9,17 +10,14 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "legal" });
-  return {
-    title: `${t("privacyTitle")} — La Casa del Lago Urugua-í`,
+  const seo = await getTranslations({ locale, namespace: "seo" });
+  return pageMetadata({
+    locale,
+    path: "/privacidad",
+    title: t("privacyTitle"),
     description: t("privacyIntro"),
-    alternates: {
-      languages: {
-        es: "/es/privacidad",
-        en: "/en/privacidad",
-        pt: "/pt/privacidad",
-      },
-    },
-  };
+    imageAlt: seo("ogAlt"),
+  });
 }
 
 export default async function PrivacidadPage({

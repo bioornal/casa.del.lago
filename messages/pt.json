@@ -12,7 +12,7 @@
     "closeMenu": "Fechar menu"
   },
   "hero": {
-    "kicker": "Puerto Libertad · Misiones",
+    "kicker": "Lago Urugua-í · Misiones",
     "title": "Dormir tão perto da água",
     "subtitle": "Cabanas de frente para o lago Urugua-í, cada uma com sua piscina e seu fogo para o churrasco. Você só traz vontade de não fazer nada.",
     "titleAccent": "que dá para ouvir",
@@ -490,5 +490,64 @@
     "privacyP6": "Usamos Google Analytics para entender como o site é navegado (páginas vistas, de onde vêm os visitantes). São dados agregados e não identificam você pessoalmente. Você pode bloqueá-los nas configurações do navegador.",
     "privacyH7": "Contato",
     "privacyP7": "Para qualquer dúvida sobre seus dados: lacasadellagouruguai2026@gmail.com ou WhatsApp."
+  },
+  "seo": {
+    "homeTitle": "Cabanas à beira do lago Urugua-í, Misiones | La Casa del Lago",
+    "homeDescription": "Duas cabanas com piscina própria, píer e caiaques no lago Urugua-í, em Puerto Libertad, a 27 km das Cataratas do Iguaçu. Reserve direto com os anfitriões.",
+    "ratesTitle": "Tarifas e disponibilidade",
+    "ratesDescription": "Preço por noite das cabanas à beira do lago Urugua-í e disponibilidade para as suas datas. Reserve direto com os anfitriões, sem comissões.",
+    "ogAlt": "Pôr do sol sobre o lago Urugua-í na La Casa del Lago, Misiones",
+    "units": {
+      "aratiri": {
+        "title": "Cabana Aguaribay: 6 hóspedes, piscina e vista para o lago",
+        "description": "Cabana de 2 quartos e 65 m² para até 6 hóspedes, com piscina própria, varanda com churrasqueira e vista para o lago Urugua-í. A 27 km das Cataratas."
+      },
+      "aguaribay": {
+        "title": "Cabana Aratirí: 7 hóspedes, piscina e deck no lago",
+        "description": "Cabana de 45 m² para até 7 hóspedes, com piscina própria, lareira, churrasqueira e deck à beira d'água no lago Urugua-í, Misiones. A 27 km das Cataratas."
+      }
+    }
+  },
+  "faq": {
+    "kicker": "Perguntas frequentes",
+    "title": "O que nos perguntam antes de vir.",
+    "items": [
+      {
+        "q": "Onde fica La Casa del Lago?",
+        "a": "Em Puerto Bossetti, Puerto Libertad (Misiones, Argentina), às margens do lago Urugua-í. Chega-se por estrada asfaltada pela antiga Rota Nacional 12, entre Puerto Iguazú e Puerto Libertad, e estaciona-se na porta."
+      },
+      {
+        "q": "A que distância ficam as Cataratas do Iguaçu?",
+        "a": "A 27 km, cerca de 36 minutos de carro até a entrada do Parque Nacional Iguazú. O aeroporto de Iguazú (IGR) fica a 30 km, cerca de 40 minutos."
+      },
+      {
+        "q": "Para quantas pessoas são as cabanas?",
+        "a": "São duas cabanas. A Aguaribay recebe até 6 hóspedes (2 quartos, 65 m²) e a Aratirí até 7 (1 quarto, 45 m²)."
+      },
+      {
+        "q": "As cabanas têm piscina?",
+        "a": "Sim. Cada cabana tem sua própria piscina e churrasqueira, e as duas têm acesso ao píer no lago, com caiaques."
+      },
+      {
+        "q": "O que está incluído na estadia?",
+        "a": "Roupa de cama e banho, wi-fi, ar-condicionado, cozinha equipada, estacionamento e acesso ao píer."
+      },
+      {
+        "q": "Qual é o horário de check-in e check-out?",
+        "a": "O check-in é a partir das 15 h e o check-out até as 11 h."
+      },
+      {
+        "q": "São aceitos animais de estimação?",
+        "a": "Não, não são aceitos animais de estimação nas cabanas."
+      },
+      {
+        "q": "Como faço a reserva?",
+        "a": "Direto com os anfitriões, por este site ou pelo WhatsApp, sem comissões de intermediários."
+      },
+      {
+        "q": "Qual é a política de cancelamento?",
+        "a": "Cancelando com 7 dias ou mais de antecedência, você recebe 100% do valor pago. Nos 7 dias anteriores ao check-in não há reembolso. Com 7 dias ou mais de antecedência você também pode mudar as datas, sujeito à disponibilidade."
+      }
+    ]
   }
 }

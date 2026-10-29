@@ -67,6 +67,8 @@ export async function saveRates(
     revalidatePath(`/${locale}/reservas`);
     for (const u of UNITS) revalidatePath(`/${locale}/departamentos/${u.slug}`);
   }
+  // El resumen para motores de IA cita el precio "desde".
+  revalidatePath("/llms.txt");
 
   return { ok: true };
 }

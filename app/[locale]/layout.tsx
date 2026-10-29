@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import { SITE_URL } from "@/lib/seo";
+import { bucketSrc } from "@/components/ui/ImageSlot";
+import { DEFAULT_OG_IMAGE, OG_LOCALE, SITE_NAME } from "@/lib/metadata";
 import { notFound } from "next/navigation";
 import { routing } from "@/lib/i18n/routing";
 import { display, sans, accent } from "@/lib/fonts";
@@ -10,6 +15,29 @@ import "../globals.css";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
+}
+
+// Metadatos comunes a todo el sitio público. Lo central es metadataBase: sin él
+// Next dejaba canonical, hreflang y og:url relativos ("/es"), y Google ignora un
+// hreflang relativo. Las páginas sólo declaran título, descripción y
+// pageAlternates(); la imagen para compartir sale de acá salvo que la pisen.
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "seo" });
+  return {
+    metadataBase: new URL(SITE_URL),
+    applicationName: SITE_NAME,
+    title: { default: t("homeTitle"), template: "%s | La Casa del Lago" },
+    description: t("homeDescription"),
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      locale: OG_LOCALE[locale] ?? "es_AR",
+      alternateLocale: Object.values(OG_LOCALE).filter((l) => l !== OG_LOCALE[locale]),
+      images: [{ url: bucketSrc(DEFAULT_OG_IMAGE.path), width: DEFAULT_OG_IMAGE.width, height: DEFAULT_OG_IMAGE.height, alt: t("ogAlt") }],
+    },
+    twitter: { card: "summary_large_image" },
+  };
 }
 
 export default async function LocaleLayout({

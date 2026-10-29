@@ -12,7 +12,7 @@
     "closeMenu": "Close menu"
   },
   "hero": {
-    "kicker": "Puerto Libertad · Misiones",
+    "kicker": "Lake Urugua-í · Misiones",
     "title": "Sleep close enough to hear",
     "subtitle": "Cabins facing Lake Urugua-í, each with its own pool and its own fire for the asado. Just bring the will to do nothing.",
     "titleAccent": "the water",
@@ -490,5 +490,64 @@
     "privacyP6": "We use Google Analytics to understand how the site is browsed (page views, where visitors come from). This is aggregate data and doesn't identify you personally. You can block it from your browser settings.",
     "privacyH7": "Contact",
     "privacyP7": "For any question about your data: lacasadellagouruguai2026@gmail.com or WhatsApp."
+  },
+  "seo": {
+    "homeTitle": "Lakefront Cabins on Lake Urugua-í, Misiones | La Casa del Lago",
+    "homeDescription": "Two cabins with private pool, dock and kayaks on Lake Urugua-í in Puerto Libertad, 27 km from Iguazú Falls, Argentina. Book direct with the hosts.",
+    "ratesTitle": "Rates & availability",
+    "ratesDescription": "Nightly rates for the lakefront cabins on Lake Urugua-í and availability for your dates. Book direct with the hosts, no booking fees.",
+    "ogAlt": "Sunset over Lake Urugua-í from La Casa del Lago, Misiones",
+    "units": {
+      "aratiri": {
+        "title": "Aguaribay Cabin: 6 guests, private pool, lake view",
+        "description": "Two-bedroom, 65 m² cabin for up to 6 guests with a private pool, covered deck with grill and views of Lake Urugua-í. 27 km from Iguazú Falls."
+      },
+      "aguaribay": {
+        "title": "Aratirí Cabin: 7 guests, private pool, lakeside deck",
+        "description": "45 m² cabin for up to 7 guests with a private pool, wood stove, grill and a deck by the water on Lake Urugua-í, Misiones. 27 km from Iguazú Falls."
+      }
+    }
+  },
+  "faq": {
+    "kicker": "FAQ",
+    "title": "What guests ask before coming.",
+    "items": [
+      {
+        "q": "Where is La Casa del Lago?",
+        "a": "In Puerto Bossetti, Puerto Libertad (Misiones, Argentina), on the shore of Lake Urugua-í. You get there on paved road along former National Route 12, between Puerto Iguazú and Puerto Libertad, and park at the door."
+      },
+      {
+        "q": "How far is it from Iguazú Falls?",
+        "a": "27 km, about 36 minutes by car to the entrance of Iguazú National Park. Iguazú airport (IGR) is 30 km away, about 40 minutes."
+      },
+      {
+        "q": "How many people do the cabins sleep?",
+        "a": "There are two cabins. Aguaribay sleeps up to 6 guests (2 bedrooms, 65 m²) and Aratirí up to 7 (1 bedroom, 45 m²)."
+      },
+      {
+        "q": "Do the cabins have a pool?",
+        "a": "Yes. Each cabin has its own pool and grill, and both have access to the dock on the lake, with kayaks."
+      },
+      {
+        "q": "What is included?",
+        "a": "Bed linen and towels, Wi-Fi, air conditioning, a fully equipped kitchen, parking and access to the dock."
+      },
+      {
+        "q": "What are the check-in and check-out times?",
+        "a": "Check-in is from 3 pm and check-out is until 11 am."
+      },
+      {
+        "q": "Are pets allowed?",
+        "a": "No, pets are not allowed in the cabins."
+      },
+      {
+        "q": "How do I book?",
+        "a": "Directly with the hosts, on this website or via WhatsApp, with no booking-platform fees."
+      },
+      {
+        "q": "What is the cancellation policy?",
+        "a": "Cancel 7 days or more before check-in and you get a 100% refund. Within 7 days of check-in there is no refund. With 7 days or more notice you can also move your dates, subject to availability."
+      }
+    ]
   }
 }

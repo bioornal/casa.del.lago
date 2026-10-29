@@ -48,3 +48,19 @@ describe("absoluteUrl", () => {
     expect(absoluteUrl("/")).toBe("https://lacasadellagouruguai.com.ar");
   });
 });
+
+describe("pageAlternates", () => {
+  it("canonical del idioma propio + hreflang de los tres idiomas + x-default en español", async () => {
+    const { pageAlternates } = await import("@/lib/seo");
+    expect(pageAlternates("en", "/tarifas")).toEqual({
+      canonical: "/en/tarifas",
+      languages: { es: "/es/tarifas", en: "/en/tarifas", pt: "/pt/tarifas", "x-default": "/es/tarifas" },
+    });
+  });
+
+  it("la home no lleva barra final", async () => {
+    const { pageAlternates } = await import("@/lib/seo");
+    expect(pageAlternates("pt", "").canonical).toBe("/pt");
+    expect(pageAlternates("pt", "").languages["x-default"]).toBe("/es");
+  });
+});
