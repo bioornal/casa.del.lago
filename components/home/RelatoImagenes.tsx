@@ -111,7 +111,7 @@ export function RelatoImagenes() {
             <button
               type="button"
               onClick={() => openAt(0)}
-              className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-carbon transition-colors duration-300 hover:text-terracota"
+              className="inline-flex min-h-[44px] items-center gap-2 text-[12px] uppercase tracking-[0.12em] text-carbon transition-colors duration-300 hover:text-terracota"
             >
               {t("viewFull")}
               <span aria-hidden>→</span>

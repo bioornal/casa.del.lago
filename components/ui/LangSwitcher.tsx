@@ -60,13 +60,17 @@ export function LangSwitcher({
       ? "text-marfil font-semibold opacity-100"
       : "text-lago font-semibold opacity-100";
   return (
-    <div className="flex items-center gap-[9px] text-[12px] tracking-[0.06em]">
+    // Cada botón ocupa 40×40 (área táctil) aunque el texto mida 16px; el -ml
+    // compensa el aire del primero para que siga alineado con la columna.
+    <div className="-ml-[12px] flex items-center text-[13px] tracking-[0.06em]">
       {LOCALES.map((l, i) => (
-        <span key={l} className="flex items-center gap-[9px]">
+        <span key={l} className="flex items-center">
           <button
             type="button"
+            lang={l}
+            aria-current={l === locale ? "true" : undefined}
             onClick={() => switchTo(l)}
-            className={`cursor-pointer uppercase transition-[opacity,color] duration-200 ${
+            className={`inline-flex min-h-[40px] min-w-[40px] cursor-pointer items-center justify-center uppercase transition-[opacity,color] duration-200 ${
               l === locale ? active : `${text} opacity-45 hover:opacity-100`
             }`}
           >

@@ -58,14 +58,14 @@ export function TestimonioRow({
         <form action={moveAction}>
           <input type="hidden" name="id" value={t.id} />
           <input type="hidden" name="dir" value="up" />
-          <button type="submit" disabled={primero || movePending} style={rowButton()} title="Subir">
+          <button type="submit" disabled={primero || movePending} style={rowButton()} title="Subir" aria-label="Subir">
             ↑
           </button>
         </form>
         <form action={moveAction}>
           <input type="hidden" name="id" value={t.id} />
           <input type="hidden" name="dir" value="down" />
-          <button type="submit" disabled={ultimo || movePending} style={rowButton()} title="Bajar">
+          <button type="submit" disabled={ultimo || movePending} style={rowButton()} title="Bajar" aria-label="Bajar">
             ↓
           </button>
         </form>

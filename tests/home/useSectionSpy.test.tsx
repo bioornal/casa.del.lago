@@ -55,6 +55,37 @@ describe("useSectionSpy", () => {
     expect(result.current).toBe("galeria");
   });
 
+  it("vuelve a vacío cuando ninguna sección queda en la franja (regreso al hero)", () => {
+    const { result } = renderHook(() => useSectionSpy());
+    const io = MockIntersectionObserver.instances[0];
+    const contacto = document.getElementById("contacto")!;
+    act(() => {
+      io.callback([{ isIntersecting: true, intersectionRatio: 0.5, target: contacto }]);
+    });
+    expect(result.current).toBe("contacto");
+    act(() => {
+      io.callback([{ isIntersecting: false, intersectionRatio: 0, target: contacto }]);
+    });
+    expect(result.current).toBe("");
+  });
+
+  it("si la sección activa sale, pasa a la que sigue visible", () => {
+    const { result } = renderHook(() => useSectionSpy());
+    const io = MockIntersectionObserver.instances[0];
+    const casa = document.getElementById("casa")!;
+    const cabanas = document.getElementById("cabanas")!;
+    act(() => {
+      io.callback([
+        { isIntersecting: true, intersectionRatio: 0.2, target: casa },
+        { isIntersecting: true, intersectionRatio: 0.5, target: cabanas },
+      ]);
+    });
+    act(() => {
+      io.callback([{ isIntersecting: false, intersectionRatio: 0, target: cabanas }]);
+    });
+    expect(result.current).toBe("casa");
+  });
+
   it("no crea observer si no hay secciones en el DOM", () => {
     document.body.innerHTML = "";
     renderHook(() => useSectionSpy());

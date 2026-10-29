@@ -5,7 +5,11 @@
     "experiences": "El lugar",
     "gallery": "Galería",
     "contact": "Contacto",
-    "book": "Reservar"
+    "book": "Reservar",
+    "rates": "Tarifas",
+    "myReservation": "Mi reserva",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
   },
   "hero": {
     "kicker": "Puerto Libertad · Misiones",
@@ -29,7 +33,9 @@
     "select": "Elegí la fecha",
     "cta": "Ver disponibilidad",
     "guest": "huésped",
-    "guestsPlural": "huéspedes"
+    "guestsPlural": "huéspedes",
+    "addGuest": "Agregar huésped",
+    "removeGuest": "Quitar huésped"
   },
   "tarifas": {
     "title": "Tarifas disponibles",
@@ -308,7 +314,8 @@
     "waBookNote": "Confirmamos tu reserva al instante por WhatsApp",
     "waBookMessage": "Hola! Quiero reservar {unit}. ¿Tienen disponibilidad?",
     "whatsappLink": "Escribinos por WhatsApp",
-    "otherTitle": "Otras formas de mirar el lago."
+    "otherTitle": "Otras formas de mirar el lago.",
+    "upToGuests": "Hasta {n} huéspedes"
   },
   "meta": {
     "title": "La Casa del Lago Urugua-í — Cabañas a orillas del lago",

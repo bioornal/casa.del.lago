@@ -15,13 +15,13 @@ function fmtDay(iso: string, locale: string): string {
 const money = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
 
 const ctaActiveClass =
-  "inline-flex min-h-[48px] items-center justify-center whitespace-nowrap rounded-[2px] bg-terracota px-[22px] py-[13px] text-[11.5px] font-medium uppercase tracking-[.1em] text-marfil no-underline transition-[background,transform,box-shadow] duration-300 hover:-translate-y-px hover:bg-terracota-hover hover:shadow-[0_12px_24px_-14px_rgba(162,75,42,.8)]";
+  "inline-flex min-h-[48px] items-center justify-center whitespace-nowrap rounded-[2px] bg-terracota px-[22px] py-[13px] text-[12.5px] font-medium uppercase tracking-[.1em] text-marfil no-underline transition-[background,transform,box-shadow] duration-300 hover:-translate-y-px hover:bg-terracota-hover hover:shadow-[0_12px_24px_-14px_rgba(162,75,42,.8)]";
 
 const ctaDisabledClass =
-  "inline-flex min-h-[48px] items-center justify-center whitespace-nowrap rounded-[2px] border border-borde-medio bg-arena-clara px-[22px] py-[13px] text-[11.5px] font-medium uppercase tracking-[.1em] text-muted";
+  "inline-flex min-h-[48px] items-center justify-center whitespace-nowrap rounded-[2px] border border-borde-medio bg-arena-clara px-[22px] py-[13px] text-[12.5px] font-medium uppercase tracking-[.1em] text-muted";
 
 const chipClass =
-  "inline-flex items-center border-b border-[#c8dfe1] pb-1 text-[11px] tracking-[.03em] text-lago";
+  "inline-flex items-center border-b border-[#c8dfe1] pb-1 text-[12.5px] tracking-[.03em] text-lago";
 
 interface UnitRateCardProps {
   unit: Unit;
@@ -83,18 +83,18 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
                 <div className="font-display text-[32px] leading-none text-carbon">{money(rate.total)}</div>
                 {rate.lines.length > 1 ? (
                   rate.lines.map((l, i) => (
-                    <div key={i} className="mt-2 text-[11.5px] text-muted">
+                    <div key={i} className="mt-2 text-[13px] text-muted">
                       {l.nights} {l.nights === 1 ? t("night") : t("nights")} · {t(l.season === "high" ? "seasonHigh" : "seasonLow")} · {money(l.nightly)} {t("perNight")}
                     </div>
                   ))
                 ) : (
-                  <div className="mt-2 text-[11.5px] text-muted">
+                  <div className="mt-2 text-[13px] text-muted">
                     {rate.nights} {rate.nights === 1 ? t("night") : t("nights")} · {money(nightly)} {t("perNight")}
                     {rate.lines[0]?.season === "high" && ` · ${t("seasonHigh")}`}
                   </div>
                 )}
                 {rate.weekendPackage && (
-                  <div className="mt-3 rounded-[3px] border border-[#b9d6d5] bg-[#eaf5f3] px-3 py-2 text-[11.5px] font-semibold leading-[1.35] text-lago">
+                  <div className="mt-3 rounded-[3px] border border-[#b9d6d5] bg-[#eaf5f3] px-3 py-2 text-[13px] font-semibold leading-[1.35] text-lago">
                     {t("weekendPackage", {
                       nights: rate.nights,
                       billed: new Intl.NumberFormat(locale).format(rate.lines[0]?.billed ?? rate.nights),
@@ -102,7 +102,7 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
                   </div>
                 )}
                 {!whatsappMode && rate.savings > 0 && (
-                  <div className="mt-2 text-[11.5px] font-medium text-[#2f6b46]">
+                  <div className="mt-2 text-[13px] font-medium text-[#2f6b46]">
                     {t("transferNote", { total: money(rate.transferTotal), savings: money(rate.savings) })}
                   </div>
                 )}
@@ -147,7 +147,7 @@ export function UnitRateCard({ unit, rate, query, prices, bookingMode }: UnitRat
         </div>
 
         {whatsappMode && bookable && (
-          <p className="m-0 mt-3 text-right text-[11.5px] text-muted">{t("waNote")}</p>
+          <p className="m-0 mt-3 text-right text-[12.5px] text-muted">{t("waNote")}</p>
         )}
       </div>
     </article>

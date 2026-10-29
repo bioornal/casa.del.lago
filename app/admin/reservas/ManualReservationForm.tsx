@@ -26,7 +26,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 5,
   background: "#fff",
   color: "#1f1d19",
-  fontSize: 14,
+  fontSize: 16,
   outline: "none",
 };
 
@@ -34,7 +34,7 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 7,
   color: "#6b665d",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 700,
   letterSpacing: ".12em",
   textTransform: "uppercase",
@@ -52,6 +52,9 @@ export function ManualReservationForm({ disabledByUnit, availabilityHealthy }: P
   const [total, setTotal] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Plegado de entrada: en el celular el formulario ocupaba varias pantallas
+  // antes de la lista de reservas, que es lo que el dueño mira a diario.
+  const [open, setOpen] = useState(false);
 
   const maxGuests = UNIT_LIMITS[unitId];
   const nights = range.checkIn && range.checkOut ? computeNights(range.checkIn, range.checkOut) : 0;
@@ -111,11 +114,23 @@ export function ManualReservationForm({ disabledByUnit, availabilityHealthy }: P
               Para reservas tomadas por WhatsApp o fuera del checkout. Al guardar, Supabase bloquea las fechas automáticamente.
             </p>
           </div>
-          <div className={`rounded-full px-3 py-1.5 text-[11px] font-semibold ${availabilityHealthy ? "bg-[#d9eee4] text-[#245c3c]" : "bg-[#f8e4c1] text-[#805b1c]"}`}>
+          <div className={`self-start rounded-full px-3 py-1.5 text-[12px] font-semibold md:self-auto ${availabilityHealthy ? "bg-[#d9eee4] text-[#245c3c]" : "bg-[#f8e4c1] text-[#805b1c]"}`}>
             {availabilityHealthy ? "Supabase conectado" : "Verificar disponibilidad"}
           </div>
         </div>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls="manual-reservation-body"
+          onClick={() => setOpen((v) => !v)}
+          className="mt-5 inline-flex min-h-[46px] w-full items-center justify-center rounded-[6px] border border-white/25 bg-white/10 px-5 text-[14px] font-semibold text-marfil transition-colors hover:bg-white/15 sm:w-auto"
+        >
+          {open ? "Cerrar formulario" : "+ Cargar una reserva"}
+        </button>
       </div>
+
+      {open && (
+      <div id="manual-reservation-body">
 
       {!availabilityHealthy && (
         <div className="border-b border-[#e9d6a8] bg-[#fef6e7] px-6 py-3 text-[12.5px] leading-[1.5] text-[#7a5a18] md:px-8">
@@ -123,14 +138,14 @@ export function ManualReservationForm({ disabledByUnit, availabilityHealthy }: P
         </div>
       )}
 
-      <div className="grid gap-8 p-6 md:p-8 lg:grid-cols-[minmax(360px,1.05fr)_minmax(360px,.95fr)]">
-        <div className="rounded-[8px] border border-borde-claro bg-[#fbf8f2] p-5 md:p-6">
+      <div className="grid gap-8 p-4 md:p-8 lg:grid-cols-[minmax(360px,1.05fr)_minmax(360px,.95fr)]">
+        <div className="rounded-[8px] border border-borde-claro bg-[#fbf8f2] p-3 md:p-6">
           <div className="mb-5 flex items-end justify-between gap-4">
             <div>
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-[.2em] text-lago">Paso 1</div>
               <h3 className="m-0 font-display text-[24px] font-medium">Elegí la cabaña y las fechas</h3>
             </div>
-            <span className="text-[11px] text-muted">{disabledByUnit[unitId].length} noches ocupadas</span>
+            <span className="text-[12.5px] text-muted">{disabledByUnit[unitId].length} noches ocupadas</span>
           </div>
 
           <label htmlFor="manual-unit" style={labelStyle}>Cabaña</label>
@@ -139,10 +154,10 @@ export function ManualReservationForm({ disabledByUnit, availabilityHealthy }: P
             <option value="aguaribay">Aratirí · hasta 7 huéspedes</option>
           </select>
 
-          <div className="admin-calendar mt-5 rounded-[6px] border border-borde-claro bg-white p-3 md:p-4">
+          <div className="admin-calendar mt-5 rounded-[6px] border border-borde-claro bg-white p-1 md:p-4">
             <RangeCalendar value={range} onChange={setRange} disabledDates={disabledByUnit[unitId]} />
           </div>
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[11.5px] text-muted">
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-muted">
             <span><i className="mr-1.5 inline-block h-2.5 w-2.5 rounded-sm bg-terracota align-[-1px]" />Llegada / salida</span>
             <span><i className="mr-1.5 inline-block h-2.5 w-2.5 rounded-sm bg-[#ead3c5] align-[-1px]" />Estadía elegida</span>
             <span><i className="mr-1.5 inline-block h-2.5 w-2.5 rounded-sm bg-carbon/30 align-[-1px]" />Ocupada</span>
@@ -185,12 +200,14 @@ export function ManualReservationForm({ disabledByUnit, availabilityHealthy }: P
           </div>
 
           {msg && <div role="alert" className="mb-4 rounded-[6px] border border-[#e0b9a6] bg-[#f7e9e2] px-4 py-3 text-[13px] leading-[1.5] text-[#8a3b1d]">{msg}</div>}
-          <button type="button" disabled={busy} onClick={submit} className="w-full rounded-[4px] border-none bg-[#23362B] px-5 py-3.5 text-[12px] font-semibold uppercase tracking-[.12em] text-marfil transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+          <button type="button" disabled={busy} onClick={submit} className="min-h-[50px] w-full rounded-[6px] border-none bg-[#23362B] px-5 py-3.5 text-[14px] font-semibold uppercase tracking-[.12em] text-marfil transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
             {busy ? "Guardando…" : "Guardar reserva confirmada"}
           </button>
-          <p className="mb-0 mt-3 text-[11.5px] leading-[1.5] text-muted">La reserva manual queda confirmada y ocupa el rango en la base de datos.</p>
+          <p className="mb-0 mt-3 text-[13px] leading-[1.5] text-muted">La reserva manual queda confirmada y ocupa el rango en la base de datos.</p>
         </div>
       </div>
+      </div>
+      )}
     </section>
   );
 }

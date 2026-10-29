@@ -73,6 +73,24 @@ lago** (el front del lago está MÁS avanzado que el de Aruma en estilo):
 - Fix: `scripts/sandbox-pago.mjs` leía `ARUMA_CAL_*` → ahora `CDL_CAL_*`;
   test de lookup usaba código `arm-…` → `cdl-…`.
 
+## Pase mobile (2026-10-29)
+La mayoría de los huéspedes entra por celular y el dueño opera el panel SÓLO
+desde el teléfono. Criterios aplicados: áreas táctiles ≥ 40–44px, campos a 16px
+en pantallas táctiles (regla global en `globals.css`, evita el zoom de iOS),
+textos informativos ≥ 12,5px.
+- **Ficha de cabaña:** `MobileBookingBar` (precio + reservar) fija al pie debajo
+  de lg; `WhatsAppFab raised` sube el botón flotante para no pisarla.
+- **Menú mobile:** hamburguesa 44px, accesos a Tarifas y Mi reserva.
+- **Calendario del buscador:** marca la llegada al elegir la salida y titula
+  el modal (Llegada/Salida).
+- **Footer:** links a secciones con `/{locale}#id` (funcionan fuera de la home),
+  "WhatsApp" abre WhatsApp, email sin cortarse.
+- **Redes:** `INSTAGRAM_URL`/`FACEBOOK_URL` en `lib/contact.ts`; en null no se
+  muestran (antes eran botones muertos). Cargar las URLs reales.
+- **Panel:** login con labels/autocomplete; reservas con botones WhatsApp/Llamar
+  al huésped (`lib/admin/guest-contact.ts`), fechas legibles ("jue 5 nov"),
+  confirmación antes de Confirmar/Liberar; reserva manual plegada por defecto.
+
 ## Verificación
 ```
 pnpm install

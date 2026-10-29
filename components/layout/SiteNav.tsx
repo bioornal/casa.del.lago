@@ -145,10 +145,11 @@ export function SiteNav() {
           <button
             type="button"
             data-nav-burger
-            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            aria-label={open ? t("closeMenu") : t("openMenu")}
             aria-expanded={open}
+            aria-controls="nav-drawer"
             onClick={() => setOpen((v) => !v)}
-            className="lg:hidden flex flex-col items-center justify-center w-8 h-8 -ml-1"
+            className="lg:hidden flex flex-col items-center justify-center w-11 h-11 -ml-[10px]"
           >
             <span
               className="block w-6 h-px transition-transform duration-300"
@@ -203,14 +204,34 @@ export function SiteNav() {
 
       {/* Mobile drawer */}
       <div
+        id="nav-drawer"
         className="lg:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-[cubic-bezier(.16,.84,.44,1)] bg-marfil"
-        style={{ maxHeight: open ? 420 : 0, opacity: open ? 1 : 0 }}
+        style={{ maxHeight: open ? 560 : 0, opacity: open ? 1 : 0 }}
         aria-hidden={!open}
+        inert={!open}
       >
         <div
           className="px-5 pb-8 pt-2 flex flex-col gap-1 border-t border-[#E7E0D4]"
         >
           {navLinks}
+          {/* Accesos que en desktop viven en el footer: desde el celular el
+              huésped busca precios y su reserva en el menú, no al pie. */}
+          <div className="mt-2 grid grid-cols-2 gap-2 border-t border-[#E7E0D4] pt-4">
+            <Link
+              href="/tarifas"
+              onClick={() => setOpen(false)}
+              className="rounded-full border border-[#d8cfbf] px-4 py-3 text-center text-[14px] text-carbon no-underline"
+            >
+              {t("rates")}
+            </Link>
+            <Link
+              href="/mi-reserva"
+              onClick={() => setOpen(false)}
+              className="rounded-full border border-[#d8cfbf] px-4 py-3 text-center text-[14px] text-carbon no-underline"
+            >
+              {t("myReservation")}
+            </Link>
+          </div>
           <div className="mt-4 pt-4 border-t border-[#E7E0D4] flex items-center justify-between">
             <LangSwitcher variant="light" />
           </div>

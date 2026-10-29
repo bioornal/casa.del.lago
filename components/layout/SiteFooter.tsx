@@ -1,14 +1,19 @@
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { LangSwitcher } from "@/components/ui/LangSwitcher";
 import { Link as IntlLink } from "@/lib/i18n/navigation";
-import { CONTACT_EMAIL } from "@/lib/contact";
+import { CONTACT_EMAIL, waLink } from "@/lib/contact";
 
 export function SiteFooter() {
   const tf = useTranslations("footer");
   const tn = useTranslations("nav");
   const tc = useTranslations("contacto");
   const tll = useTranslations("comoLlegar");
+  const locale = useLocale();
+  // Con la ruta completa: el footer también se ve en las fichas y en /tarifas,
+  // donde un "#casa" pelado no lleva a ningún lado. En la home el navegador lo
+  // resuelve como salto dentro de la misma página.
+  const home = (id: string) => `/${locale}#${id}`;
 
   return (
     <footer className="bg-lago-hover text-arena pt-16 md:pt-[90px] pb-9">
@@ -36,33 +41,33 @@ export function SiteFooter() {
             <div className="text-[11px] uppercase tracking-[.22em] text-[#7FC9D6] mb-5">
               {tf("exploreTitle")}
             </div>
-            <div className="flex flex-col gap-[13px] text-[14px]">
+            <div className="flex flex-col gap-[13px] text-[14px] [&>a]:py-1">
               <a
-                href="#casa"
+                href={home("casa")}
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("brand")}
               </a>
               <a
-                href="#cabanas"
+                href={home("cabanas")}
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("apartments")}
               </a>
               <a
-                href="#lugar"
+                href={home("lugar")}
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("experiences")}
               </a>
               <a
-                href="#llegar"
+                href={home("llegar")}
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tll("kicker")}
               </a>
               <a
-                href="#galeria"
+                href={home("galeria")}
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tn("gallery")}
@@ -75,7 +80,7 @@ export function SiteFooter() {
             <div className="text-[11px] uppercase tracking-[.22em] text-[#7FC9D6] mb-5">
               {tf("contactTitle")}
             </div>
-            <div className="flex flex-col gap-[13px] text-[14px]">
+            <div className="flex flex-col gap-[13px] text-[14px] [&>a]:py-1">
               <IntlLink
                 href="/mi-reserva"
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
@@ -83,19 +88,21 @@ export function SiteFooter() {
                 {tf("myReservation")}
               </IntlLink>
               <a
-                href="#contacto"
+                href={waLink()}
+                target="_blank"
+                rel="noopener"
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 WhatsApp
               </a>
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
-                className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
+                className="break-all text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {CONTACT_EMAIL}
               </a>
               <a
-                href="#contacto"
+                href={home("contacto")}
                 className="text-[#C7DDE3] no-underline transition-colors duration-[250ms] hover:text-marfil"
               >
                 {tc("address")}

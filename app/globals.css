@@ -205,8 +205,8 @@ html[data-fx]:not([data-fx~="grano"]) [data-grain] { display: none !important; }
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 34px !important;
-  height: 34px !important;
+  width: 40px !important;
+  height: 40px !important;
   border: 1px solid #c9bfae !important;
   border-radius: 50% !important;
   background: #fff !important;
@@ -268,6 +268,12 @@ html[data-fx]:not([data-fx~="grano"]) [data-grain] { display: none !important; }
 .rdp-disabled {
   opacity: 0.35 !important;
   cursor: not-allowed !important;
+}
+/* La llegada queda deshabilitada mientras se elige la salida (estadía mínima),
+   pero tiene que seguir viéndose marcada: con el .35 parecía un día ocupado. */
+.rdp-disabled.rdp-lago-end {
+  opacity: 1 !important;
+  cursor: default !important;
 }
 
 /* Panel admin: el calendario ocupa su columna, no queda perdido en una tarjeta
@@ -334,3 +340,43 @@ html[data-fx]:not([data-fx~="grano"]) [data-grain] { display: none !important; }
   }
 }
 /* ================================================================================ */
+
+/* iOS Safari hace zoom al enfocar cualquier campo con letra < 16px y no vuelve
+   solo: el huésped (y el dueño en el panel) quedaban con la página ampliada y
+   corrida a mitad del formulario. En pantallas táctiles chicas todo campo de
+   texto va a 16px como mínimo. !important porque varios formularios fijan el
+   tamaño inline (style={{ fontSize: 14 }}). */
+@media (max-width: 767px) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+  select,
+  textarea {
+    font-size: max(16px, 1em) !important;
+  }
+}
+
+/* Panel: contacto al huésped con un toque (el dueño opera desde el celular). */
+.admin-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.admin-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--color-borde-medio);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-carbon);
+  font-size: 14px;
+  text-decoration: none;
+}
+.admin-contact-btn--wa {
+  border-color: #25D366;
+  background: #25D366;
+  color: #fff;
+  font-weight: 600;
+}

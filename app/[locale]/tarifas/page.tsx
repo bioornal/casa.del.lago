@@ -72,7 +72,7 @@ export default async function TarifasPage({
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,39,40,.72)_0%,rgba(17,39,40,.42)_38%,rgba(17,39,40,.08)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(17,39,40,.24),transparent_58%)]" />
 
-          <div className="relative z-10 mx-auto max-w-[1180px] px-5 pb-32 md:px-10 md:pb-36">
+          <div className="relative z-10 mx-auto max-w-[1180px] px-5 pb-8 md:px-10 md:pb-36">
             <div className="max-w-[650px]">
               <div className="mb-5 flex items-center gap-3 text-[10px] font-medium uppercase tracking-[.28em] text-[#b7d5d1]">
                 <span className="h-px w-9 bg-[#b7d5d1]/70" />
@@ -87,7 +87,9 @@ export default async function TarifasPage({
             </div>
           </div>
 
-          <div className="absolute inset-x-0 bottom-[-52px] z-20">
+          {/* En mobile el buscador apilado mide ~300px: absoluto tapaba el
+              subtítulo del hero. Ahí va en el flujo y sólo invade el borde. */}
+          <div className="relative z-20 -mb-[52px] md:absolute md:inset-x-0 md:bottom-[-52px] md:mb-0">
             <SearchWidget variant="bar" initial={query ?? undefined} stay={{ high: settings.high, low }} />
           </div>
         </section>

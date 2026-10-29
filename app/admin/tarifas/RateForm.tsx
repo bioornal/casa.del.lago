@@ -266,7 +266,7 @@ export function RateForm({ settings }: { settings: RateSettings }) {
                         setRanges((rs) => rs.filter((_, j) => j !== i));
                         setDirty(true);
                       }}
-                      className="ml-auto rounded-[4px] px-2.5 py-1.5 text-[12px] text-[#8a3b1d] hover:bg-[#f6e6df]"
+                      className="ml-auto min-h-[44px] rounded-[6px] px-3.5 text-[14px] text-[#8a3b1d] hover:bg-[#f6e6df]"
                     >
                       Quitar
                     </button>
@@ -277,7 +277,7 @@ export function RateForm({ settings }: { settings: RateSettings }) {
                 <button
                   type="button"
                   onClick={() => setRanges((rs) => [...rs, { from: "", to: "" }])}
-                  className="mt-1 rounded-[4px] border border-[#d8cfbf] bg-white px-3.5 py-2 text-[12.5px] text-[#23362B] hover:bg-[#fbf8f2]"
+                  className="mt-1 min-h-[44px] rounded-[6px] border border-[#d8cfbf] bg-white px-4 text-[14px] text-[#23362B] hover:bg-[#fbf8f2]"
                 >
                   + Agregar período
                 </button>

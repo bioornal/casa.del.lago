@@ -18,7 +18,7 @@ export const h2: CSSProperties = {
 };
 
 export const hint: CSSProperties = {
-  fontSize: 12.5,
+  fontSize: 13.5,
   color: "#6b665d",
   lineHeight: 1.6,
   margin: "0 0 16px",
@@ -26,7 +26,7 @@ export const hint: CSSProperties = {
 
 export const label: CSSProperties = {
   display: "block",
-  fontSize: 12,
+  fontSize: 13,
   color: "#6b665d",
   marginBottom: 6,
   letterSpacing: ".04em",
@@ -65,8 +65,11 @@ export function rowButton(danger = false): CSSProperties {
     background: "transparent",
     border: "1px solid #E7E0D4",
     borderRadius: 4,
-    padding: "6px 11px",
-    fontSize: 12.5,
+    // 44px: son los botones que el dueño toca desde el celular.
+    minHeight: 44,
+    minWidth: 44,
+    padding: "0 14px",
+    fontSize: 14,
     cursor: "pointer",
     color: danger ? "#8a3b1d" : "#6b665d",
     fontFamily: "inherit",

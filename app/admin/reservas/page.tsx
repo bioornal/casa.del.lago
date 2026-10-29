@@ -4,6 +4,7 @@ import { signComprobanteUrl } from "@/lib/reservation/comprobante.server";
 import { getAvailabilityServer } from "@/lib/reservation/availability.server";
 import { ReservationActions } from "./ReservationActions";
 import { ManualReservationForm } from "./ManualReservationForm";
+import { guestWhatsAppLink, guestTelLink, formatStayDate } from "@/lib/admin/guest-contact";
 
 const money = (n: number) => `$${new Intl.NumberFormat("es-AR").format(n)}`;
 
@@ -58,8 +59,10 @@ export default async function AdminReservasPage({
         <div className="flex flex-wrap gap-2">
         {tabs.map((tb) => (
           <a key={tb} href={`/admin/reservas?filter=${tb}`}
+            aria-current={filter === tb ? "page" : undefined}
             style={{
-              padding: "9px 15px", borderRadius: 5, fontSize: 12, textDecoration: "none", letterSpacing: ".04em",
+              display: "inline-flex", alignItems: "center", minHeight: 44,
+              padding: "0 16px", borderRadius: 6, fontSize: 14, textDecoration: "none", letterSpacing: ".02em",
               border: filter === tb ? "1px solid #23362B" : "1px solid #d8cfbf",
               background: filter === tb ? "#23362B" : "#fff",
               color: filter === tb ? "#F8F5F0" : "#6b665d",
@@ -68,7 +71,7 @@ export default async function AdminReservasPage({
           </a>
         ))}
         </div>
-        <span className="text-[12px] text-muted">{withUrls.length} {withUrls.length === 1 ? "reserva" : "reservas"}</span>
+        <span className="text-[13px] text-muted">{withUrls.length} {withUrls.length === 1 ? "reserva" : "reservas"}</span>
       </div>
 
       {dbError && (
@@ -81,19 +84,39 @@ export default async function AdminReservasPage({
       {withUrls.length === 0 && !dbError && <p style={{ color: "#6b665d" }}>No hay reservas en este filtro.</p>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {withUrls.map(({ r, comprobanteUrl }) => (
+        {withUrls.map(({ r, comprobanteUrl }) => {
+          const wa = guestWhatsAppLink(r.phone);
+          const tel = guestTelLink(r.phone);
+          return (
           <div key={r.id} className="admin-reservation-card">
             <div className="admin-reservation-person">
               <div style={{ fontWeight: 600 }}>{r.unit_name}</div>
-              <div style={{ fontSize: 13, color: "#6b665d" }}>{r.first_name} {r.last_name} · {r.email}</div>
-              <div style={{ fontSize: 13, color: "#6b665d" }}>{r.phone || "—"}</div>
+              <div style={{ fontSize: 15, color: "#1f1d19" }}>{r.first_name} {r.last_name}</div>
+              <a href={`mailto:${r.email}`} style={{ fontSize: 14, color: "#6b665d", wordBreak: "break-all" }}>{r.email}</a>
+              <div style={{ fontSize: 14, color: "#6b665d" }}>{r.phone || "—"}</div>
+              {/* El dueño opera desde el celular: un toque para escribir o llamar. */}
+              {(wa || tel) && (
+                <div className="admin-contact-actions">
+                  {wa && (
+                    <a href={wa} target="_blank" rel="noreferrer" className="admin-contact-btn admin-contact-btn--wa">
+                      WhatsApp
+                    </a>
+                  )}
+                  {tel && (
+                    <a href={tel} className="admin-contact-btn">
+                      Llamar
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
-            <div className="admin-reservation-stay" style={{ fontSize: 13 }}>
-              <div>{r.check_in} → {r.check_out}</div>
+            <div className="admin-reservation-stay" style={{ fontSize: 14 }}>
+              <div style={{ fontWeight: 600 }}>{formatStayDate(r.check_in)} → {formatStayDate(r.check_out)}</div>
+              <div style={{ color: "#8a8170", fontSize: 12.5 }}>{r.check_in} → {r.check_out}</div>
               <div style={{ color: "#6b665d" }}>{r.nights} noches · {r.guests} huésp.</div>
               <div style={{ fontWeight: 600 }}>{money(r.total)}</div>
             </div>
-            <div className="admin-reservation-meta" style={{ fontSize: 13 }}>
+            <div className="admin-reservation-meta" style={{ fontSize: 14 }}>
               <div>
                 <span style={{ padding: "2px 8px", borderRadius: 4, fontSize: 12, background: r.payment_method === "transfer" ? "#eef3ee" : "#f3eee6" }}>
                   {r.payment_method === "transfer" ? "Transferencia" : "Tarjeta"}
@@ -105,18 +128,23 @@ export default async function AdminReservasPage({
                 {r.status === "pending" ? "Pendiente" : r.status === "confirmed" ? "Confirmada" : "Liberada"}
               </div>
               {comprobanteUrl && (
-                <a href={comprobanteUrl} target="_blank" rel="noreferrer" style={{ fontSize: 13, color: "#A04B2A" }}>
+                <a href={comprobanteUrl} target="_blank" rel="noreferrer" style={{ display: "inline-block", padding: "8px 0", fontSize: 14, color: "#A04B2A" }}>
                   Ver comprobante ↗
                 </a>
               )}
             </div>
             <div className="admin-reservation-actions">
               {r.status === "pending" && (
-                <ReservationActions id={r.id} canConfirm={r.payment_method === "transfer"} />
+                <ReservationActions
+                  id={r.id}
+                  canConfirm={r.payment_method === "transfer"}
+                  summary={`${r.first_name} ${r.last_name} · ${r.unit_name} · ${formatStayDate(r.check_in)} → ${formatStayDate(r.check_out)}`}
+                />
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

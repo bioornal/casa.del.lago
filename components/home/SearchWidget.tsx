@@ -101,7 +101,7 @@ export function SearchWidget({ variant, initial, stay }: SearchWidgetProps) {
   const isHero = variant === "hero";
 
   const label: React.CSSProperties = {
-    fontSize: isHero ? 10.5 : 11,
+    fontSize: 11.5,
     fontWeight: isHero ? 600 : undefined,
     letterSpacing: ".2em",
     textTransform: "uppercase",
@@ -162,6 +162,10 @@ export function SearchWidget({ variant, initial, stay }: SearchWidgetProps) {
               <>
                 {backdrop}
                 <div className={popoverClass} onClick={(e) => e.stopPropagation()}>
+                  {/* En mobile el modal tapa el campo: el título dice qué fecha se elige. */}
+                  <div className="px-2 pb-1 pt-1 text-[11.5px] font-semibold uppercase tracking-[.2em] text-[#155e75] sm:hidden">
+                    {t("arrival")}
+                  </div>
                   <DayPicker
                     locale={dateFnsLocale}
                     defaultMonth={checkIn ?? new Date()}
@@ -197,12 +201,17 @@ export function SearchWidget({ variant, initial, stay }: SearchWidgetProps) {
               <>
                 {backdrop}
                 <div className={popoverClass} onClick={(e) => e.stopPropagation()}>
+                  <div className="px-2 pb-1 pt-1 text-[11.5px] font-semibold uppercase tracking-[.2em] text-[#155e75] sm:hidden">
+                    {t("departure")}
+                  </div>
                   <DayPicker
                     locale={dateFnsLocale}
                     defaultMonth={checkIn}
                     weekStartsOn={1}
                     disabled={{ before: addDays(checkIn, minimumNights(checkIn, stay)) }}
-                    modifiers={{ picked: checkOut ? [checkOut] : [] }}
+                    // La llegada también se marca: sin ella el huésped elegía la
+                    // salida sin ver desde qué día contaba.
+                    modifiers={{ picked: checkOut ? [checkIn, checkOut] : [checkIn] }}
                     modifiersClassNames={{ picked: "rdp-lago-end" }}
                     onDayClick={pickDeparture}
                   />
@@ -236,7 +245,7 @@ export function SearchWidget({ variant, initial, stay }: SearchWidgetProps) {
               <span className="flex gap-[10px]">
                 <button
                   type="button"
-                  aria-label="−"
+                  aria-label={t("removeGuest")}
                   onClick={() => setGuests((g) => Math.max(1, g - 1))}
                   style={variant === "hero" ? roundBtnGlass : roundBtnLight}
                 >
@@ -244,8 +253,8 @@ export function SearchWidget({ variant, initial, stay }: SearchWidgetProps) {
                 </button>
                 <button
                   type="button"
-                  aria-label="+"
-                    onClick={() => setGuests((g) => Math.min(7, g + 1))}
+                  aria-label={t("addGuest")}
+                  onClick={() => setGuests((g) => Math.min(7, g + 1))}
                   style={variant === "hero" ? roundBtnGlass : roundBtnLight}
                 >
                   +
@@ -298,9 +307,10 @@ const glassPanel: React.CSSProperties = {
   boxShadow: "0 26px 70px rgba(18,16,14,.40)",
 };
 
+// 40px: en el celular es lo mínimo cómodo para el pulgar (con 30 se erraba).
 const roundBtnBase: React.CSSProperties = {
-  width: 30,
-  height: 30,
+  width: 40,
+  height: 40,
   borderRadius: "50%",
   cursor: "pointer",
   fontSize: 17,

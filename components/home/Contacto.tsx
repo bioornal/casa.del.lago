@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { ContactForm } from "./ContactForm";
-import { waLink, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_HREF } from "@/lib/contact";
+import { waLink, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_HREF, INSTAGRAM_URL, FACEBOOK_URL } from "@/lib/contact";
 
 const WA_HREF = waLink();
 // Ficha de Google Maps del lodge. La anterior era la de Aruma (Obispo Angelelli
@@ -131,18 +131,18 @@ export function Contacto() {
                 </div>
                 <div
                   className="flex flex-col"
-                  style={{ gap: 9, fontSize: 14 }}
+                  style={{ gap: 2, fontSize: 14 }}
                 >
                   <a
                     href={`mailto:${CONTACT_EMAIL}`}
-                    className="no-underline transition-colors duration-[250ms] hover:text-terracota"
+                    className="break-all py-[7px] no-underline transition-colors duration-[250ms] hover:text-terracota"
                     style={{ color: "#4a463f" }}
                   >
                     {CONTACT_EMAIL}
                   </a>
                   <a
                     href={CONTACT_PHONE_HREF}
-                    className="no-underline transition-colors duration-[250ms] hover:text-terracota"
+                    className="break-all py-[7px] no-underline transition-colors duration-[250ms] hover:text-terracota"
                     style={{ color: "#4a463f" }}
                   >
                     {CONTACT_PHONE_DISPLAY}
@@ -151,14 +151,18 @@ export function Contacto() {
                 </div>
 
                 {/* Social icons */}
+                {(INSTAGRAM_URL || FACEBOOK_URL) && (
                 <div className="flex gap-[10px]" style={{ marginTop: 18 }}>
+                  {INSTAGRAM_URL && (
                   <a
-                    href="#contacto"
+                    href={INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label="Instagram"
                     className="flex items-center justify-center rounded-full transition-[border-color,color] duration-300 hover:border-bronce hover:text-carbon"
                     style={{
-                      width: 36,
-                      height: 36,
+                      width: 44,
+                      height: 44,
                       border: "1px solid #c9bfae",
                       color: "#6b665d",
                     }}
@@ -176,13 +180,17 @@ export function Contacto() {
                       <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" />
                     </svg>
                   </a>
+                  )}
+                  {FACEBOOK_URL && (
                   <a
-                    href="#contacto"
+                    href={FACEBOOK_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label="Facebook"
                     className="flex items-center justify-center rounded-full transition-[border-color,color] duration-300 hover:border-bronce hover:text-carbon"
                     style={{
-                      width: 36,
-                      height: 36,
+                      width: 44,
+                      height: 44,
                       border: "1px solid #c9bfae",
                       color: "#6b665d",
                     }}
@@ -196,7 +204,9 @@ export function Contacto() {
                       <path d="M13.5 21v-8h2.5l.5-3h-3V8.2c0-.9.3-1.5 1.6-1.5H17V4.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.7 1.3-3.7 3.8V10H8.5v3H11v8h2.5z" />
                     </svg>
                   </a>
+                  )}
                 </div>
+                )}
               </div>
             </div>
 

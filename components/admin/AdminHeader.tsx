@@ -28,15 +28,15 @@ export function AdminHeader({
   children?: ReactNode;
 }) {
   return (
-    <header className="mb-8 rounded-[12px] bg-[#183d43] px-6 py-6 text-marfil shadow-[0_22px_55px_-42px_rgba(21,45,55,.8)] md:px-8">
+    <header className="mb-6 rounded-[12px] bg-[#183d43] px-5 py-5 text-marfil md:mb-8 md:py-6 shadow-[0_22px_55px_-42px_rgba(21,45,55,.8)] md:px-8">
       <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
         <div>
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[.26em] text-[#a9cbd5]">{eyebrow}</div>
           <h1 className="m-0 font-display text-[clamp(34px,5vw,52px)] font-normal leading-none">{title}</h1>
-          <p className="mb-0 mt-3 max-w-[620px] text-[13px] leading-[1.6] text-[#c7dde3]">{description}</p>
+          <p className="mb-0 mt-3 max-w-[620px] text-[14px] leading-[1.6] text-[#c7dde3]">{description}</p>
         </div>
         {status && (
-          <div className={`rounded-full px-3 py-2 text-center text-[11px] font-semibold ${status.ok ? "bg-[#d9eee4] text-[#245c3c]" : "bg-[#f8e4c1] text-[#805b1c]"}`}>
+          <div className={`rounded-full px-3 py-2 text-center text-[12.5px] font-semibold ${status.ok ? "bg-[#d9eee4] text-[#245c3c]" : "bg-[#f8e4c1] text-[#805b1c]"}`}>
             {status.label}
           </div>
         )}
@@ -48,7 +48,7 @@ export function AdminHeader({
             <Link
               key={item.key}
               href={item.href}
-              className={`rounded-[4px] border px-3.5 py-2 text-[12px] no-underline transition-colors ${active ? "border-[#d9eee4] bg-[#d9eee4] font-semibold text-[#245c3c]" : "border-white/20 bg-transparent text-[#dcebed] hover:bg-white/10"}`}
+              className={`inline-flex min-h-[44px] items-center rounded-[6px] border px-4 text-[14px] no-underline transition-colors ${active ? "border-[#d9eee4] bg-[#d9eee4] font-semibold text-[#245c3c]" : "border-white/20 bg-transparent text-[#dcebed] hover:bg-white/10"}`}
             >
               {item.label}
             </Link>
@@ -56,7 +56,7 @@ export function AdminHeader({
         })}
         {children}
         <form action={signOut} className="ml-auto">
-          <button type="submit" className="rounded-[4px] border border-white/20 bg-transparent px-3.5 py-2 text-[12px] text-[#dcebed] transition-colors hover:bg-white/10">
+          <button type="submit" className="min-h-[44px] rounded-[6px] border border-white/20 bg-transparent px-4 text-[14px] text-[#dcebed] transition-colors hover:bg-white/10">
             Cerrar sesión
           </button>
         </form>

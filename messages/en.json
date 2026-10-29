@@ -5,7 +5,11 @@
     "experiences": "The place",
     "gallery": "Gallery",
     "contact": "Contact",
-    "book": "Book"
+    "book": "Book",
+    "rates": "Rates",
+    "myReservation": "My booking",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "hero": {
     "kicker": "Puerto Libertad · Misiones",
@@ -29,7 +33,9 @@
     "select": "Pick a date",
     "cta": "Check availability",
     "guest": "guest",
-    "guestsPlural": "guests"
+    "guestsPlural": "guests",
+    "addGuest": "Add guest",
+    "removeGuest": "Remove guest"
   },
   "tarifas": {
     "title": "Available rates",
@@ -308,7 +314,8 @@
     "waBookNote": "We confirm your booking instantly via WhatsApp",
     "waBookMessage": "Hi! I would like to book {unit}. Is it available?",
     "whatsappLink": "Message us on WhatsApp",
-    "otherTitle": "Other ways to look at the lake."
+    "otherTitle": "Other ways to look at the lake.",
+    "upToGuests": "Up to {n} guests"
   },
   "meta": {
     "title": "La Casa del Lago Urugua-í — Cabins on the lakeshore",

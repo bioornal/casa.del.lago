@@ -4,6 +4,7 @@ import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { WhatsAppFab } from "@/components/layout/WhatsAppFab";
 import { UnitDetail } from "@/components/departamento/UnitDetail";
+import { MobileBookingBar } from "@/components/departamento/StickyBookingCard";
 import { UNITS, getUnit } from "@/lib/units";
 import { getRateSettings } from "@/lib/reservation/rate-settings.server";
 import { getBookingMode } from "@/lib/site-settings.server";
@@ -76,7 +77,8 @@ export default async function DepartamentoPage({
         <UnitDetail unit={unit} locale={locale} prices={listPrices} bookingMode={bookingMode} />
       </main>
       <SiteFooter />
-      <WhatsAppFab />
+      <MobileBookingBar unit={unit} price={listPrices[unit.slug]} bookingMode={bookingMode} />
+      <WhatsAppFab raised />
     </>
   );
 }
