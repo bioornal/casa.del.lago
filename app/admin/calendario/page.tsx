@@ -1,17 +1,15 @@
-import Link from "next/link";
-import { AdminHeader, ADMIN_PAGE } from "@/components/admin/AdminHeader";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { listActiveStaysBetween, type StayRow } from "@/lib/reservation/reservations.server";
 import { todayIso } from "@/lib/admin/reservation-views";
-import { parseMonth, shiftMonth, monthOccupancy, monthGrid } from "@/lib/admin/calendar";
+import { parseMonth, getMonthsSequence, multiMonthDateBounds } from "@/lib/admin/calendar";
 import { UNITS } from "@/lib/units";
-import { CalendarMonth, type CalendarStay, type CalendarUnit } from "./CalendarMonth";
+import { AdminCalendarView } from "./AdminCalendarView";
+import type { CalendarStay, CalendarUnit } from "./CalendarMonth";
 
 export const metadata = { title: "Calendario — Panel La Casa del Lago" };
 
 // Siempre fresco: el calendario tiene que mostrar la última reserva cargada.
 export const dynamic = "force-dynamic";
-
-const MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
 // Un color fijo por cabaña, el mismo en la barra, la agenda y la leyenda.
 const UNIT_COLORS: Record<string, { color: string; soft: string }> = {
@@ -28,12 +26,15 @@ export default async function AdminCalendarioPage({
   const today = todayIso();
   const ref = parseMonth(mes, today);
 
-  // Sólo las semanas que se ven (con los días de relleno de los costados).
-  const weeks = monthGrid(ref.year, ref.month);
+  // Traemos un búfer de 5 meses consecutivos a partir del mes de referencia.
+  // Permite alternar en PC entre 1, 2, 3 o 4 meses al instante sin saltos ni esperas.
+  const bufferMonths = getMonthsSequence(ref, 5);
+  const { fromIso, toIso } = multiMonthDateBounds(bufferMonths);
+
   let dbError = false;
   let rows: StayRow[] = [];
   try {
-    rows = await listActiveStaysBetween(weeks[0][0].iso, weeks[weeks.length - 1][6].iso);
+    rows = await listActiveStaysBetween(fromIso, toIso);
   } catch {
     dbError = true;
   }
@@ -64,64 +65,19 @@ export default async function AdminCalendarioPage({
       phone: r.phone,
     }));
 
-  const occ = monthOccupancy(stays, ref.year, ref.month);
-  const isCurrent = shiftMonth(ref, 0) === today.slice(0, 7);
-
   return (
-    <div className={ADMIN_PAGE}>
+    <div className="mx-auto max-w-[1400px] px-4 pb-[calc(96px+env(safe-area-inset-bottom))] pt-5 md:px-8 md:pb-24 md:pt-8">
       <AdminHeader
         title="Calendario"
         alert={dbError ? "No se pudieron leer las reservas. Probá recargar en un rato." : undefined}
       />
 
-      {/* Navegación de meses */}
-      <div className="mb-4 flex items-center gap-2">
-        <Link
-          href={`/admin/calendario?mes=${shiftMonth(ref, -1)}`}
-          aria-label="Mes anterior"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d8cfbf] bg-white text-[18px] text-carbon no-underline"
-        >
-          ‹
-        </Link>
-        <h2 className="m-0 min-w-0 flex-1 text-center font-display text-[24px] font-normal">
-          {MONTHS[ref.month - 1]} {ref.year}
-        </h2>
-        <Link
-          href={`/admin/calendario?mes=${shiftMonth(ref, 1)}`}
-          aria-label="Mes siguiente"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d8cfbf] bg-white text-[18px] text-carbon no-underline"
-        >
-          ›
-        </Link>
-        {!isCurrent && (
-          <Link
-            href="/admin/calendario"
-            className="inline-flex min-h-[44px] items-center rounded-full border border-[#183d43] px-4 text-[14px] font-semibold text-[#183d43] no-underline"
-          >
-            Hoy
-          </Link>
-        )}
-      </div>
-
-      {/* Leyenda + ocupación del mes */}
-      <div className="mb-4 grid grid-cols-2 gap-2">
-        {units.map((u) => {
-          const n = occ.byUnit[u.id] ?? 0;
-          return (
-            <div key={u.id} className="flex items-center gap-2.5 rounded-[12px] border border-[#E7E0D4] bg-white px-3 py-2.5">
-              <span aria-hidden className="h-8 w-1.5 shrink-0 rounded-full" style={{ background: u.color }} />
-              <div className="min-w-0">
-                <div className="truncate text-[14.5px] font-semibold text-carbon">{u.short}</div>
-                <div className="text-[13px] text-[#6b665d]">
-                  {n} de {occ.nights} noches · {Math.round((n / occ.nights) * 100)}%
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <CalendarMonth year={ref.year} month={ref.month} today={today} stays={stays} units={units} />
+      <AdminCalendarView
+        initialRef={ref}
+        today={today}
+        stays={stays}
+        units={units}
+      />
 
       <p className="mb-0 mt-4 text-[13px] leading-[1.5] text-[#8a8170]">
         Barra llena: confirmada. Barra rayada: pendiente de pago. El día de salida queda libre para otra llegada.

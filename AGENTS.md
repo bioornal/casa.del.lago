@@ -103,9 +103,12 @@ textos informativos ≥ 12,5px.
   release habla de "pago no identificado") y `delete` (sólo released). En la
   tarjeta van dentro de "Detalles". Una released con `confirmed_at` o manual se
   muestra "Cancelada"; sin eso, "Liberada" (hold que no se pagó).
-- **Calendario (`/admin/calendario`):** vista mensual con una franja por
-  cabaña (color fijo), pendientes rayadas, ocupación del mes y agenda del día
-  tocado. Lógica en `lib/admin/calendar.ts` (fechas ISO como string).
+- **Calendario (`/admin/calendario`):** en PC admite vista multi-mes (selector
+  de 1, 2, 3 o 4 calendarios a la par, persistido en localStorage y por defecto 3)
+  con botón "Ampliar" (zoom) por mes para ver el detalle y volver; agenda interactiva
+  del período o del día seleccionado; en celular se fuerza siempre 1 mes a la vez.
+  Lógica en `lib/admin/calendar.ts` (fechas ISO como string). Búfer de 5 meses en la
+  consulta inicial (`listActiveStaysBetween`) para cambios de vista instantáneos.
 
 - **Velocidad del panel:** el middleware valida la sesión con `getClaims()`
   (claves ES256, verificación local; antes `getUser()` iba a Supabase en cada
@@ -165,9 +168,9 @@ sumar una fila al "Historial de cambios" del final.
 ## Verificación
 ```
 pnpm install
-pnpm test      # vitest — 510 tests (incluye method-pricing, rate-settings,
+pnpm test      # vitest — 545 tests (incluye method-pricing, rate-settings,
                # test-payment, fx-default, fx-watchdog, onda/estela/asentar,
-               # panel: reservation-views, calendar, guest-contact)
+               # panel: reservation-views, calendar multi-mes/zoom, guest-contact)
 pnpm exec tsc  # typecheck limpio
 pnpm build     # pasa; /admin/tarifas y /admin/pago-prueba quedan dinámicas
 pnpm dev       # http://localhost:3000

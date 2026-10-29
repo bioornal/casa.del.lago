@@ -10,6 +10,21 @@ type Stay = { unit_id: string; check_in: string; check_out: string };
 const pad = (n: number) => String(n).padStart(2, "0");
 const isoOf = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
+export const MONTHS_ES = [
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
+];
+
 export function parseMonth(raw: string | undefined, today: string): MonthRef {
   const m = raw ? /^(\d{4})-(\d{2})$/.exec(raw) : null;
   if (m && Number(m[2]) >= 1 && Number(m[2]) <= 12) return { year: Number(m[1]), month: Number(m[2]) };
@@ -19,6 +34,29 @@ export function parseMonth(raw: string | undefined, today: string): MonthRef {
 export function shiftMonth({ year, month }: MonthRef, delta: number): string {
   const d = new Date(year, month - 1 + delta, 1);
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+}
+
+export function addMonthsToRef({ year, month }: MonthRef, delta: number): MonthRef {
+  const d = new Date(year, month - 1 + delta, 1);
+  return { year: d.getFullYear(), month: d.getMonth() + 1 };
+}
+
+export function getMonthsSequence(startRef: MonthRef, count: number): MonthRef[] {
+  const n = Math.max(1, count);
+  return Array.from({ length: n }, (_, i) => addMonthsToRef(startRef, i));
+}
+
+export function formatMonthRange(months: MonthRef[]): string {
+  if (months.length === 0) return "";
+  if (months.length === 1) {
+    return `${MONTHS_ES[months[0].month - 1]} ${months[0].year}`;
+  }
+  const first = months[0];
+  const last = months[months.length - 1];
+  if (first.year === last.year) {
+    return `${MONTHS_ES[first.month - 1]} – ${MONTHS_ES[last.month - 1]} ${first.year}`;
+  }
+  return `${MONTHS_ES[first.month - 1]} ${first.year} – ${MONTHS_ES[last.month - 1]} ${last.year}`;
 }
 
 /** Semanas (lunes a domingo) que cubren el mes, con días de relleno a los costados. */
@@ -73,4 +111,33 @@ export function monthOccupancy(stays: Stay[], year: number, month: number): { ni
     }
   }
   return { nights, byUnit };
+}
+
+/** Noches ocupadas combinadas en un rango de meses. */
+export function rangeOccupancy(
+  stays: Stay[],
+  months: MonthRef[],
+): { nights: number; byUnit: Record<string, number> } {
+  let totalNights = 0;
+  const byUnit: Record<string, number> = {};
+  for (const m of months) {
+    const occ = monthOccupancy(stays, m.year, m.month);
+    totalNights += occ.nights;
+    for (const [unitId, n] of Object.entries(occ.byUnit)) {
+      byUnit[unitId] = (byUnit[unitId] ?? 0) + n;
+    }
+  }
+  return { nights: totalNights, byUnit };
+}
+
+/** Devuelve las fechas extremas [fromIso, toIso] que cubren las semanas de todos los meses dados. */
+export function multiMonthDateBounds(months: MonthRef[]): { fromIso: string; toIso: string } {
+  if (months.length === 0) throw new Error("months must not be empty");
+  const firstGrid = monthGrid(months[0].year, months[0].month);
+  const last = months[months.length - 1];
+  const lastGrid = monthGrid(last.year, last.month);
+  return {
+    fromIso: firstGrid[0][0].iso,
+    toIso: lastGrid[lastGrid.length - 1][6].iso,
+  };
 }

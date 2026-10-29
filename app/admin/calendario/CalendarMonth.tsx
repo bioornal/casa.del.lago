@@ -20,10 +20,10 @@ export type CalendarStay = {
 
 export type CalendarUnit = { id: string; name: string; short: string; color: string; soft: string };
 
-const WEEKDAYS = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sá", "Do"];
+export const WEEKDAYS = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sá", "Do"];
 
 /** Fondo de la barra: lleno si está confirmada, rayado si todavía está pendiente. */
-function barStyle(u: CalendarUnit, pending: boolean): React.CSSProperties {
+export function barStyle(u: CalendarUnit, pending: boolean): React.CSSProperties {
   return pending
     ? { background: `repeating-linear-gradient(135deg, ${u.soft} 0 5px, ${u.color}55 5px 9px)`, color: u.color }
     : { background: u.color, color: "#fff" };
@@ -35,12 +35,16 @@ export function CalendarMonth({
   today,
   stays,
   units,
+  onZoomOut,
+  zoomBackLabel,
 }: {
   year: number;
   month: number;
   today: string;
   stays: CalendarStay[];
   units: CalendarUnit[];
+  onZoomOut?: () => void;
+  zoomBackLabel?: string;
 }) {
   const weeks = monthGrid(year, month);
   const inMonthToday = today.startsWith(`${year}-${String(month).padStart(2, "0")}`);
@@ -54,7 +58,27 @@ export function CalendarMonth({
     .sort((a, b) => a.check_in.localeCompare(b.check_in));
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start">
+    <div>
+      {onZoomOut && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-[12px] border border-[#183d43]/15 bg-[#f0f6f6] px-4 py-2.5">
+          <div className="flex items-center gap-2 text-[13.5px] text-[#183d43]">
+            <span className="font-semibold">Modo ampliado</span>
+            <span className="text-[#6b665d]">· Vista detallada del mes con agenda lateral</span>
+          </div>
+          <button
+            type="button"
+            onClick={onZoomOut}
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#183d43] bg-white px-3.5 py-1 text-[13px] font-semibold text-[#183d43] shadow-xs hover:bg-[#183d43] hover:text-white transition-colors cursor-pointer"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {zoomBackLabel ?? "Volver a vista múltiple"}
+          </button>
+        </div>
+      )}
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start">
       <div className="overflow-hidden rounded-[14px] border border-[#E7E0D4] bg-white">
         <div className="grid grid-cols-7 border-b border-[#f0eae0] bg-[#fbf8f2]">
           {WEEKDAYS.map((d) => (
@@ -176,5 +200,6 @@ export function CalendarMonth({
         )}
       </section>
     </div>
+  </div>
   );
 }
