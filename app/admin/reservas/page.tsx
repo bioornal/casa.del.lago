@@ -1,9 +1,17 @@
 import Link from "next/link";
+import { after } from "next/server";
 import { AdminHeader, ADMIN_PAGE } from "@/components/admin/AdminHeader";
-import { listReservations } from "@/lib/reservation/reservations.server";
+import { listReservations, releaseExpiredPendingReservations } from "@/lib/reservation/reservations.server";
 import { signComprobanteUrl } from "@/lib/reservation/comprobante.server";
-import { getAvailabilityServer } from "@/lib/reservation/availability.server";
-import { parseView, reservationView, todayIso, VIEW_IDS, VIEW_LABEL } from "@/lib/admin/reservation-views";
+import {
+  parseView,
+  reservationView,
+  todayIso,
+  blockedNightsByUnit,
+  withExpiredHoldsReleased,
+  VIEW_IDS,
+  VIEW_LABEL,
+} from "@/lib/admin/reservation-views";
 import { ManualReservationForm } from "./ManualReservationForm";
 import { ReservationCard } from "./ReservationCard";
 
@@ -29,11 +37,21 @@ export default async function AdminReservasPage({
   let dbError: string | null = null;
   let rows: Awaited<ReturnType<typeof listReservations>> = [];
   try {
-    // Se traen todas y se filtran acá: así cada pestaña muestra su contador.
-    rows = await listReservations("all");
+    // UNA consulta para todo: la lista, los contadores de cada pestaña y las
+    // fechas ocupadas del formulario manual. Antes eran seis consultas en fila
+    // (lista + limpieza y disponibilidad por cabaña), ~1,2 s por navegación.
+    rows = withExpiredHoldsReleased(await listReservations("all"));
   } catch (err) {
     dbError = err instanceof Error ? err.message : String(err);
   }
+  // La limpieza de holds vencidos en la base corre después de responder: la
+  // pantalla ya los muestra liberados (withExpiredHoldsReleased).
+  after(() =>
+    releaseExpiredPendingReservations().catch((err) =>
+      console.error("[admin] limpieza de holds falló:", err instanceof Error ? err.message : err),
+    ),
+  );
+
   const { list, counts } = reservationView(rows, view, today);
   const withUrls = await Promise.all(
     list.map(async (r) => ({
@@ -42,13 +60,8 @@ export default async function AdminReservasPage({
     })),
   );
 
-  const winFrom = new Date();
-  const winTo = new Date(winFrom.getFullYear() + 1, winFrom.getMonth(), 1);
-  const [avAra, avAgu] = await Promise.all([
-    getAvailabilityServer("aratiri", { from: winFrom, to: winTo }),
-    getAvailabilityServer("aguaribay", { from: winFrom, to: winTo }),
-  ]);
-  const availabilityHealthy = avAra.source === "supabase" && avAgu.source === "supabase";
+  const blocked = blockedNightsByUnit(rows, today);
+  const availabilityHealthy = dbError === null;
 
   return (
     <div className={ADMIN_PAGE}>
@@ -56,10 +69,8 @@ export default async function AdminReservasPage({
         title="Reservas"
         alert={
           dbError
-            ? "No se pudieron leer las reservas. Probá recargar en un rato; si sigue, avisale a quien mantiene la web."
-            : !availabilityHealthy
-              ? "No se pudo verificar la disponibilidad real. Antes de cargar una reserva, confirmá las fechas."
-              : undefined
+            ? "No se pudieron leer las reservas ni la disponibilidad. Probá recargar en un rato; si sigue, avisale a quien mantiene la web."
+            : undefined
         }
       />
 
@@ -77,7 +88,7 @@ export default async function AdminReservasPage({
       )}
 
       <ManualReservationForm
-        disabledByUnit={{ aratiri: avAra.disabledDates, aguaribay: avAgu.disabledDates }}
+        disabledByUnit={{ aratiri: blocked.aratiri ?? [], aguaribay: blocked.aguaribay ?? [] }}
         availabilityHealthy={availabilityHealthy}
       />
 

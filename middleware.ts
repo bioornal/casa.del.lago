@@ -34,8 +34,14 @@ async function guardAdmin(req: NextRequest): Promise<NextResponse> {
       },
     },
   );
-  const { data } = await supabase.auth.getUser();
-  const email = data.user?.email?.trim().toLowerCase();
+  // getClaims y no getUser: el proyecto firma los tokens con claves
+  // asimétricas (ES256), así que la firma se verifica acá con la clave pública
+  // (que queda en memoria) y no hace falta ir al servidor de Auth en cada
+  // navegación del panel (~250 ms cada vez). Si el token venció, lo renueva y
+  // escribe las cookies nuevas por setAll, igual que getUser.
+  const { data } = await supabase.auth.getClaims();
+  const claimEmail = data?.claims?.email;
+  const email = typeof claimEmail === "string" ? claimEmail.trim().toLowerCase() : undefined;
   const allow = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
   const ok = !!email && allow.includes(email);
 

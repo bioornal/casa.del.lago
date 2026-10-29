@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/site-settings.server";
 import { hasBookingModeOverride } from "@/lib/booking-mode";
-import { getAdminUser } from "@/lib/admin/auth";
+import { getAdminEmailForDisplay } from "@/lib/admin/auth";
 import { signOut } from "@/app/admin/login/actions";
 import { AdminHeader, ADMIN_PAGE } from "@/components/admin/AdminHeader";
 import { ModeToggle } from "./ModeToggle";
@@ -13,7 +13,7 @@ export const metadata = { title: "Ajustes — Panel La Casa del Lago" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminConfiguracionPage() {
-  const [settings, admin] = await Promise.all([getSiteSettings(), getAdminUser()]);
+  const [settings, adminEmail] = await Promise.all([getSiteSettings(), getAdminEmailForDisplay()]);
 
   return (
     <div className={ADMIN_PAGE}>
@@ -23,7 +23,7 @@ export default async function AdminConfiguracionPage() {
 
         <section className="rounded-[14px] border border-[#E7E0D4] bg-white p-4 md:p-6">
           <h2 className="m-0 font-display text-[22px] font-normal">Tu cuenta</h2>
-          {admin?.email && <p className="mb-0 mt-1 break-all text-[14px] text-[#6b665d]">{admin.email}</p>}
+          {adminEmail && <p className="mb-0 mt-1 break-all text-[14px] text-[#6b665d]">{adminEmail}</p>}
           <form action={signOut} className="mt-4">
             <button
               type="submit"

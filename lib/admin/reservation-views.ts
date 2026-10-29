@@ -55,3 +55,45 @@ export function reservationView<T extends Viewable>(
   else list.sort((a, b) => b.created_at.localeCompare(a.created_at));
   return { list, counts };
 }
+
+/**
+ * Noches ocupadas por cabaña (Date a medianoche local, como las espera el
+ * RangeCalendar), sacadas de las mismas filas que ya trae la lista. Antes el
+ * panel hacía cuatro consultas más a Supabase para lo mismo. Se omiten las
+ * reservas que ya terminaron antes de `fromIso`.
+ */
+export function blockedNightsByUnit(
+  rows: Array<{ unit_id: string; status: string; check_in: string; check_out: string }>,
+  fromIso: string,
+): Record<string, Date[]> {
+  const out: Record<string, Date[]> = {};
+  for (const r of rows) {
+    if (r.status === "released" || r.check_out <= fromIso) continue;
+    const [ys, ms, ds] = r.check_in.split("-").map(Number);
+    const [ye, me, de] = r.check_out.split("-").map(Number);
+    const cur = new Date(ys, ms - 1, ds);
+    const end = new Date(ye, me - 1, de);
+    const list = (out[r.unit_id] ??= []);
+    while (cur < end) {
+      list.push(new Date(cur));
+      cur.setDate(cur.getDate() + 1);
+    }
+  }
+  return out;
+}
+
+/**
+ * Un hold de tarjeta vencido se muestra ya como liberado, sin esperar a que la
+ * limpieza en la base termine: así la limpieza puede correr después de
+ * responder y no retrasa la pantalla.
+ */
+export function withExpiredHoldsReleased<T extends { status: string; expires_at: string | null }>(
+  rows: T[],
+  now: Date = new Date(),
+): T[] {
+  // Date.parse y no comparación de texto: Supabase devuelve "+00:00", no "Z".
+  const nowMs = now.getTime();
+  return rows.map((r) =>
+    r.status === "pending" && r.expires_at !== null && Date.parse(r.expires_at) < nowMs ? { ...r, status: "released" } : r,
+  );
+}

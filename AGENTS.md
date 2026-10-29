@@ -92,8 +92,8 @@ textos informativos ≥ 12,5px.
   confirmación antes de Confirmar/Liberar; reserva manual plegada por defecto.
 - **Panel tipo app (2026-10-29, segunda vuelta):** navegación en
   `components/admin/AdminNav.tsx` (montada en `app/admin/layout.tsx`): barra
-  superior compacta + pestañas fijas abajo en mobile (Reservas · Tarifas ·
-  Opiniones · Ajustes). `AdminHeader` es sólo título/aviso; `ADMIN_PAGE` es el
+  superior compacta + pestañas fijas abajo en mobile (Reservas · Calendario ·
+  Tarifas · Opiniones · Ajustes). `AdminHeader` es sólo título/aviso; `ADMIN_PAGE` es el
   contenedor común. Reservas abre en "Próximas" ordenadas por llegada, con
   contadores por pestaña (`lib/admin/reservation-views.ts`, fecha de hoy en
   hora argentina). Ajustes guarda lo técnico (unidad y pago de prueba) en un
@@ -107,11 +107,27 @@ textos informativos ≥ 12,5px.
   cabaña (color fijo), pendientes rayadas, ocupación del mes y agenda del día
   tocado. Lógica en `lib/admin/calendar.ts` (fechas ISO como string).
 
+- **Velocidad del panel:** el middleware valida la sesión con `getClaims()`
+  (claves ES256, verificación local; antes `getUser()` iba a Supabase en cada
+  navegación). Reservas hace UNA consulta: las noches ocupadas del formulario
+  salen de esas filas (`blockedNightsByUnit`) y la limpieza de holds vencidos
+  corre con `after()` tras responder. `app/admin/loading.tsx` da el esqueleto
+  instantáneo al cambiar de pestaña. Las acciones que cambian datos siguen
+  usando `getAdminUser()` (consulta al servidor de Auth).
+
+## Guía para el cliente
+El dueño tiene una guía en Claude Docs: "Guía de la web — La Casa del Lago
+Urugua-í" (https://claude.ai/artifact/C4R1jhAmAoC3n9rrugDMaJ). Está escrita
+para él, sin tecnicismos. Cuando cambia algo que el dueño ve o usa (panel,
+precios, mails, flujo de reserva), actualizar la sección que corresponde y
+sumar una fila al "Historial de cambios" del final.
+
 ## Verificación
 ```
 pnpm install
-pnpm test      # vitest — 243 tests (incluye method-pricing, rate-settings,
-               # test-payment, fx-default, fx-watchdog, onda/estela/asentar)
+pnpm test      # vitest — 510 tests (incluye method-pricing, rate-settings,
+               # test-payment, fx-default, fx-watchdog, onda/estela/asentar,
+               # panel: reservation-views, calendar, guest-contact)
 pnpm exec tsc  # typecheck limpio
 pnpm build     # pasa; /admin/tarifas y /admin/pago-prueba quedan dinámicas
 pnpm dev       # http://localhost:3000
