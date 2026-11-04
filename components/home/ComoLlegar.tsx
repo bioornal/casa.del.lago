@@ -19,7 +19,10 @@ export function ComoLlegar() {
   return (
     // -mt-px: guarda contra el hilo de fracción de píxel con "El lugar".
     <section id="llegar" className="-mt-px bg-marfil">
-      <div className="relative h-[clamp(260px,32vw,480px)] overflow-hidden bg-lago">
+      {/* Fondo petróleo → marfil (no bg-lago liso): el alto cae en fracciones
+          de píxel y la última fila dejaba ver el petróleo como un hilo oscuro
+          sobre el marfil. Arriba sigue siendo petróleo mientras carga la foto. */}
+      <div className="relative h-[clamp(260px,32vw,480px)] overflow-hidden bg-[linear-gradient(180deg,#155e75_0%,#155e75_55%,#f5eee1_100%)]">
         {/* Parallax suave hacia abajo: la foto va más lenta que la página y la
             banda gana profundidad. Sobra 80px arriba para ese recorrido. */}
         <Parallax speed={70} className="absolute inset-x-0 -top-[80px] h-[calc(100%+80px)]">
@@ -31,10 +34,19 @@ export function ComoLlegar() {
             sizes="100vw"
           />
         </Parallax>
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: UNION }} />
+        {/* -bottom-[2px]: el velo pasa apenas el borde (la banda lo recorta), así
+            la última fila de fracción de píxel también queda cubierta de marfil
+            y la foto no asoma como un hilo. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 -bottom-[2px]"
+          style={{ background: UNION }}
+        />
       </div>
 
-      <div className="px-[clamp(20px,4vw,56px)] pt-[clamp(24px,4vw,48px)] pb-[clamp(80px,11vh,140px)]">
+      {/* Aire de marfil liso entre el final del fundido y el texto (pedido
+          del dueño: que la foto no "toque" el título). */}
+      <div className="px-[clamp(20px,4vw,56px)] pt-[clamp(64px,8vw,120px)] pb-[clamp(80px,11vh,140px)]">
       <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-start gap-[clamp(36px,6vw,96px)] md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <div>
           <div>

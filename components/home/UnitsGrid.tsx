@@ -42,26 +42,15 @@ export function UnitsGrid({ prices }: { prices: Record<UnitSlug, number> }) {
       // contenedor de scroll.
       className="relative isolate overflow-clip bg-marfil px-[clamp(20px,4vw,56px)] pt-[clamp(72px,10vh,120px)] pb-[clamp(80px,11vh,140px)]"
     >
-      {/* Lámina botánica, arriba a la derecha. Nunca detrás de un texto:
-          - desktop: grande; baja por detrás de la FOTO de la primera fila (que
-            por eso va a la derecha) y asoma por el costado y por arriba de
-            ella. El encabezado se queda en el 56% izquierdo.
-          - celular: el título ocupa todo el ancho, así que va chica y
-            encuadrada en las palmas, en la esquina, por encima del título.
-          Parallax hacia ARRIBA: se va por el borde superior, nunca baja. */}
+      {/* Lámina botánica en celular: el título ocupa todo el ancho, así que va
+          chica y encuadrada en las palmas, en la esquina, por encima del
+          título. En desktop va detrás de la foto de la primera fila (abajo). */}
       <Ilustracion
         {...LAMINA_BOTANICA}
         encuadre={{ proporcion: "928 / 600", posicion: "50% 0%" }}
         aclarar={1.1}
         sizes="150px"
         className="right-0 top-0 w-[150px] opacity-80 md:hidden"
-      />
-      <Ilustracion
-        {...LAMINA_BOTANICA}
-        aclarar={1.1}
-        parallax={-40}
-        sizes="620px"
-        className="right-0 top-0 hidden w-[clamp(300px,42vw,620px)] md:block"
       />
 
       <div className="mx-auto max-w-[1240px]">
@@ -136,6 +125,23 @@ export function UnitsGrid({ prices }: { prices: Record<UnitSlug, number> }) {
 
                 {/* Fotos: la grande se abre como cortina, la chica sube después */}
                 <div className="relative pb-[clamp(36px,4.5vw,60px)] [grid-area:photo]">
+                  {/* Desktop: la lámina botánica grande, DETRÁS de la foto de la
+                      primera fila (por eso esa fila lleva la foto a la derecha).
+                      125% del ancho de la foto y corrida hacia arriba (margin-top
+                      en % = % del ANCHO, así escala igual que la foto): las
+                      palmas suben por encima de la foto hacia el lado vacío del
+                      encabezado, y el helecho y la yerba asoman a la derecha y
+                      abajo, antes de la fila siguiente. Ningún texto queda encima.
+                      Parallax hacia arriba: nunca baja hacia la fila 2. */}
+                  {i === 0 && (
+                    <Ilustracion
+                      {...LAMINA_BOTANICA}
+                      aclarar={1.1}
+                      parallax={-40}
+                      sizes="(max-width: 1440px) 70vw, 1000px"
+                      className="left-[2.5%] top-0 -mt-[46.5%] hidden w-[125%] md:block"
+                    />
+                  )}
                   <Link href={href} tabIndex={-1} aria-hidden="true" className="group block">
                     <div data-cortina className="relative aspect-[4/3] overflow-hidden rounded-[3px] bg-slot">
                       <div data-cortina-img className="absolute inset-0">
