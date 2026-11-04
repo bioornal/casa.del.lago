@@ -98,6 +98,16 @@ const BUCKET_FILES = new Set([
   "hero/hero2.jpg", // el atardecer bajo el árbol grande — la del hero
   "hero/ChatGPT1.jpg", // el mismo lago al atardecer, extendido a 16:9
   "hero/ChatGPT2.jpg", // la misma vista pasada a día — la banda de "El lugar"
+  // ── Secciones del home ──────────────────────────────────────────────────
+  // Carpeta secciones/ (2026-11-04): fotos e ilustraciones hechas para una
+  // sección puntual de la home.
+  "secciones/seccion reservas (1).jpg", // la cabaña de noche con guirnaldas, panorámica 1584×672 — fondo de "Reservá"
+  // Generadas con IA. Estas dos quedaron con el nombre CRUZADO al subirlas:
+  "secciones/lagoAnochecer.jpg", // en realidad la LÁMINA BOTÁNICA (pindó, helecho, yerba), 928×1152 — "Cabañas"
+  "secciones/GraficosHojas.jpg", // en realidad el LAGO AL ANOCHECER con bruma, panorámica 1584×672 — "Cómo llegar"
+  "secciones/lago.jpg", // ilustración: kayak, juncos y garza, 1200×896 — "Postales del lago"
+  "secciones/mate.jpg", // ilustración: mate y termo sobre una tabla, 1024×1024 — "Opiniones"
+  "secciones/preguntas.jpg", // ilustración: llave, brújula y mapa del lago, 928×1152 — "Preguntas frecuentes"
 ]);
 
 /** URL pública de una foto dentro del bucket imagenes (p. ej. "14.jpeg"). */

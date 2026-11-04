@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
 import { ImageSlot } from "@/components/ui/ImageSlot";
+import { Ilustracion, ILUSTRACION_KAYAK } from "@/components/ui/Ilustracion";
 import { GalleryLightbox, type GalleryItem } from "./GalleryLightbox";
 
 /**
@@ -84,10 +85,25 @@ export function RelatoImagenes() {
   };
 
   return (
-    <section id="galeria" className="relative bg-arena py-16 md:py-[110px] overflow-hidden">
+    // En celular el padding de arriba es más alto: ahí vive el kayak, por encima
+    // del título (en desktop entra a la derecha del encabezado).
+    <section id="galeria" className="relative isolate bg-arena pt-[140px] pb-16 md:py-[110px] overflow-hidden">
+      {/* Ilustración: kayak, juncos y garza. La mitad izquierda y el tercio de
+          abajo del archivo son papel (que se funde con la arena), así que los
+          trazos caen sólo arriba a la derecha: al lado del encabezado (que va
+          en columna a la izquierda) y, apenas, por detrás de las primeras
+          fotos de la grilla, que la tapan. */}
+      <Ilustracion
+        {...ILUSTRACION_KAYAK}
+        aclarar={1.03}
+        parallax={-30}
+        sizes="(max-width: 768px) 280px, 720px"
+        className="right-0 top-0 w-[280px] md:w-[clamp(360px,48vw,720px)]"
+      />
       <div className="relative z-[1] mx-auto max-w-[1320px] px-5 md:px-12">
-        {/* Header */}
-        <div className="flex flex-wrap items-end justify-between gap-5 mb-9 md:mb-[48px]">
+        {/* Header en columna (el botón debajo del título), como Cabañas: deja
+            libre la derecha para la ilustración. */}
+        <div className="flex flex-col items-start gap-2 mb-9 md:mb-[48px]">
           <div className="max-w-[560px]">
             <div>
               <Kicker>{t("kicker")}</Kicker>
@@ -101,13 +117,7 @@ export function RelatoImagenes() {
               </h2>
             </div>
           </div>
-          {/* La fogata se ancla AL BOTÓN, no a la sección: centrada con
-              left-1/2 queda alineada con él sea cual sea su ancho —"Ver
-              completa" / "View full" / "Ver completa" miden distinto— y en
-              cualquier viewport, sin porcentajes a ojo. Sube al aire del
-              padding superior con bottom-full. */}
           <div className="relative">
-
             <button
               type="button"
               onClick={() => openAt(0)}

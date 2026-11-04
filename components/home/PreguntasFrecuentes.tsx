@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
+import { Ilustracion, ILUSTRACION_PREGUNTAS } from "@/components/ui/Ilustracion";
 
 // Preguntas frecuentes de la home. Es texto visible (no sólo JSON-LD): Google
 // exige que el FAQPage refleje lo que está en la página, y es el formato que los
@@ -22,6 +23,20 @@ export function PreguntasFrecuentes() {
           >
             {t("title")}
           </h2>
+          {/* Ilustración: la llave, la brújula y el mapa del lago — lo que hay
+              que saber para llegar. Viñeta en la columna vacía bajo el título
+              (nunca detrás de un texto). Sólo en desktop: en celular las
+              preguntas vienen enseguida y no hay hueco. El encuadre le saca
+              el papel vacío de arriba y abajo: más dibujo en el mismo alto. */}
+          <Ilustracion
+            {...ILUSTRACION_PREGUNTAS}
+            encuadre={{ proporcion: "928 / 760", posicion: "50% 55%" }}
+            enFlujo
+            aclarar={1.13}
+            parallax={30}
+            sizes="420px"
+            className="mt-[clamp(20px,3vw,40px)] hidden w-[clamp(280px,30vw,420px)] -translate-x-[8%] md:block"
+          />
         </div>
 
         <div className="border-b border-borde-medio">

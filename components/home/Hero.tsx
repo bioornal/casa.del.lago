@@ -61,6 +61,14 @@ export function Hero({ children }: { children?: React.ReactNode }) {
             "linear-gradient(90deg,rgba(18,16,14,.62) 0%,rgba(18,16,14,.20) 48%,rgba(18,16,14,0) 76%)",
         }}
       />
+      {/* Fundido al pie: el hero termina en el mismo tono sólido con el que
+          arranca "La casa" (otra foto a todo el ancho), así el paso de una a
+          otra no se lee como un corte. Ver HERO_JOIN en Manifiesto. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[18%]"
+        style={{ background: "linear-gradient(180deg,rgba(18,16,14,0) 0%,rgb(18,16,14) 100%)" }}
+      />
 
       <div className="relative z-[3] mx-auto w-full max-w-[1240px]">
         <div>

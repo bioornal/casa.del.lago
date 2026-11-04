@@ -1,16 +1,40 @@
 import { useTranslations } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
+import { ImageSlot } from "@/components/ui/ImageSlot";
+import { Parallax } from "@/components/motion/Parallax";
 
 const ROWS = ["igr", "cataratas", "wanda", "foz", "cde", "posadas"] as const;
+
+// Banda de entrada: el lago al anochecer (imagen generada con IA; en el bucket
+// quedó con el nombre cruzado, "secciones/GraficosHojas.jpg"). Arriba arranca del mismo
+// petróleo con el que termina "El lugar" (bg-lago, #155e75) — el cielo de la
+// foto es casi de ese tono, así que la unión no se ve — y abajo la bruma del
+// agua se disuelve en el marfil de esta sección.
+const UNION =
+  "linear-gradient(180deg,rgb(21,94,117) 0%,rgba(21,94,117,.55) 14%,rgba(21,94,117,0) 36%,rgba(245,238,225,0) 56%,rgba(245,238,225,.24) 70%,rgba(245,238,225,.6) 85%,rgb(245,238,225) 100%)";
 
 export function ComoLlegar() {
   const t = useTranslations("comoLlegar");
 
   return (
-    <section
-      id="llegar"
-      className="bg-marfil px-[clamp(20px,4vw,56px)] py-[clamp(80px,11vh,140px)]"
-    >
+    // -mt-px: guarda contra el hilo de fracción de píxel con "El lugar".
+    <section id="llegar" className="-mt-px bg-marfil">
+      <div className="relative h-[clamp(260px,32vw,480px)] overflow-hidden bg-lago">
+        {/* Parallax suave hacia abajo: la foto va más lenta que la página y la
+            banda gana profundidad. Sobra 80px arriba para ese recorrido. */}
+        <Parallax speed={70} className="absolute inset-x-0 -top-[80px] h-[calc(100%+80px)]">
+          <ImageSlot
+            label={t("photoAlt")}
+            photo="secciones/GraficosHojas.jpg"
+            className="h-full w-full bg-transparent!"
+            position="20% 55%"
+            sizes="100vw"
+          />
+        </Parallax>
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: UNION }} />
+      </div>
+
+      <div className="px-[clamp(20px,4vw,56px)] pt-[clamp(24px,4vw,48px)] pb-[clamp(80px,11vh,140px)]">
       <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-start gap-[clamp(36px,6vw,96px)] md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         <div>
           <div>
@@ -59,6 +83,7 @@ export function ComoLlegar() {
             {t("mapLink")}
           </a>
         </div>
+      </div>
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
 import { useTranslations, useFormatter } from "next-intl";
 import { Kicker } from "@/components/ui/Kicker";
+import { Ilustracion, ILUSTRACION_MATE } from "@/components/ui/Ilustracion";
 import { FICHA_URL, type ReviewsAggregate, type Testimonio } from "@/lib/reviews/testimonios";
 
 /**
@@ -89,7 +90,10 @@ export function Opiniones({
         >
           {/* Columna izquierda: el dato duro. Sticky en desktop para que el 4,7
               acompañe el scroll de las tarjetas —es el argumento, no un adorno. */}
-          <div className={hayTestimonios ? "md:sticky md:top-[120px]" : undefined}>
+          {/* bg-arena-clara (el mismo del fondo, no se nota): sticky crea su
+              propio grupo de mezcla y la ilustración del mate necesita un fondo
+              adentro de ese grupo para fundir su papel. */}
+          <div className={hayTestimonios ? "md:sticky md:top-[120px] md:bg-arena-clara" : undefined}>
             <div>
               <Kicker>{t("kicker")}</Kicker>
             </div>
@@ -128,6 +132,22 @@ export function Opiniones({
                 <span aria-hidden>→</span>
               </a>
             </div>
+
+            {/* Ilustración: el mate y el termo, la ronda de quien cuenta cómo le
+                fue. Viñeta en su propio lugar debajo del link (no detrás de un
+                texto); viaja con la columna sticky y llena el hueco bajo el
+                4,7. Sólo en desktop, donde ese hueco existe. El encuadre le
+                saca el papel de arriba y abajo (más dibujo en el mismo alto).
+                Sin translate: si se sale de la columna, esa franja queda fuera
+                del fondo de la columna y el papel se ve. */}
+            <Ilustracion
+              {...ILUSTRACION_MATE}
+              encuadre={{ proporcion: "1024 / 860", posicion: "50% 50%" }}
+              enFlujo
+              aclarar={1.17}
+              sizes="340px"
+              className="mt-[clamp(16px,2vw,28px)] hidden w-[clamp(240px,24vw,340px)] md:block"
+            />
           </div>
 
           {/* Tarjetas: hairlines, no cajas — es el mismo recurso que Cómo llegar

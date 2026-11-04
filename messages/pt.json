@@ -104,23 +104,33 @@
   },
   "manifiesto": {
     "kicker": "A casa",
-    "title": "O dia termina olhando o pôr do sol sobre a água.",
+    "title": "O dia termina olhando o pôr do sol <em>sobre a água.</em>",
     "body": "Dias de píer, caiaque e água; noites de céu aberto e silêncio. A calma é por nossa conta.",
-    "link": "Conheça o lugar →"
+    "link": "Conheça o lugar →",
+    "caption": "o lago, visto da margem",
+    "photoAlt": "O lago Urugua-í ao pôr do sol, o céu refletido na água"
   },
   "units": {
     "sectionKicker": "Cabanas",
-    "sectionTitle": "Cada cabana olha o lago de outra maneira.",
+    "sectionTitle": "Cada cabana olha o lago <em>de outra maneira.</em>",
     "viewAll": "Consultar disponibilidade →",
     "fromPrice": "A partir de {price}",
     "perNight": "a noite",
+    "cta": "Ver a cabana",
+    "specGuests": "Hóspedes",
+    "guestsValue": "Até {n}",
+    "specBedrooms": "Quartos",
+    "specArea": "Área",
+    "specOutdoor": "Área externa",
+    "outdoorValue": "Piscina e churrasqueira",
+    "insetAlt": "Interior da {name}",
     "aratiri": {
       "name": "Cabaña Aguaribay",
-      "sub": "Até 6 hóspedes · 2 quartos · varanda com churrasqueira · vista para o lago"
+      "feat": "Dois quartos, varanda com churrasqueira e o lago de frente."
     },
     "aguaribay": {
       "name": "Cabaña Aratirí",
-      "sub": "Até 7 hóspedes · 1 quarto · salamandra · deck na água"
+      "feat": "Salamandra para as noites e um deck na água."
     },
     "note": "Cada cabana tem sua piscina e sua churrasqueira. As duas incluem roupa de cama, wifi, estacionamento e acesso ao píer."
   },
@@ -154,6 +164,7 @@
     "body": "Às margens do lago Urugua-í, na antiga RN12 entre Puerto Iguazú e Puerto Libertad: acesso por asfalto e estacionamento na porta. Para Foz e Ciudad del Este, some o tempo de alfândega.",
     "checkin": "Check-in 15 h · Check-out 11 h",
     "mapLink": "Abrir no Maps →",
+    "photoAlt": "O lago Urugua-í ao anoitecer, com névoa sobre a água e a mata na outra margem",
     "rows": {
       "igr": {
         "place": "Aeroporto de Iguazú (IGR)",
@@ -242,11 +253,12 @@
   },
   "cta": {
     "kicker": "Reservar",
-    "title": "Conte para nós quando você vem.",
+    "title": "Conte para nós quando <em>você vem.</em>",
     "body": "Escreva para nós e combinamos a estadia. Somos os anfitriões: respondemos nós mesmos, sem intermediários nem comissões.",
     "bookNow": "Reservar agora",
     "whatsapp": "WhatsApp",
-    "handwritten": "Esperamos por você!"
+    "handwritten": "Esperamos por você!",
+    "photoAlt": "A cabana à noite, com as luzinhas acesas sobre a piscina"
   },
   "contacto": {
     "kicker": "Contato",

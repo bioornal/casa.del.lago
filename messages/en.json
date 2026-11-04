@@ -104,23 +104,33 @@
   },
   "manifiesto": {
     "kicker": "The house",
-    "title": "The day ends watching the sunset over the water.",
+    "title": "The day ends watching the sunset <em>over the water.</em>",
     "body": "Days of dock, kayak and water; nights of open sky and silence. We supply the calm.",
-    "link": "Discover the place →"
+    "link": "Discover the place →",
+    "caption": "the lake, from the shore",
+    "photoAlt": "Lake Urugua-í at sunset, the sky reflected on the water"
   },
   "units": {
     "sectionKicker": "Cabins",
-    "sectionTitle": "Each cabin looks at the lake its own way.",
+    "sectionTitle": "Each cabin looks at the lake <em>its own way.</em>",
     "viewAll": "Check availability →",
     "fromPrice": "From {price}",
     "perNight": "a night",
+    "cta": "See the cabin",
+    "specGuests": "Guests",
+    "guestsValue": "Up to {n}",
+    "specBedrooms": "Bedrooms",
+    "specArea": "Size",
+    "specOutdoor": "Outdoors",
+    "outdoorValue": "Pool and grill",
+    "insetAlt": "Inside {name}",
     "aratiri": {
       "name": "Cabaña Aguaribay",
-      "sub": "Up to 6 guests · 2 bedrooms · porch with grill · lake view"
+      "feat": "Two bedrooms, a porch with a grill and the lake right in front."
     },
     "aguaribay": {
       "name": "Cabaña Aratirí",
-      "sub": "Up to 7 guests · 1 bedroom · wood stove · deck on the water"
+      "feat": "A wood stove for the evenings and a deck on the water."
     },
     "note": "Every cabin has its own pool and its own grill. Both include linens, wifi, parking and dock access."
   },
@@ -154,6 +164,7 @@
     "body": "On the shores of Lake Urugua-í, right off the old RN12 between Puerto Iguazú and Puerto Libertad: paved road access and parking at the door. For Foz and Ciudad del Este, allow extra time for border crossings.",
     "checkin": "Check-in 3 pm · Check-out 11 am",
     "mapLink": "Open in Maps →",
+    "photoAlt": "Lake Urugua-í at dusk, mist over the water and the forest on the far shore",
     "rows": {
       "igr": {
         "place": "Iguazú Airport (IGR)",
@@ -242,11 +253,12 @@
   },
   "cta": {
     "kicker": "Book",
-    "title": "Tell us when you're coming.",
+    "title": "Tell us when <em>you're coming.</em>",
     "body": "Write to us and we'll arrange the stay. We're the hosts: we answer ourselves, with no middlemen and no commissions.",
     "bookNow": "Book now",
     "whatsapp": "WhatsApp",
-    "handwritten": "See you soon!"
+    "handwritten": "See you soon!",
+    "photoAlt": "The cabin at night, string lights glowing over the pool"
   },
   "contacto": {
     "kicker": "Contact",

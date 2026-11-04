@@ -104,23 +104,33 @@
   },
   "manifiesto": {
     "kicker": "La casa",
-    "title": "El día termina mirando el atardecer sobre el agua.",
+    "title": "El día termina mirando el atardecer <em>sobre el agua.</em>",
     "body": "Días de muelle, kayak y agua; noches de cielo abierto y silencio. Nosotros ponemos la calma.",
-    "link": "Conocé el lugar →"
+    "link": "Conocé el lugar →",
+    "caption": "el lago, desde la orilla",
+    "photoAlt": "El lago Urugua-í al atardecer, el cielo reflejado en el agua"
   },
   "units": {
     "sectionKicker": "Cabañas",
-    "sectionTitle": "Cada cabaña mira el lago de otra manera.",
+    "sectionTitle": "Cada cabaña mira el lago <em>de otra manera.</em>",
     "viewAll": "Consultar disponibilidad →",
     "fromPrice": "Desde {price}",
     "perNight": "la noche",
+    "cta": "Ver la cabaña",
+    "specGuests": "Huéspedes",
+    "guestsValue": "Hasta {n}",
+    "specBedrooms": "Dormitorios",
+    "specArea": "Superficie",
+    "specOutdoor": "Exterior",
+    "outdoorValue": "Pileta y parrilla",
+    "insetAlt": "Interior de la {name}",
     "aratiri": {
       "name": "Cabaña Aguaribay",
-      "sub": "Hasta 6 huéspedes · 2 dormitorios · galería con parrilla · vista al lago"
+      "feat": "Dos dormitorios, galería con parrilla y el lago de frente."
     },
     "aguaribay": {
       "name": "Cabaña Aratirí",
-      "sub": "Hasta 7 huéspedes · 1 dormitorio · salamandra · deck al agua"
+      "feat": "Salamandra para las noches y un deck al agua."
     },
     "note": "Cada cabaña tiene su pileta y su parrilla. Las dos incluyen ropa blanca, wifi, estacionamiento y acceso al muelle."
   },
@@ -154,6 +164,7 @@
     "body": "A orillas del lago Urugua-í, sobre la Ex RN12 entre Puerto Iguazú y Puerto Libertad: llegás por asfalto y estacionás en la puerta. Para Foz y Ciudad del Este, sumá el tiempo de aduana.",
     "checkin": "Check-in 15 h · Check-out 11 h",
     "mapLink": "Abrir en Maps →",
+    "photoAlt": "El lago Urugua-í al anochecer, con bruma sobre el agua y el monte en la otra orilla",
     "rows": {
       "igr": {
         "place": "Aeropuerto de Iguazú (IGR)",
@@ -242,11 +253,12 @@
   },
   "cta": {
     "kicker": "Reservá",
-    "title": "Contanos cuándo venís.",
+    "title": "Contanos cuándo <em>venís.</em>",
     "body": "Escribinos y coordinamos la estadía. Somos los anfitriones: contestamos nosotros, sin intermediarios ni comisiones.",
     "bookNow": "Reservar ahora",
     "whatsapp": "WhatsApp",
-    "handwritten": "¡Te esperamos!"
+    "handwritten": "¡Te esperamos!",
+    "photoAlt": "La cabaña de noche, con las guirnaldas encendidas sobre la pileta"
   },
   "contacto": {
     "kicker": "Contacto",
